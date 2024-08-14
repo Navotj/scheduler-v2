@@ -2,14 +2,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const port = process.env.PORT || 5000;
+const saltRounds = 10;
+const jwtSecret = 'your_jwt_secret';  // Replace with your own secret
 
 app.use(cors());
 app.use(bodyParser.json());
 
-// MongoDB connection with proper error handling
+// MongoDB connection to the "scheduler" database
 mongoose.connect('mongodb://localhost:27017/scheduler', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -19,71 +23,47 @@ mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to MongoDB');
 });
 
-mongoose.connection.on('error', (err) => {
-    console.error('Mongoose connection error:', err);
-});
-
-mongoose.connection.on('disconnected', () => {
-    console.log('Mongoose disconnected');
-});
-
-mongoose.connection.on('reconnected', () => {
-    console.log('Mongoose reconnected to MongoDB');
-});
-
-process.on('SIGINT', async () => {
-    await mongoose.connection.close();
-    console.log('Mongoose connection closed due to app termination');
-    process.exit(0);
-});
-
-// Define your schemas and routes below
-const availabilitySchema = new mongoose.Schema({
-    times: [{ start: Number, end: Number }]
-});
-
-const weekAvailabilitySchema = new mongoose.Schema({
+// Define the user schema and ensure it's stored in the "users" collection
+const userSchema = new mongoose.Schema({
     username: String,
-    week: Number,
-    availability: [availabilitySchema]
-});
+    password: String,
+}, { collection: 'users' });
 
-const WeekAvailability = mongoose.model('WeekAvailability', weekAvailabilitySchema);
+const User = mongoose.model('User', userSchema);
 
-app.post('/save', async (req, res) => {
-    const { username, week, availability } = req.body;
+// Sign Up Route
+app.post('/signup', async (req, res) => {
+    const { username, password } = req.body;
     try {
-        let weekAvailability = await WeekAvailability.findOne({ username, week });
-        if (weekAvailability) {
-            // Clear existing availability before saving new data
-            weekAvailability.availability = [{ times: availability }];
-        } else {
-            weekAvailability = new WeekAvailability({
-                username,
-                week,
-                availability: [{ times: availability }]
-            });
-        }
-        await weekAvailability.save();
-        res.send('User week availability saved');
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const newUser = new User({ username, password: hashedPassword });
+        await newUser.save();
+        res.status(201).send('User registered');
     } catch (error) {
-        console.error('Error saving user availability:', error);
-        res.status(500).send('Error saving user availability');
+        console.error('Error signing up user:', error);
+        res.status(500).send('Error signing up user');
     }
 });
 
-app.get('/availability/:username/:week', async (req, res) => {
-    const { username, week } = req.params;
+// Login Route
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
     try {
-        const weekAvailability = await WeekAvailability.findOne({ username, week });
-        if (weekAvailability) {
-            res.json(weekAvailability.availability);
-        } else {
-            res.json([]);
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(401).send('Invalid username or password');
         }
+
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            return res.status(401).send('Invalid username or password');
+        }
+
+        const token = jwt.sign({ username: user.username }, jwtSecret, { expiresIn: '1h' });
+        res.json({ token });
     } catch (error) {
-        console.error('Error fetching user availability:', error);
-        res.status(500).send('Error fetching user availability');
+        console.error('Error logging in user:', error);
+        res.status(500).send('Error logging in user');
     }
 });
 

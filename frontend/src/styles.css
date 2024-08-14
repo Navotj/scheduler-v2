@@ -1,5 +1,3 @@
-/* Updated styles.css to ensure table visibility */
-
 body {
     margin: 0;
     padding: 0;
@@ -8,121 +6,171 @@ body {
     color: #e0e0e0;
     height: 100vh;
     overflow: hidden;
-}
-
-#usernamePrompt {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
 }
 
-#usernamePrompt label, #usernamePrompt input, #usernamePrompt button {
-    margin: 5px;
-}
-
-#weeklyView {
-    display: flex;
-    height: 100%;
-    overflow: hidden;
-}
-
-#weeksList {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
-    width: auto;
-    padding: 10px;
-    box-sizing: border-box;
-    min-width: 200px;
-}
-
-.week {
-    cursor: pointer;
-    margin: 2px 0;
-    padding: 10px;
+#sidebar {
+    width: 250px;
+    height: 100vh;
     background-color: #1e1e1e;
-    border-radius: 4px;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    max-width: 100%;
-}
-
-.week:hover {
-    background-color: #333;
-}
-
-#availabilityPickerContainer {
-    flex-grow: 1;
-    margin-left: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: width 0.3s;
+    overflow-x: hidden;
+    z-index: 1000;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    width: 75%;  
     flex-direction: column;
+    padding-top: 60px;
 }
 
-.week.selected {
-    background-color: #555;
+#sidebar.collapsed {
+    width: 60px;
 }
 
-table {
-    width: 100%;
-    table-layout: fixed;
-    visibility: visible;  /* Ensure table is visible */
-}
-
-th, td {
-    border: 1px solid #444;
-    visibility: visible;  /* Ensure table cells are visible */
-}
-
-th {
-    padding: 5px;
-    text-align: center;
-    color: #e0e0e0;
-    font-size: 16px;
-}
-
-td.dayLabel {
-    text-align: right;
-    padding-right: 10px;
-    font-weight: bold;
-    user-select: none;
-    height: 40px;
-}
-
-td.timeLabel {
-    text-align: center;
-    font-weight: bold;
-    font-size: 14px;
-    height: 40px;
-}
-
-td.slot {
-    cursor: pointer;
-    width: 100%;
+.toggle-btn {
+    position: absolute;
+    top: 0;
+    left: 220px;
+    width: 20px;
     height: 20px;
-    user-select: none;
-}
-
-td.slot.clicked {
-    background-color: #14e14a;
-}
-
-button {
     cursor: pointer;
-    padding: 10px 15px;
+    font-size: 20px;
+    margin: 10px;
+}
+
+#sidebar.collapsed .toggle-btn {
+    left: 10px;
+}
+
+#main-content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: margin-left 0.3s;
+    flex-grow: 1;
+    background-color: #282828;
+}
+
+#main-content.collapsed {
+    margin-left: 60px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+button, input[type="text"], input[type="password"] {
     background-color: #333;
     color: #fff;
     border: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 5px 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-button:hover {
+button:hover, input[type="text"]:hover, input[type="password"]:hover {
+    background-color: #444;
+}
+
+button:active, input[type="text"]:active, input[type="password"]:active {
+    background-color: #555;
+}
+
+/* Availability Table Styling */
+#availabilityPickerContainer {
+    margin-right: 20px;
+    flex-grow: 1;
+}
+
+#availabilityPickerContainer table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    user-select: none;
+}
+
+#availabilityPickerContainer th, #availabilityPickerContainer td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #444;
+    color: #fff;
+}
+
+#availabilityPickerContainer th {
+    background-color: #333;
+}
+
+#availabilityPickerContainer td {
+    background-color: #1e1e1e;
+    cursor: pointer;
+}
+
+#availabilityPickerContainer td:hover {
+    background-color: #555;
+}
+
+#availabilityPickerContainer td.selected {
+    background-color: #4caf50;
+}
+
+#availabilityPickerContainer td.unavailable {
+    background-color: #f44336;
+}
+
+/* Action Buttons */
+#actionButtons {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    flex-grow: 1;
+}
+
+#actionButtons button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 0 5px;
+}
+
+#actionButtons button:hover {
+    background-color: #444;
+}
+
+#actionButtons button:active {
+    background-color: #555;
+}
+
+/* Week Buttons Styling */
+.week-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    overflow-x: auto;
+}
+
+.week-buttons button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 0 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.week-buttons button:hover {
+    background-color: #444;
+}
+
+.week-buttons button:active {
     background-color: #555;
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const AvailabilityPicker = ({ week, onAvailabilitySubmit, username }) => {
+const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailabilitySubmit, username }) => {
     const [availability, setAvailability] = useState({});
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState(null);
@@ -8,18 +8,20 @@ const AvailabilityPicker = ({ week, onAvailabilitySubmit, username }) => {
     const [dragAction, setDragAction] = useState('add'); // Default to "add" mode
 
     useEffect(() => {
-        if (!week || !week.startDate) {
-            console.error('Invalid week data:', week);
-            return;
+        console.log('Initial availability:', initialAvailability);
+        if (initialAvailability && initialAvailability.length > 0) {
+            const availabilityMap = {};
+            initialAvailability[0].times.forEach(range => {
+                for (let i = range.start; i < range.end; i++) {
+                    availabilityMap[i] = true;
+                }
+            });
+            setAvailability(availabilityMap);
+        } else {
+            // Clear the availability if no data is fetched
+            setAvailability({});
         }
-
-        const initializeAvailability = () => {
-            const initialAvailability = {};
-            setAvailability(initialAvailability);
-        };
-
-        initializeAvailability();
-    }, [week]);
+    }, [initialAvailability]);
 
     const updateAvailability = (slot, action) => {
         setAvailability(prev => {
@@ -44,7 +46,7 @@ const AvailabilityPicker = ({ week, onAvailabilitySubmit, username }) => {
     const handleMouseDown = (rowIndex, columnIndex) => {
         setIsDragging(true);
         setDragStart([rowIndex, columnIndex]);
-        setDragEnd([rowIndex, columnIndex]); // Initialize dragEnd
+        setDragEnd([rowIndex, columnIndex]); // Initialize dragEnd correctly
     };
 
     const handleMouseEnter = (rowIndex, columnIndex) => {
@@ -74,22 +76,23 @@ const AvailabilityPicker = ({ week, onAvailabilitySubmit, username }) => {
         resetDraggingState();
     };
 
-    // This function determines if a cell is within the drag area and returns the appropriate style
     const getDragStyle = (rowIndex, columnIndex) => {
         if (!dragStart || !dragEnd) return {};
+        
         const [startRow, startColumn] = dragStart;
         const [endRow, endColumn] = dragEnd;
-
+    
         const isWithinDragArea =
             rowIndex >= Math.min(startRow, endRow) &&
             rowIndex <= Math.max(startRow, endRow) &&
             columnIndex >= Math.min(startColumn, endColumn) &&
             columnIndex <= Math.max(startColumn, endColumn);
-
+    
         return isWithinDragArea
             ? { backgroundColor: dragAction === 'add' ? 'rgba(0, 255, 0, 0.5)' : 'rgba(255, 0, 0, 0.5)' }
             : {};
     };
+    
 
     const handleMouseLeaveTable = () => {
         if (isDragging) {
@@ -100,9 +103,9 @@ const AvailabilityPicker = ({ week, onAvailabilitySubmit, username }) => {
     const handleSave = async () => {
         const formattedAvailability = [];
         let currentRange = null;
-    
+
         const sortedSlots = Object.keys(availability).map(Number).sort((a, b) => a - b);
-    
+
         sortedSlots.forEach(slot => {
             if (currentRange === null) {
                 currentRange = { start: slot, end: slot + 1 };
@@ -113,17 +116,17 @@ const AvailabilityPicker = ({ week, onAvailabilitySubmit, username }) => {
                 currentRange = { start: slot, end: slot + 1 };
             }
         });
-    
+
         if (currentRange) {
             formattedAvailability.push(currentRange);
         }
-    
+
         const payload = {
             username,
             week: week.weekNumber,
             availability: formattedAvailability
         };
-    
+
         console.log('Submitting availability:', payload);
         await fetch('http://localhost:5000/save', {
             method: 'POST',
@@ -131,9 +134,8 @@ const AvailabilityPicker = ({ week, onAvailabilitySubmit, username }) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(payload),
-        });        
+        });
     };
-    
 
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const timeSlots = Array(24).fill(null).map((_, i) => `${i}`);
@@ -249,6 +251,19 @@ const AvailabilityPicker = ({ week, onAvailabilitySubmit, username }) => {
                     onClick={handleSave}
                 >
                     Save
+                </button>
+                <button
+                    style={{
+                        backgroundColor: 'darkred',
+                        color: 'white',
+                        padding: '10px',
+                        flex: 0.48,
+                        cursor: 'pointer',
+                        border: '2px solid red', // Make it more obvious
+                    }}
+                    onClick={() => setAvailability({})} // Clears the availability data
+                >
+                    Clear All
                 </button>
             </div>
         </div>

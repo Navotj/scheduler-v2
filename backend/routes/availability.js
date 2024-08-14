@@ -34,14 +34,25 @@ router.get('/availability/:username/:week', async (req, res) => {
     try {
         const weekAvailability = await WeekAvailability.findOne({ username, week });
         if (weekAvailability) {
-            res.json(weekAvailability.availability);
+            res.json({
+                username: weekAvailability.username,
+                week: weekAvailability.week,
+                availability: weekAvailability.availability,
+                __v: weekAvailability.__v
+            });
         } else {
-            res.json([]);
+            res.json({
+                username,
+                week,
+                availability: [],
+                __v: 0
+            });
         }
     } catch (error) {
         console.error('Error fetching user availability:', error);
         res.status(500).send('Error fetching user availability');
     }
 });
+
 
 module.exports = router;
