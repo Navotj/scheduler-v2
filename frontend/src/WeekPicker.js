@@ -8,10 +8,23 @@ const WeekPicker = ({ username, onWeekSelect }) => {
         populateWeeks();
     }, []);
 
+    useEffect(() => {
+        // Automatically select the current week upon component mount
+        if (weeks.length > 0) {
+            const currentWeek = weeks.find(week => {
+                const today = new Date();
+                return week.startDate <= today && today <= week.endDate;
+            });
+            if (currentWeek) {
+                setSelectedWeek(currentWeek);
+                onWeekSelect(currentWeek);
+            }
+        }
+    }, [weeks]);
+
     const populateWeeks = () => {
         const today = new Date();
-        const currentWeekStart = new Date(today);
-        currentWeekStart.setDate(today.getDate() - today.getDay());
+        const currentWeekStart = getStartOfWeek(today);
 
         const weeksArray = [];
 
@@ -24,12 +37,18 @@ const WeekPicker = ({ username, onWeekSelect }) => {
 
             weeksArray.push({
                 weekNumber,
-                startOfWeek,
-                endOfWeek,
+                startDate: startOfWeek,
+                endDate: endOfWeek,
             });
         }
 
         setWeeks(weeksArray);
+    };
+
+    const getStartOfWeek = (date) => {
+        const day = date.getDay();
+        const diff = date.getDate() - day;
+        return new Date(date.setDate(diff));
     };
 
     const getWeekNumber = (date) => {
@@ -63,7 +82,7 @@ const WeekPicker = ({ username, onWeekSelect }) => {
                         flex: '1',
                     }}
                 >
-                    Week {week.weekNumber} ({week.startOfWeek.toLocaleDateString()} - {week.endOfWeek.toLocaleDateString()})
+                    Week {week.weekNumber} ({week.startDate.toLocaleDateString()} - {week.endDate.toLocaleDateString()})
                 </div>
             ))}
         </div>

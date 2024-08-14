@@ -39,7 +39,6 @@ process.on('SIGINT', async () => {
 
 // Define your schemas and routes below
 const availabilitySchema = new mongoose.Schema({
-    day: Number,
     times: [{ start: Number, end: Number }]
 });
 
@@ -56,9 +55,14 @@ app.post('/save', async (req, res) => {
     try {
         let weekAvailability = await WeekAvailability.findOne({ username, week });
         if (weekAvailability) {
-            weekAvailability.availability = availability;
+            // Clear existing availability before saving new data
+            weekAvailability.availability = [{ times: availability }];
         } else {
-            weekAvailability = new WeekAvailability({ username, week, availability });
+            weekAvailability = new WeekAvailability({
+                username,
+                week,
+                availability: [{ times: availability }]
+            });
         }
         await weekAvailability.save();
         res.send('User week availability saved');

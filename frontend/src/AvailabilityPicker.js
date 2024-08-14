@@ -1,75 +1,256 @@
-// Updated AvailabilityPicker.js
-
 import React, { useState, useEffect } from 'react';
 
-const AvailabilityPicker = ({ week, onAvailabilitySubmit }) => {
-    const [availability, setAvailability] = useState([]);
+const AvailabilityPicker = ({ week, onAvailabilitySubmit, username }) => {
+    const [availability, setAvailability] = useState({});
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragStart, setDragStart] = useState(null);
+    const [dragEnd, setDragEnd] = useState(null);
+    const [dragAction, setDragAction] = useState('add'); // Default to "add" mode
 
     useEffect(() => {
+        if (!week || !week.startDate) {
+            console.error('Invalid week data:', week);
+            return;
+        }
+
         const initializeAvailability = () => {
-            const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            const hoursInDay = 24;
-
-            const initialAvailability = daysOfWeek.map(() =>
-                Array(hoursInDay).fill(false)
-            );
-
+            const initialAvailability = {};
             setAvailability(initialAvailability);
         };
 
         initializeAvailability();
     }, [week]);
 
-    const toggleSlot = (dayIndex, slotIndex) => {
-        const newAvailability = availability.map((day, dIndex) =>
-            day.map((slot, sIndex) =>
-                dIndex === dayIndex && sIndex === slotIndex ? !slot : slot
-            )
-        );
+    const updateAvailability = (slot, action) => {
+        setAvailability(prev => {
+            const newAvailability = { ...prev };
 
-        setAvailability(newAvailability);
+            if (action === 'add') {
+                newAvailability[slot] = true;
+            } else if (action === 'remove') {
+                delete newAvailability[slot];
+            }
+
+            return newAvailability;
+        });
     };
 
-    const handleSubmit = () => {
-        onAvailabilitySubmit(availability);
+    const resetDraggingState = () => {
+        setIsDragging(false);
+        setDragStart(null);
+        setDragEnd(null);
     };
+
+    const handleMouseDown = (rowIndex, columnIndex) => {
+        setIsDragging(true);
+        setDragStart([rowIndex, columnIndex]);
+        setDragEnd([rowIndex, columnIndex]); // Initialize dragEnd
+    };
+
+    const handleMouseEnter = (rowIndex, columnIndex) => {
+        if (isDragging) {
+            setDragEnd([rowIndex, columnIndex]);
+        }
+    };
+
+    const handleMouseUp = () => {
+        if (isDragging && dragStart && dragEnd) {
+            const [startRow, startColumn] = dragStart;
+            const [endRow, endColumn] = dragEnd;
+
+            const startRowMin = Math.min(startRow, endRow);
+            const startColumnMin = Math.min(startColumn, endColumn);
+            const endRowMax = Math.max(startRow, endRow);
+            const endColumnMax = Math.max(startColumn, endColumn);
+
+            // Mark the entire rectangular area based on rows and columns
+            for (let row = startRowMin; row <= endRowMax; row++) {
+                for (let column = startColumnMin; column <= endColumnMax; column++) {
+                    const slot = row * 48 + column;
+                    updateAvailability(slot, dragAction);
+                }
+            }
+        }
+        resetDraggingState();
+    };
+
+    // This function determines if a cell is within the drag area and returns the appropriate style
+    const getDragStyle = (rowIndex, columnIndex) => {
+        if (!dragStart || !dragEnd) return {};
+        const [startRow, startColumn] = dragStart;
+        const [endRow, endColumn] = dragEnd;
+
+        const isWithinDragArea =
+            rowIndex >= Math.min(startRow, endRow) &&
+            rowIndex <= Math.max(startRow, endRow) &&
+            columnIndex >= Math.min(startColumn, endColumn) &&
+            columnIndex <= Math.max(startColumn, endColumn);
+
+        return isWithinDragArea
+            ? { backgroundColor: dragAction === 'add' ? 'rgba(0, 255, 0, 0.5)' : 'rgba(255, 0, 0, 0.5)' }
+            : {};
+    };
+
+    const handleMouseLeaveTable = () => {
+        if (isDragging) {
+            resetDraggingState();
+        }
+    };
+
+    const handleSave = async () => {
+        const formattedAvailability = [];
+        let currentRange = null;
+    
+        const sortedSlots = Object.keys(availability).map(Number).sort((a, b) => a - b);
+    
+        sortedSlots.forEach(slot => {
+            if (currentRange === null) {
+                currentRange = { start: slot, end: slot + 1 };
+            } else if (currentRange.end === slot) {
+                currentRange.end = slot + 1;
+            } else {
+                formattedAvailability.push(currentRange);
+                currentRange = { start: slot, end: slot + 1 };
+            }
+        });
+    
+        if (currentRange) {
+            formattedAvailability.push(currentRange);
+        }
+    
+        const payload = {
+            username,
+            week: week.weekNumber,
+            availability: formattedAvailability
+        };
+    
+        console.log('Submitting availability:', payload);
+        await fetch('http://localhost:5000/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });        
+    };
+    
 
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const timeSlots = Array(24).fill(null).map((_, i) => `${i.toString().padStart(2, '0')}`);
-    const weekStartDate = new Date(week.startDate); // Assuming week.startDate is available
+    const timeSlots = Array(24).fill(null).map((_, i) => `${i}`);
+
+    const weekStartDate = new Date(week.startDate);
 
     return (
-        <div>
-            <table>
-                <thead>
-                    <tr>
-                        <th></th>
-                        {timeSlots.map((time, index) => (
-                            <th key={index} className="timeLabel">{time}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {availability.map((day, dayIndex) => {
-                        const currentDate = new Date(weekStartDate);
-                        currentDate.setDate(weekStartDate.getDate() + dayIndex);
-                        const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
-                        return (
-                            <tr key={dayIndex}>
-                                <td className="dayLabel">{daysOfWeek[dayIndex]} | {formattedDate}</td>
-                                {day.map((slot, slotIndex) => (
+        <div
+            style={{ overflowX: 'auto', height: 'calc(100vh - 50px)', display: 'flex' }}
+            onMouseUp={handleMouseUp} // Ensure mouse up is caught if outside the table
+        >
+            <div style={{ flexGrow: 1 }}>
+                <table
+                    onMouseLeave={handleMouseLeaveTable} // Reset dragging if mouse leaves table
+                    style={{ width: '100%', tableLayout: 'fixed', height: '100%' }}
+                >
+                    <thead>
+                        <tr>
+                            <th style={{ width: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', backgroundColor: '#333' }}></th>
+                            {timeSlots.map((time, index) => (
+                                <th
+                                    key={index}
+                                    colSpan={2} // Each hour spans two columns (30 min each)
+                                    className="timeLabel"
+                                    style={{ minWidth: '40px', backgroundColor: '#333' }} // Adjust width for each hour slot
+                                >
+                                    {time}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {daysOfWeek.map((day, dayIndex) => {
+                            const currentDate = new Date(weekStartDate);
+                            currentDate.setDate(weekStartDate.getDate() + dayIndex);
+                            const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
+                            return (
+                                <tr key={dayIndex}>
                                     <td
-                                        key={slotIndex}
-                                        className={`slot ${slot ? 'clicked' : ''}`}
-                                        onClick={() => toggleSlot(dayIndex, slotIndex)}
-                                    />
-                                ))}
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
-            <button onClick={handleSubmit}>Submit Availability</button>
+                                        className="dayLabel"
+                                        style={{
+                                            width: '100px',
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            backgroundColor: '#333',
+                                            textAlign: 'center',
+                                            fontWeight: 'bold',
+                                        }}
+                                    >
+                                        {day} | {formattedDate}
+                                    </td>
+                                    {Array(48).fill(null).map((_, slotIndex) => {
+                                        const slot = dayIndex * 48 + slotIndex;
+                                        return (
+                                            <td
+                                                key={slotIndex}
+                                                className={`slot ${availability[slot] ? 'clicked' : ''}`}
+                                                onMouseDown={() => handleMouseDown(dayIndex, slotIndex)}
+                                                onMouseEnter={() => handleMouseEnter(dayIndex, slotIndex)}
+                                                onMouseUp={handleMouseUp}
+                                                style={{
+                                                    minWidth: '20px',
+                                                    maxWidth: '40px',
+                                                    height: 'calc(100% / 7)',
+                                                    borderRight: slotIndex % 2 === 1 ? '2px solid #555' : 'none',
+                                                    outline: 'none',
+                                                    backgroundColor: availability[slot] ? '#0f0' : '',
+                                                    ...getDragStyle(dayIndex, slotIndex), // Apply drag style here
+                                                }}
+                                            />
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+            <div style={{ marginLeft: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+                <button
+                    style={{
+                        backgroundColor: dragAction === 'add' ? 'darkgreen' : 'green',
+                        color: 'white',
+                        padding: '10px',
+                        flex: 0.23,
+                        cursor: 'pointer'
+                    }}
+                    onClick={() => setDragAction('add')}
+                >
+                    +
+                </button>
+                <button
+                    style={{
+                        backgroundColor: dragAction === 'remove' ? 'darkred' : 'red',
+                        color: 'white',
+                        padding: '10px',
+                        flex: 0.23,
+                        cursor: 'pointer'
+                    }}
+                    onClick={() => setDragAction('remove')}
+                >
+                    -
+                </button>
+                <button
+                    style={{
+                        backgroundColor: 'grey',
+                        color: 'white',
+                        padding: '10px',
+                        flex: 0.48,
+                        cursor: 'pointer'
+                    }}
+                    onClick={handleSave}
+                >
+                    Save
+                </button>
+            </div>
         </div>
     );
 };

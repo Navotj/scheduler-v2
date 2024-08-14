@@ -1,8 +1,6 @@
-
 const express = require('express');
-const WeekAvailability = require('../models/WeekAvailability');
-
 const router = express.Router();
+const WeekAvailability = require('./WeekAvailability');
 
 // API to save user availability
 router.post('/save', async (req, res) => {
@@ -12,10 +10,14 @@ router.post('/save', async (req, res) => {
         let weekAvailability = await WeekAvailability.findOne({ username, week });
         if (weekAvailability) {
             // Update availability for the specific week
-            weekAvailability.availability = availability;
+            weekAvailability.availability = [{ times: availability }];
         } else {
             // Create new week availability entry
-            weekAvailability = new WeekAvailability({ username, week, availability });
+            weekAvailability = new WeekAvailability({
+                username,
+                week,
+                availability: [{ times: availability }]
+            });
         }
         await weekAvailability.save();
         console.log('User week availability saved:', weekAvailability);
@@ -26,17 +28,14 @@ router.post('/save', async (req, res) => {
     }
 });
 
-// API to get user availability
+// API to get user availability for a specific week
 router.get('/availability/:username/:week', async (req, res) => {
     const { username, week } = req.params;
-    console.log('Received get availability request for username:', username, 'week:', week);
     try {
         const weekAvailability = await WeekAvailability.findOne({ username, week });
         if (weekAvailability) {
-            console.log('User week availability found:', weekAvailability.availability);
             res.json(weekAvailability.availability);
         } else {
-            console.log('Week availability not found');
             res.json([]);
         }
     } catch (error) {

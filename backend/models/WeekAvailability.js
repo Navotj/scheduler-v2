@@ -1,9 +1,6 @@
-
 const mongoose = require('mongoose');
 
-// Define a schema for user availability with separate week field
 const availabilitySchema = new mongoose.Schema({
-    day: Number,
     times: [{ start: Number, end: Number }]
 });
 
@@ -13,4 +10,6 @@ const weekAvailabilitySchema = new mongoose.Schema({
     availability: [availabilitySchema]
 });
 
-module.exports = mongoose.model('WeekAvailability', weekAvailabilitySchema);
+const WeekAvailability = mongoose.model('WeekAvailability', weekAvailabilitySchema);
+
+module.exports = WeekAvailability;
