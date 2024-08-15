@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import './styles.css';
 
-const Login = () => {
+const Login = ({ navigateTo, onLoginSuccess }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -16,10 +17,35 @@ const Login = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                // Save token to local storage or handle login success
                 console.log('Login successful', data);
+                localStorage.setItem('token', data.token);
+                onLoginSuccess(username);  // Pass the username to the parent component
+                navigateTo('mySchedule');
             } else {
                 console.error('Login failed');
+                alert('Login failed, please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred, please try again later.');
+        }
+    };
+
+    const handleSignUp = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (response.ok) {
+                console.log('Sign-up successful');
+                navigateTo('login');  // Redirect to login after successful sign-up
+            } else {
+                console.error('Sign-up failed');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -28,20 +54,28 @@ const Login = () => {
 
     return (
         <div className="login-container">
-            <h2>Login</h2>
-            <input 
-                type="text" 
-                placeholder="Username" 
-                value={username} 
-                onChange={(e) => setUsername(e.target.value)} 
-            />
-            <input 
-                type="password" 
-                placeholder="Password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-            />
-            <button onClick={handleLogin}>Login</button>
+            <div className="login-box">
+                <h2>Login</h2>
+                <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <button onClick={handleLogin}>Login</button>
+                <p style={{ cursor: 'pointer', fontSize: '0.9em' }} onClick={() => alert('Forgot your password? Functionality coming soon!')}>
+                    Forgot your password?
+                </p>
+                <p onClick={handleSignUp} style={{ cursor: 'pointer', fontSize: '0.9em' }}>
+                    Sign up
+                </p>
+            </div>
         </div>
     );
 };

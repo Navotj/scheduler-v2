@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const availabilityRoutes = require('./routes/availability');
+const gameRoutes = require('./routes/games'); // Add game routes
 
 const app = express();
 
@@ -14,17 +15,13 @@ app.use(cors({
     allowedHeaders: 'Content-Type, Authorization'
 }));
 
-
-
 const port = process.env.PORT || 5000;
 const saltRounds = 10;
 const jwtSecret = '9e0274ce3e08ef40f347bdce8d9ccbae19de135972384a164d4a0fa09108f13a7156326849ff324b6edcc2124891db0f9c70ca6c4d316bcc359a64b23dea706d';  // Replace with your own secret
 
-const availabilityRoutes = require('./routes/availability');
-
-
-app.use('/', availabilityRoutes);
 app.use(bodyParser.json());
+app.use('/', availabilityRoutes);
+app.use('/games', gameRoutes); // Use the game routes
 
 // MongoDB connection to the "scheduler" database
 mongoose.connect('mongodb://localhost:27017/scheduler', {
