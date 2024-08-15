@@ -6,18 +6,25 @@ const WeekAvailability = require('../models/WeekAvailability');
 router.post('/save', async (req, res) => {
     const { username, week, availability } = req.body;
     console.log('Received save request:', req.body);
+
     try {
         let weekAvailability = await WeekAvailability.findOne({ username, week });
+        console.log('Found week availability:', weekAvailability);
+
         if (weekAvailability) {
-            weekAvailability.availability = availability;
+            weekAvailability.availability = [{ times: availability }];
+            console.log('Updating existing week availability');
         } else {
             weekAvailability = new WeekAvailability({
                 username,
                 week,
                 availability: [{ times: availability }]
             });
+            console.log('Creating new week availability');
         }
+
         await weekAvailability.save();
+        console.log('Availability successfully saved');
         res.send('User week availability saved');
     } catch (error) {
         console.error('Error saving user availability:', error);
@@ -25,19 +32,22 @@ router.post('/save', async (req, res) => {
     }
 });
 
-
 router.get('/availability/:username/:week', async (req, res) => {
     const { username, week } = req.params;
+    console.log(`Fetching availability for user: ${username}, week: ${week}`);
+
     try {
         const weekAvailability = await WeekAvailability.findOne({ username, week });
         if (weekAvailability) {
+            console.log('Found availability:', weekAvailability);
             res.json({
                 username: weekAvailability.username,
                 week: weekAvailability.week,
-                availability: weekAvailability.availability,
+                availability: weekAvailability.availability.length > 0 ? weekAvailability.availability[0].times : [],
                 __v: weekAvailability.__v
             });
         } else {
+            console.log('No availability found for the user and week:', { username, week });
             res.json({
                 username,
                 week,
@@ -50,7 +60,6 @@ router.get('/availability/:username/:week', async (req, res) => {
         res.status(500).send('Error fetching user availability');
     }
 });
-
 
 
 module.exports = router;
