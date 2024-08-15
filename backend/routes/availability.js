@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const WeekAvailability = require('./WeekAvailability');
+const WeekAvailability = require('../models/WeekAvailability');
 
 // API to save user availability
 router.post('/save', async (req, res) => {
@@ -9,10 +9,8 @@ router.post('/save', async (req, res) => {
     try {
         let weekAvailability = await WeekAvailability.findOne({ username, week });
         if (weekAvailability) {
-            // Update availability for the specific week
-            weekAvailability.availability = [{ times: availability }];
+            weekAvailability.availability = availability;
         } else {
-            // Create new week availability entry
             weekAvailability = new WeekAvailability({
                 username,
                 week,
@@ -20,7 +18,6 @@ router.post('/save', async (req, res) => {
             });
         }
         await weekAvailability.save();
-        console.log('User week availability saved:', weekAvailability);
         res.send('User week availability saved');
     } catch (error) {
         console.error('Error saving user availability:', error);
@@ -28,7 +25,7 @@ router.post('/save', async (req, res) => {
     }
 });
 
-// API to get user availability for a specific week
+
 router.get('/availability/:username/:week', async (req, res) => {
     const { username, week } = req.params;
     try {
@@ -53,6 +50,7 @@ router.get('/availability/:username/:week', async (req, res) => {
         res.status(500).send('Error fetching user availability');
     }
 });
+
 
 
 module.exports = router;

@@ -69,20 +69,30 @@ const Main = () => {
     };
 
     const fetchAvailability = async (username, weekNumber) => {
-        console.log('Fetching availability for:', username, weekNumber);
         try {
-            const response = await fetch(`http://localhost:5000/availability/${username}/${weekNumber}`);
-            const data = await response.json();
-            console.log('Fetched data:', data);
-            setAvailability(data);
+            const response = await fetch(`http://localhost:5000/availability/${username}/${weekNumber}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` // if you are using JWT tokens
+                }
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                setAvailability(data);
+            } else {
+                console.error('Failed to fetch availability');
+            }
         } catch (error) {
             console.error('Error fetching availability:', error);
         }
     };
+    
 
     const handleAvailabilitySubmit = async (availabilityData) => {
         try {
-            const response = await fetch('http://localhost:5000/save', {
+            const response = await fetch('http://localhost:5000/save', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,7 +103,7 @@ const Main = () => {
                     availability: availabilityData,
                 }),
             });
-
+    
             if (response.ok) {
                 console.log('Availability saved successfully');
             } else {
@@ -103,6 +113,7 @@ const Main = () => {
             console.error('Error:', error);
         }
     };
+    
 
     return (
         <div>
@@ -177,8 +188,8 @@ const Main = () => {
                 )}
                 {activePage === 'mySchedule' && (
                     <div id="mySchedule">
-                        <div id="availabilityContainer">
-                            <div id="availabilityPickerContainer">
+                        <div id="availabilityContainer" style={{display: 'flex', flexDirection: 'row'}}>
+                            <div id="availabilityPickerContainer" style={{flexGrow: 1}}>
                                 {selectedWeek && (
                                     <AvailabilityPicker
                                         username={username}
@@ -188,15 +199,9 @@ const Main = () => {
                                     />
                                 )}
                             </div>
-                        </div>
-                        <div id="actionButtons">
-                            <button>+</button>
-                            <button>-</button>
-                            <button>Save</button>
-                            <button>Clear All</button>
-                        </div>
-                        <div id="weeksList" className="week-buttons">
-                            <WeekPicker username={username} onWeekSelect={handleWeekSelect} />
+                            <div id="weeksList" className="week-buttons">
+                                <WeekPicker username={username} onWeekSelect={handleWeekSelect} />
+                            </div>
                         </div>
                     </div>
                 )}

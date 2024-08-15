@@ -5,10 +5,9 @@ const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailab
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState(null);
     const [dragEnd, setDragEnd] = useState(null);
-    const [dragAction, setDragAction] = useState('add'); // Default to "add" mode
+    const [dragAction, setDragAction] = useState('add');
 
     useEffect(() => {
-        console.log('Initial availability:', initialAvailability);
         if (initialAvailability && initialAvailability.length > 0) {
             const availabilityMap = {};
             initialAvailability[0].times.forEach(range => {
@@ -18,7 +17,6 @@ const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailab
             });
             setAvailability(availabilityMap);
         } else {
-            // Clear the availability if no data is fetched
             setAvailability({});
         }
     }, [initialAvailability]);
@@ -46,7 +44,7 @@ const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailab
     const handleMouseDown = (rowIndex, columnIndex) => {
         setIsDragging(true);
         setDragStart([rowIndex, columnIndex]);
-        setDragEnd([rowIndex, columnIndex]); // Initialize dragEnd correctly
+        setDragEnd([rowIndex, columnIndex]);
     };
 
     const handleMouseEnter = (rowIndex, columnIndex) => {
@@ -65,7 +63,6 @@ const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailab
             const endRowMax = Math.max(startRow, endRow);
             const endColumnMax = Math.max(startColumn, endColumn);
 
-            // Mark the entire rectangular area based on rows and columns
             for (let row = startRowMin; row <= endRowMax; row++) {
                 for (let column = startColumnMin; column <= endColumnMax; column++) {
                     const slot = row * 48 + column;
@@ -103,9 +100,9 @@ const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailab
     const handleSave = async () => {
         const formattedAvailability = [];
         let currentRange = null;
-
+    
         const sortedSlots = Object.keys(availability).map(Number).sort((a, b) => a - b);
-
+    
         sortedSlots.forEach(slot => {
             if (currentRange === null) {
                 currentRange = { start: slot, end: slot + 1 };
@@ -116,26 +113,50 @@ const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailab
                 currentRange = { start: slot, end: slot + 1 };
             }
         });
-
+    
         if (currentRange) {
             formattedAvailability.push(currentRange);
         }
-
+    
         const payload = {
             username,
             week: week.weekNumber,
             availability: formattedAvailability
         };
-
-        console.log('Submitting availability:', payload);
-        await fetch('http://localhost:5000/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
+    
+        try {
+            const response = await fetch('http://localhost:5000/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+    
+            if (response.ok) {
+                console.log('Availability saved successfully');
+            } else {
+                console.error('Failed to save availability');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    
+    
+const response = await fetch('http://localhost:5000/save', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload)
+});
+if (response.ok) {
+    console.log('Availability saved successfully');
+} else {
+    console.error('Failed to save availability');
+}
     };
+    
 
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const timeSlots = Array(24).fill(null).map((_, i) => `${i}`);
@@ -144,85 +165,94 @@ const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailab
 
     return (
         <div
-            style={{ overflowX: 'auto', height: 'calc(100vh - 50px)', display: 'flex' }}
-            onMouseUp={handleMouseUp} // Ensure mouse up is caught if outside the table
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', position: 'relative', height: '100%' }}
         >
-            <div style={{ flexGrow: 1 }}>
-                <table
-                    onMouseLeave={handleMouseLeaveTable} // Reset dragging if mouse leaves table
-                    style={{ width: '100%', tableLayout: 'fixed', height: '100%' }}
-                >
-                    <thead>
-                        <tr>
-                            <th style={{ width: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', backgroundColor: '#333' }}></th>
-                            {timeSlots.map((time, index) => (
-                                <th
-                                    key={index}
-                                    colSpan={2} // Each hour spans two columns (30 min each)
-                                    className="timeLabel"
-                                    style={{ minWidth: '40px', backgroundColor: '#333' }} // Adjust width for each hour slot
-                                >
-                                    {time}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {daysOfWeek.map((day, dayIndex) => {
-                            const currentDate = new Date(weekStartDate);
-                            currentDate.setDate(weekStartDate.getDate() + dayIndex);
-                            const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
-                            return (
-                                <tr key={dayIndex}>
-                                    <td
-                                        className="dayLabel"
-                                        style={{
-                                            width: '100px',
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            backgroundColor: '#333',
-                                            textAlign: 'center',
-                                            fontWeight: 'bold',
-                                        }}
+            <div
+                style={{ overflowX: 'auto', flexGrow: 1, width: '100%' }}
+                onMouseUp={handleMouseUp}
+            >
+                <div style={{ flexGrow: 1 }}>
+                    <table
+                        onMouseLeave={handleMouseLeaveTable}
+                        style={{ width: '100%', tableLayout: 'fixed', height: '100%' }}
+                    >
+                        <thead>
+                            <tr>
+                                <th style={{ width: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', backgroundColor: '#333' }}></th>
+                                {timeSlots.map((time, index) => (
+                                    <th
+                                        key={index}
+                                        colSpan={2}
+                                        className="timeLabel"
+                                        style={{ minWidth: '40px', backgroundColor: '#333' }}
                                     >
-                                        {day} | {formattedDate}
-                                    </td>
-                                    {Array(48).fill(null).map((_, slotIndex) => {
-                                        const slot = dayIndex * 48 + slotIndex;
-                                        return (
-                                            <td
-                                                key={slotIndex}
-                                                className={`slot ${availability[slot] ? 'clicked' : ''}`}
-                                                onMouseDown={() => handleMouseDown(dayIndex, slotIndex)}
-                                                onMouseEnter={() => handleMouseEnter(dayIndex, slotIndex)}
-                                                onMouseUp={handleMouseUp}
-                                                style={{
-                                                    minWidth: '20px',
-                                                    maxWidth: '40px',
-                                                    height: 'calc(100% / 7)',
-                                                    borderRight: slotIndex % 2 === 1 ? '2px solid #555' : 'none',
-                                                    outline: 'none',
-                                                    backgroundColor: availability[slot] ? '#0f0' : '',
-                                                    ...getDragStyle(dayIndex, slotIndex), // Apply drag style here
-                                                }}
-                                            />
-                                        );
-                                    })}
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                                        {time}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {daysOfWeek.map((day, dayIndex) => {
+                                const currentDate = new Date(weekStartDate);
+                                currentDate.setDate(weekStartDate.getDate() + dayIndex);
+                                const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
+                                return (
+                                    <tr key={dayIndex}>
+                                        <td
+                                            className="dayLabel"
+                                            style={{
+                                                width: '100px',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                backgroundColor: '#333',
+                                                textAlign: 'center',
+                                                fontWeight: 'bold',
+                                            }}
+                                        >
+                                            {day} | {formattedDate}
+                                        </td>
+                                        {Array(48).fill(null).map((_, slotIndex) => {
+                                            const slot = dayIndex * 48 + slotIndex;
+                                            return (
+                                                <td
+                                                    key={slotIndex}
+                                                    className={`slot ${availability[slot] ? 'clicked' : ''}`}
+                                                    onMouseDown={() => handleMouseDown(dayIndex, slotIndex)}
+                                                    onMouseEnter={() => handleMouseEnter(dayIndex, slotIndex)}
+                                                    onMouseUp={handleMouseUp}
+                                                    style={{
+                                                        minWidth: '20px',
+                                                        maxWidth: '40px',
+                                                        height: 'calc(100% / 7)',
+                                                        borderRight: slotIndex % 2 === 1 ? '2px solid #555' : 'none',
+                                                        outline: 'none',
+                                                        backgroundColor: availability[slot] ? '#0f0' : '',
+                                                        ...getDragStyle(dayIndex, slotIndex),
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div style={{ marginLeft: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+
+            <div
+                id="actionButtons"
+                style={{ display: 'flex', justifyContent: 'center', position: 'relative', bottom: '0px', width: '100%', padding: '10px' }}
+            >
                 <button
                     style={{
-                        backgroundColor: dragAction === 'add' ? 'darkgreen' : 'green',
+                        backgroundColor: dragAction === 'add' ? 'darkgreen' : '#4a4a4a',
                         color: 'white',
                         padding: '10px',
+                        marginRight: '10px',
                         flex: 0.23,
-                        cursor: 'pointer'
+                        cursor: 'pointer',
                     }}
                     onClick={() => setDragAction('add')}
                 >
@@ -230,11 +260,12 @@ const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailab
                 </button>
                 <button
                     style={{
-                        backgroundColor: dragAction === 'remove' ? 'darkred' : 'red',
+                        backgroundColor: dragAction === 'remove' ? 'darkred' : '#4a4a4a',
                         color: 'white',
                         padding: '10px',
+                        marginRight: '10px',
                         flex: 0.23,
-                        cursor: 'pointer'
+                        cursor: 'pointer',
                     }}
                     onClick={() => setDragAction('remove')}
                 >
@@ -242,11 +273,12 @@ const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailab
                 </button>
                 <button
                     style={{
-                        backgroundColor: 'grey',
+                        backgroundColor: '#4a4a4a',
                         color: 'white',
                         padding: '10px',
+                        marginRight: '10px',
                         flex: 0.48,
-                        cursor: 'pointer'
+                        cursor: 'pointer',
                     }}
                     onClick={handleSave}
                 >
@@ -254,14 +286,13 @@ const AvailabilityPicker = ({ week, availability: initialAvailability, onAvailab
                 </button>
                 <button
                     style={{
-                        backgroundColor: 'darkred',
+                        backgroundColor: '#4a4a4a',
                         color: 'white',
                         padding: '10px',
                         flex: 0.48,
                         cursor: 'pointer',
-                        border: '2px solid red', // Make it more obvious
                     }}
-                    onClick={() => setAvailability({})} // Clears the availability data
+                    onClick={() => setAvailability({})}
                 >
                     Clear All
                 </button>
