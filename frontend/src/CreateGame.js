@@ -483,7 +483,14 @@ const CreateGame = ({ username }) => {
                             <p className="game-info">
                                 {gameSystem && <>System: {gameSystem}<br /></>}
                                 {language && <>Language: {language}<br /></>}
-                                Frequency: {frequencyNumber > 1 ? `${frequencyNumber} times per ${frequencyInterval} ${frequencyTimeFrame}` : `Once per ${frequencyTimeFrame}`}<br />
+                                Frequency: {
+                                    frequencyNumber === "1" ? 
+                                    `Once per ${frequencyInterval > 1 ? frequencyInterval + " " : ""}${frequencyTimeFrame}${frequencyInterval > 1 ? "s" : ""}` : 
+                                    frequencyNumber === "2" ? 
+                                    `Twice per ${frequencyInterval > 1 ? frequencyInterval + " " : ""}${frequencyTimeFrame}${frequencyInterval > 1 ? "s" : ""}` : 
+                                    `${frequencyNumber} times per ${frequencyInterval > 1 ? frequencyInterval + " " : ""}${frequencyTimeFrame}${frequencyInterval > 1 ? "s" : ""}`
+                                }<br />
+
                                 {intendedGameLengthMin && intendedGameLengthMax && (intendedGameLengthMin === intendedGameLengthMax
                                     ? `Length: ${intendedGameLengthMin} ${intendedGameLengthUnit}${intendedGameLengthMax > 1 ? 's' : ''}`
                                     : `Length: ${intendedGameLengthMin}-${intendedGameLengthMax} ${intendedGameLengthUnit}${intendedGameLengthMax > 1 ? 's' : ''}`
