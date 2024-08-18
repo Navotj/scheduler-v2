@@ -284,12 +284,18 @@ button:active, input[type="text"]:active, input[type="password"]:active {
 
 .create-button {
     background-color: #4caf50;
-    margin-top: 20px;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%; /* Make the button take the full width */
 }
 
 .create-button:hover {
     background-color: #45a049;
 }
+
 .form-grid-four-cols {
     display: grid;
     grid-template-columns: 30% 30% 3% 40%;
@@ -508,7 +514,19 @@ select {
     font-size: 1.2em; /* Slightly larger font */
     color: #ddd;
     flex-grow: 1; /* Allow this section to grow */
+    overflow: hidden;
 }
+
+.game-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Number of lines to show */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    margin-top: 10px; /* Adjust if needed */
+}
+
 
 .game-info {
     margin: 0;
@@ -591,3 +609,5 @@ select {
     align-items: center;
     justify-content: center;
 }
+
+

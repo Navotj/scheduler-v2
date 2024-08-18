@@ -1,61 +1,52 @@
 const express = require('express');
+const Game = require('../models/games'); // Adjust the path as necessary
+
 const router = express.Router();
-const Game = require('../models/games');
 
 // Create a new game
 router.post('/', async (req, res) => {
     try {
-        const game = new Game(req.body);
-        await game.save();
-        res.status(201).send(game);
+        const newGame = new Game(req.body);
+        const savedGame = await newGame.save();
+        res.status(201).json(savedGame);
     } catch (error) {
-        res.status(400).send({ error: error.message });
+        console.error('Error creating game:', error);
+        res.status(500).json({ message: 'Failed to create game' });
     }
 });
 
-// Get all public games
-router.get('/public', async (req, res) => {
-    try {
-        const games = await Game.find({ publicity: 'public' });
-        res.send(games);
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-});
-
-// Get games by user
+// Get games by username
 router.get('/user/:username', async (req, res) => {
     try {
-        const games = await Game.find({
-            $or: [
-                { owner: req.params.username },
-                { players: req.params.username }
-            ]
-        });
-        res.send(games);
+        const games = await Game.find({ owner: req.params.username });
+        res.status(200).json(games);
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        console.error('Error fetching games:', error);
+        res.status(500).json({ message: 'Failed to fetch games' });
     }
 });
 
-// Join a game
-router.post('/:id/join', async (req, res) => {
+// Get a single game by ID
+router.get('/:id', async (req, res) => {
     try {
         const game = await Game.findById(req.params.id);
-        if (!game) {
-            return res.status(404).send({ error: 'Game not found' });
-        }
-
-        if (game.players.includes(req.body.username)) {
-            return res.status(400).send({ error: 'User already joined this game' });
-        }
-
-        game.players.push(req.body.username);
-        await game.save();
-
-        res.send(game);
+        if (!game) return res.status(404).json({ message: 'Game not found' });
+        res.status(200).json(game);
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        console.error('Error fetching game:', error);
+        res.status(500).json({ message: 'Failed to fetch game' });
+    }
+});
+
+// Update a game
+router.put('/:id', async (req, res) => {
+    try {
+        const updatedGame = await Game.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updatedGame) return res.status(404).json({ message: 'Game not found' });
+        res.status(200).json(updatedGame);
+    } catch (error) {
+        console.error('Error updating game:', error);
+        res.status(500).json({ message: 'Failed to update game' });
     }
 });
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './styles.css';
 import Cropper from 'react-easy-crop';
+import GamePreview from './GamePreview'; // Import GamePreview component
 
 const CreateGame = ({ username }) => {
     const [gameName, setGameName] = useState('');
@@ -78,7 +79,6 @@ const CreateGame = ({ username }) => {
         setSortedSpecialTags18plus([...specialTags18plus].sort());
     }, []);  // Removed dependencies
     
-    
     useEffect(() => {
         const handleKeyDown = (event) => {
             if (showCropper) {
@@ -95,8 +95,6 @@ const CreateGame = ({ username }) => {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, [showCropper]);
-    
-
 
     const onCropComplete = (croppedArea, croppedAreaPixels) => {
         setCropArea(croppedAreaPixels);
@@ -126,8 +124,6 @@ const CreateGame = ({ username }) => {
         handleCropImage();
     };
     
-    
-
     const handleCropImage = () => {
         if (!cropArea || !gameImage) return;
 
@@ -462,6 +458,12 @@ const CreateGame = ({ username }) => {
                         type="file" 
                         onChange={handleImageUpload} 
                     />
+                    <button
+                        className={"button"}
+                        onClick={handleCreateGame}
+                    >
+                        Create Game
+                    </button>
                 </div>
                 <div className="col col-right">
                     <label>Game Description:</label>
@@ -473,65 +475,44 @@ const CreateGame = ({ username }) => {
                 </div>
                 <div className="col col-preview">
                     <label>Preview:</label>
-                    <div className="game-preview-card">
-                        {croppedImage && <div className="game-preview-banner" style={{ backgroundImage: `url(${croppedImage})` }}></div>}
-                        <div className="game-preview-header">
-                            <span className="gm-name">{username}</span>
-                            <h2 className="game-title">{gameName}</h2>
-                        </div>
-                        <div className="game-preview-body">
-                            <p className="game-info">
-                                {gameSystem && <>System: {gameSystem}<br /></>}
-                                {language && <>Language: {language}<br /></>}
-                                Frequency: {
-                                    frequencyNumber === "1" ? 
-                                    `Once per ${frequencyInterval > 1 ? frequencyInterval + " " : ""}${frequencyTimeFrame}${frequencyInterval > 1 ? "s" : ""}` : 
-                                    frequencyNumber === "2" ? 
-                                    `Twice per ${frequencyInterval > 1 ? frequencyInterval + " " : ""}${frequencyTimeFrame}${frequencyInterval > 1 ? "s" : ""}` : 
-                                    `${frequencyNumber} times per ${frequencyInterval > 1 ? frequencyInterval + " " : ""}${frequencyTimeFrame}${frequencyInterval > 1 ? "s" : ""}`
-                                }<br />
-
-                                {intendedGameLengthMin && intendedGameLengthMax && (intendedGameLengthMin === intendedGameLengthMax
-                                    ? `Length: ${intendedGameLengthMin} ${intendedGameLengthUnit}${intendedGameLengthMax > 1 ? 's' : ''}`
-                                    : `Length: ${intendedGameLengthMin}-${intendedGameLengthMax} ${intendedGameLengthUnit}${intendedGameLengthMax > 1 ? 's' : ''}`
-                                )}
-                            </p>
-                        </div>
-                        <div className="game-preview-footer">
-                            {minPlayers && maxPlayers && (minPlayers === maxPlayers
-                                ? <span className="players-info">Players: {minPlayers}</span>
-                                : <span className="players-info">Players: {minPlayers} - {maxPlayers}</span>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-
-
-            {showCropper && (
-            <div className="cropper-container">
-                <div className="cropper-wrapper">
-                    <Cropper
-                        image={gameImage}
-                        crop={crop}
-                        zoom={zoom}
-                        aspect={2 / 1}
-                        onCropChange={setCrop}
-                        onZoomChange={setZoom}
-                        onCropComplete={onCropComplete}
+                    <GamePreview
+                        username={username}
+                        gameName={gameName}
+                        gameSystem={gameSystem}
+                        language={language}
+                        frequencyNumber={frequencyNumber}
+                        frequencyInterval={frequencyInterval}
+                        frequencyTimeFrame={frequencyTimeFrame}
+                        intendedGameLengthMin={intendedGameLengthMin}
+                        intendedGameLengthMax={intendedGameLengthMax}
+                        intendedGameLengthUnit={intendedGameLengthUnit}
+                        minPlayers={minPlayers}
+                        maxPlayers={maxPlayers}
+                        croppedImage={croppedImage}
+                        gameDescription={gameDescription}  // Ensure the description is passed here
                     />
                 </div>
-                <div className="cropper-buttons">
-                    <button onClick={handleSaveCrop}>Save</button>
-                    <button onClick={handleCancelCrop}>Cancel</button>
-                </div>
             </div>
-        )}
 
-
-
+            {showCropper && (
+                <div className="cropper-container">
+                    <div className="cropper-wrapper">
+                        <Cropper
+                            image={gameImage}
+                            crop={crop}
+                            zoom={zoom}
+                            aspect={2 / 1}
+                            onCropChange={setCrop}
+                            onZoomChange={setZoom}
+                            onCropComplete={onCropComplete}
+                        />
+                    </div>
+                    <div className="cropper-buttons">
+                        <button onClick={handleSaveCrop}>Save</button>
+                        <button onClick={handleCancelCrop}>Cancel</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

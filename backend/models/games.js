@@ -1,22 +1,33 @@
 const mongoose = require('mongoose');
 
+const tagSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    isSpecial: { type: Boolean, default: false }
+});
+
 const gameSchema = new mongoose.Schema({
     gameName: { type: String, required: true },
     gameSystem: { type: String, required: true },
-    intendedPlayerCount: { type: Number, required: true },
-    gameModule: { type: String, required: true },
+    gameModule: String,
     language: { type: String, required: true },
-    startingLevel: { type: String, required: true },
-    intendedGameLength: { type: String, required: true },
-    homebrewAvailability: { type: Boolean, required: true },
-    age: { type: String, required: true },
-    maxPlayers: { type: Number, required: true },
-    gameFrequency: { type: String, required: true },
-    publicity: { type: String, enum: ['public', 'private'], default: 'public' },
+    startingLevel: Number,
+    intendedGameLengthMin: Number,
+    intendedGameLengthMax: Number,
+    intendedGameLengthUnit: String,
+    minAge: Number,
+    maxAge: Number,
+    minPlayers: Number,
+    maxPlayers: Number,
+    frequencyNumber: Number,
+    frequencyInterval: Number,
+    frequencyTimeFrame: String,
+    gameDescription: String,
+    gameImage: String,
+    enabledTags: [tagSchema],  // This is now an array of objects
+    enabledTabs: Object,
     owner: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
-    players: [{ type: String }], // Array of usernames
-}, { collection: 'games' }); // Ensures the collection name is 'games'
+});
 
 const Game = mongoose.model('Game', gameSchema);
 
