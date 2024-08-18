@@ -74,12 +74,13 @@ const WeekPicker = ({ username, onWeekSelect }) => {
                         margin: '2px 0',
                         padding: '10px',
                         backgroundColor: '#1e1e1e',
-                        borderRadius: '4px',
+                        borderRadius: '8px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        textAlign: 'center',
+                        textAlign: 'left',
                         flex: '1',
+                        padding: '20px'
                     }}
                 >
                     Week {week.weekNumber} ({week.startDate.toLocaleDateString()} - {week.endDate.toLocaleDateString()})

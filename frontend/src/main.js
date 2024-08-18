@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import WeekPicker from './WeekPicker';
 import AvailabilityPicker from './AvailabilityPicker';
 import Sidebar from './sidebar';
-import Login from './Login';
+import Login from './login';
 import CreateGame from './CreateGame';
 import FindGame from './FindGame';
 import MyGames from './MyGames';

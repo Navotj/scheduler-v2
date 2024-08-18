@@ -216,38 +216,39 @@ useEffect(() => {
     
     // These arrays store the days of the week and the hours of the day to create the grid.
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const timeSlots = Array(24).fill(null).map((_, i) => `${i}`); // Creates an array of hour labels.
+    // Updated timeSlots array with ":00" suffix
+    const timeSlots = Array(24).fill(null).map((_, i) => `${i + 1}:00`); // Creates an array of hour labels with ":00" suffix.
     const weekStartDate = new Date(week.startDate); // Converts the week start date to a Date object.
 
     return (
         // The main container for the component, styled as a flexbox.
         <div
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', position: 'relative', height: '100%' }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 'calc(100% - 12px)', position: 'relative', height: '100vh', paddingLeft: '25px' }} // Set to full viewport height
         >
             <div
                 style={{ overflowX: 'auto', flexGrow: 1, width: '100%' }}
-                onMouseUp={handleMouseUp} // Calls handleMouseUp when the mouse button is released.
+                onMouseUp={handleMouseUp}
             >
                 <div style={{ flexGrow: 1 }}>
                     <table
-                        onMouseLeave={handleMouseLeaveTable} // Calls handleMouseLeaveTable if the mouse leaves the table.
+                        onMouseLeave={handleMouseLeaveTable}
                         style={{ width: '100%', tableLayout: 'fixed', height: '100%' }}
                     >
-                        <thead>
-                            <tr>
-                                <th style={{ width: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', backgroundColor: '#333' }}></th>
-                                {timeSlots.map((time, index) => (
-                                    <th
-                                        key={index}
-                                        colSpan={2}
-                                        className="timeLabel"
-                                        style={{ minWidth: '40px', backgroundColor: '#333' }}
-                                    >
-                                        {time} {/* Hour label for each column */}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
+                    <thead>
+                        <tr>
+                            <th style={{ width: '110px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}></th>
+                            <th style={{ minWidth: '20px'}}></th> {/* Empty column to shift the hours */}
+                            {timeSlots.map((time, index) => (
+                                <th
+                                    key={index}
+                                    colSpan={2} // Keep the colspan as 2
+                                    className="timeLabel"
+                                >
+                                    {time}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
                         <tbody>
                             {daysOfWeek.map((day, dayIndex) => {
                                 const currentDate = new Date(weekStartDate);
@@ -263,8 +264,9 @@ useEffect(() => {
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis',
                                                 backgroundColor: '#333',
-                                                textAlign: 'center',
+                                                textAlign: 'left',
                                                 fontWeight: 'bold',
+                                                paddingLeft: '15px'
                                             }}
                                         >
                                             {day} | {formattedDate} {/* Display day and date */}
@@ -281,7 +283,6 @@ useEffect(() => {
                                                     style={{
                                                         minWidth: '20px',
                                                         maxWidth: '40px',
-                                                        height: 'calc(100% / 7)',
                                                         borderRight: slotIndex % 2 === 1 ? '2px solid #555' : 'none',
                                                         outline: 'none',
                                                         backgroundColor: availability[slot] ? '#0f0' : '', // Set color if slot is selected.
@@ -300,7 +301,7 @@ useEffect(() => {
 
             <div
                 id="actionButtons"
-                style={{ display: 'flex', justifyContent: 'center', position: 'relative', bottom: '0px', width: '100%', padding: '10px' }}
+                style={{ display: 'flex', justifyContent: 'center', position: 'relative', bottom: '0px', width: '100%', padding: '15px' }}
             >
                 <button
                     style={{
