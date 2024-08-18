@@ -79,17 +79,25 @@ const CreateGame = ({ username }) => {
         }
     };
 
-    const handleTagRemove = (tag) => {
-        setEnabledTags(enabledTags.filter(t => t.name !== tag.name));
+    const handleMinPlayersChange = (e) => {
+        const value = parseInt(e.target.value, 10);
+        setMinPlayers(value);
+        if (value > maxPlayers) {
+            setMaxPlayers(value); // Adjust maxPlayers to match minPlayers if it's lower
+        }
+    };
+    
+    const handleMaxPlayersChange = (e) => {
+        const value = parseInt(e.target.value, 10);
+        if (value >= minPlayers) {
+            setMaxPlayers(value);
+        } else {
+            setMaxPlayers(minPlayers); // Prevent maxPlayers from being set lower than minPlayers
+        }
     };
 
-    const handleMinAgeChange = (e) => {
-        const age = e.target.value;
-        if (enabledTags.some(t => specialTags18plus.includes(t.name)) && age < 18) {
-            setMinAge(18);
-        } else {
-            setMinAge(age);
-        }
+    const handleTagRemove = (tag) => {
+        setEnabledTags(enabledTags.filter(t => t.name !== tag.name));
     };
 
     const handleFrequencyNumberChange = (e) => {
@@ -254,6 +262,78 @@ const CreateGame = ({ username }) => {
                             ))}
                         </select>
                     </div>
+                    <div className="age-container">
+                        <div className="min-age">
+                            <label>Min Age:</label>
+                            <input 
+                                type="number" 
+                                value={minAge} 
+                                onChange={(e) => setMinAge(e.target.value)} 
+                                min="0" 
+                            />
+                        </div>
+                        <div className="max-age">
+                            <label>Max Age:</label>
+                            <input 
+                                type="number" 
+                                value={maxAge} 
+                                onChange={(e) => setMaxAge(e.target.value)} 
+                                min={minAge || "0"}
+                            />
+                        </div>
+                    </div>
+                    <div className="player-count-container">
+                        <div className="min-players">
+                            <label>Min Players:</label>
+                            <input 
+                                type="number" 
+                                value={minPlayers} 
+                                onChange={handleMinPlayersChange} 
+                                min="1" 
+                            />
+                        </div>
+                        <div className="max-players">
+                            <label>Max Players:</label>
+                            <input 
+                                type="number" 
+                                value={maxPlayers} 
+                                onChange={handleMaxPlayersChange} 
+                                min={minPlayers} 
+                            />
+                        </div>
+</div>
+                    <div className="game-frequency-container">
+                        <label>Game Frequency:</label>
+                        <div className="frequency-inputs">
+                        <input 
+                            type="number" 
+                            value={frequencyNumber} 
+                            onChange={handleFrequencyNumberChange} 
+                            min="1" 
+                            max="9"
+                        />
+                        <span>per</span>
+                        <input 
+                            type="number" 
+                            value={frequencyInterval} 
+                            onChange={e => setFrequencyInterval(e.target.value)} 
+                            disabled={frequencyNumber > 1} 
+                            min="1" 
+                            max="9"
+                            style={{ backgroundColor: frequencyNumber > 1 ? '#333' : '#1e1e1e' }}
+                        />
+                            <select 
+                                value={frequencyTimeFrame} 
+                                onChange={e => setFrequencyTimeFrame(e.target.value)}
+                            >
+                                {timeFrames.map((frame, index) => (
+                                    <option key={index} value={frame}>
+                                        {frame}{frequencyInterval > 1 ? 's' : ''}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
                     <div className="homebrew-options">
                         <div className="homebrew-option">
                             <button 
@@ -284,77 +364,7 @@ const CreateGame = ({ username }) => {
                             </button>
                         </div>
                     </div>
-                    <div className="age-container">
-                        <div className="min-age">
-                            <label>Min Age:</label>
-                            <input 
-                                type="number" 
-                                value={minAge} 
-                                onChange={(e) => setMinAge(e.target.value)} 
-                                min="0" 
-                            />
-                        </div>
-                        <div className="max-age">
-                            <label>Max Age:</label>
-                            <input 
-                                type="number" 
-                                value={maxAge} 
-                                onChange={(e) => setMaxAge(e.target.value)} 
-                                min={minAge || "0"}
-                            />
-                        </div>
-                    </div>
-                    <div className="player-count-container">
-                        <div className="min-players">
-                            <label>Min Players:</label>
-                            <input 
-                                type="number" 
-                                value={minPlayers} 
-                                onChange={(e) => setMinPlayers(e.target.value)} 
-                                min="1" 
-                            />
-                        </div>
-                        <div className="max-players">
-                            <label>Max Players:</label>
-                            <input 
-                                type="number" 
-                                value={maxPlayers} 
-                                onChange={(e) => setMaxPlayers(e.target.value)} 
-                                min="1" 
-                            />
-                        </div>
-                    </div>
-                    <div className="game-frequency-container">
-                        <label>Game Frequency:</label>
-                        <div className="frequency-inputs">
-                        <input 
-                            type="number" 
-                            value={frequencyNumber} 
-                            onChange={handleFrequencyNumberChange} 
-                            min="1" 
-                            max="9"
-                        />
-                        <input 
-                            type="number" 
-                            value={frequencyInterval} 
-                            onChange={e => setFrequencyInterval(e.target.value)} 
-                            disabled={frequencyNumber > 1} 
-                            min="1" 
-                            max="9"
-                            style={{ backgroundColor: frequencyNumber > 1 ? '#333' : '#1e1e1e' }}
-                        />
-                            <select 
-                                value={frequencyTimeFrame} 
-                                onChange={e => setFrequencyTimeFrame(e.target.value)}
-                            >
-                                {timeFrames.map((frame, index) => (
-                                    <option key={index} value={frame}>
-                                        {frame}{frequencyInterval > 1 ? 's' : ''}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
+
                     <label>Game Image:</label>
                     <input 
                         type="file" 
