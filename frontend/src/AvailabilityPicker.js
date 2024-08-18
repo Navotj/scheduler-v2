@@ -301,7 +301,7 @@ useEffect(() => {
 
             <div
                 id="actionButtons"
-                style={{ display: 'flex', justifyContent: 'center', position: 'relative', bottom: '0px', width: '100%', padding: '15px' }}
+                style={{ display: 'flex', justifyContent: 'left', position: 'relative', bottom: '30px', right: '10px', width: '98%' }}
             >
                 <button
                     style={{

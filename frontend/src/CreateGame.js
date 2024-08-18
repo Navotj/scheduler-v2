@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './styles.css';
+import Cropper from 'react-easy-crop';
 
 const CreateGame = ({ username }) => {
     const [gameName, setGameName] = useState('');
@@ -19,6 +20,11 @@ const CreateGame = ({ username }) => {
     const [frequencyTimeFrame, setFrequencyTimeFrame] = useState('week');
     const [gameDescription, setGameDescription] = useState('');
     const [gameImage, setGameImage] = useState(null);
+    const [croppedImage, setCroppedImage] = useState(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [cropArea, setCropArea] = useState(null);
+    const [showCropper, setShowCropper] = useState(false);
     const [enabledTags, setEnabledTags] = useState([]);
     const [sortedTags, setSortedTags] = useState([]);
     const [sortedSpecialTags, setSortedSpecialTags] = useState([]);
@@ -30,7 +36,14 @@ const CreateGame = ({ username }) => {
         feats: false,
     });
 
-    const gameSystems = ['D&D 3.5e', 'D&D 5e', 'Pathfinder', 'Pathfinder 2e', 'Call of Cthulhu', 'Starfinder', 'Other'];
+    const gameSystems = [
+        'D&D 3.5e', 'D&D 5e', 'Pathfinder', 'Pathfinder 2e', 'Call of Cthulhu', 'Starfinder', 'Shadowrun',
+        'GURPS', 'Warhammer 40k', 'Vampire: The Masquerade', 'Cyberpunk 2020', 'Cyberpunk Red',
+        'Fate', 'Savage Worlds', 'Blades in the Dark', 'Dungeon World', 'Powered by the Apocalypse',
+        'Mutants & Masterminds', 'Kids on Bikes', 'The Witcher', 'Star Wars: Edge of the Empire',
+        'Numenera', 'The One Ring', 'Alien RPG', 'Cortex Prime', 'Genesys', 'Hero System', 'Other'
+    ];
+    
     const languages = ['English', 'Spanish', 'French', 'German', 'Other'];
     const timeFrames = ['day', 'week', 'month'];
     const gameLengthUnits = ['session', 'day', 'week', 'month', 'year'];
@@ -48,19 +61,109 @@ const CreateGame = ({ username }) => {
     ];
 
     const specialTags = [
-        "Arachnophobia", "Thalassophobia"
+        "Arachnophobia", "Thalassophobia", "Claustrophobia", "Entomophobia",
+        "Trypophobia", "Acrophobia", "Blood", "Needles", "Medical Procedures",
+        "Body Horror", "Animal Harm"
     ];
+    
 
     const specialTags18plus = [
-        "NSFW", "Drug Use", "Suicide", "Mental Illness", 
-        "Self-Harm", "Torture", "Gore"
+        "NSFW", "Drug Use", "Suicide", "Mental Illness", "Self-Harm", "Torture", "Gore",
+        "Extreme Violence", "Body Mutilation", "Human Trafficking",
     ];
-
+    
     useEffect(() => {
         setSortedTags([...allTags].sort());
         setSortedSpecialTags([...specialTags].sort());
         setSortedSpecialTags18plus([...specialTags18plus].sort());
-    }, [allTags, specialTags, specialTags18plus]);
+    }, []);  // Removed dependencies
+    
+    
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (showCropper) {
+                if (event.key === 'Escape') {
+                    handleCancelCrop();
+                } else if (event.key === 'Enter') {
+                    handleSaveCrop(event);
+                }
+            }
+        };
+    
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [showCropper]);
+    
+
+
+    const onCropComplete = (croppedArea, croppedAreaPixels) => {
+        setCropArea(croppedAreaPixels);
+    };
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                setGameImage(reader.result);
+                setShowCropper(true); // Show the cropper immediately after image is uploaded
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleCancelCrop = () => {
+        setShowCropper(false);
+        setGameImage(null); // Reset the game image if canceled
+    };
+    
+    const handleSaveCrop = (event) => {
+        if (event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+        }
+        handleCropImage();
+    };
+    
+    
+
+    const handleCropImage = () => {
+        if (!cropArea || !gameImage) return;
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const image = new Image();
+        image.src = gameImage;
+        image.onload = () => {
+            const aspectRatio = 2 / 1;
+            canvas.width = cropArea.width;
+            canvas.height = cropArea.width / aspectRatio;
+            context.drawImage(
+                image,
+                cropArea.x,
+                cropArea.y,
+                cropArea.width,
+                cropArea.height,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                setCroppedImage(url);
+                setShowCropper(false); // Hide cropper after cropping is done
+            });
+        };
+    };
+
+    const toggleTab = (tabName) => {
+        setEnabledTabs((prevTabs) => ({
+            ...prevTabs,
+            [tabName]: !prevTabs[tabName],
+        }));
+    };
 
     const handleTagClick = (tag) => {
         if (!enabledTags.some(t => t.name === tag)) {
@@ -77,6 +180,10 @@ const CreateGame = ({ username }) => {
                 setMinAge(18);
             }
         }
+    };
+
+    const handleTagRemove = (tag) => {
+        setEnabledTags(enabledTags.filter(t => t.name !== tag.name));
     };
 
     const handleMinPlayersChange = (e) => {
@@ -96,10 +203,6 @@ const CreateGame = ({ username }) => {
         }
     };
 
-    const handleTagRemove = (tag) => {
-        setEnabledTags(enabledTags.filter(t => t.name !== tag.name));
-    };
-
     const handleFrequencyNumberChange = (e) => {
         const value = e.target.value;
         setFrequencyNumber(value);
@@ -108,17 +211,6 @@ const CreateGame = ({ username }) => {
         if (value !== "1") {
             setFrequencyInterval("1");
         }
-    };
-
-    const handleImageUpload = (e) => {
-        setGameImage(e.target.files[0]);
-    };
-
-    const toggleTab = (tabName) => {
-        setEnabledTabs((prevTabs) => ({
-            ...prevTabs,
-            [tabName]: !prevTabs[tabName],
-        }));
     };
 
     const handleCreateGame = async () => {
@@ -139,8 +231,8 @@ const CreateGame = ({ username }) => {
         formData.append('frequencyInterval', frequencyInterval);
         formData.append('frequencyTimeFrame', frequencyTimeFrame);
         formData.append('gameDescription', gameDescription);
-        if (gameImage) {
-            formData.append('gameImage', gameImage);
+        if (croppedImage) {
+            formData.append('gameImage', croppedImage);
         }
         formData.append('enabledTags', JSON.stringify(enabledTags));
         formData.append('enabledTabs', JSON.stringify(enabledTabs));
@@ -167,7 +259,7 @@ const CreateGame = ({ username }) => {
     return (
         <div className="form-container">
             <h2>New Game</h2>
-            <div className="form-grid-three-cols">
+            <div className="form-grid-four-cols">
                 <div className="col col-left">
                     <label>Game Title:</label>
                     <input 
@@ -301,27 +393,27 @@ const CreateGame = ({ username }) => {
                                 min={minPlayers} 
                             />
                         </div>
-</div>
+                    </div>
                     <div className="game-frequency-container">
                         <label>Game Frequency:</label>
                         <div className="frequency-inputs">
-                        <input 
-                            type="number" 
-                            value={frequencyNumber} 
-                            onChange={handleFrequencyNumberChange} 
-                            min="1" 
-                            max="9"
-                        />
-                        <span>per</span>
-                        <input 
-                            type="number" 
-                            value={frequencyInterval} 
-                            onChange={e => setFrequencyInterval(e.target.value)} 
-                            disabled={frequencyNumber > 1} 
-                            min="1" 
-                            max="9"
-                            style={{ backgroundColor: frequencyNumber > 1 ? '#333' : '#1e1e1e' }}
-                        />
+                            <input 
+                                type="number" 
+                                value={frequencyNumber} 
+                                onChange={handleFrequencyNumberChange} 
+                                min="1" 
+                                max="9"
+                            />
+                            <span>per</span>
+                            <input 
+                                type="number" 
+                                value={frequencyInterval} 
+                                onChange={e => setFrequencyInterval(e.target.value)} 
+                                disabled={frequencyNumber > 1} 
+                                min="1" 
+                                max="9"
+                                style={{ backgroundColor: frequencyNumber > 1 ? '#333' : '#1e1e1e' }}
+                            />
                             <select 
                                 value={frequencyTimeFrame} 
                                 onChange={e => setFrequencyTimeFrame(e.target.value)}
@@ -376,12 +468,63 @@ const CreateGame = ({ username }) => {
                     <textarea 
                         value={gameDescription}
                         onChange={(e) => setGameDescription(e.target.value)}
-                        rows="10"
                         style={{ resize: 'none', height: '100%' }}
                     />
                 </div>
+                <div className="col col-preview">
+                    <label>Preview:</label>
+                    <div className="game-preview-card">
+                        {croppedImage && <div className="game-preview-banner" style={{ backgroundImage: `url(${croppedImage})` }}></div>}
+                        <div className="game-preview-header">
+                            <span className="gm-name">{username}</span>
+                            <h2 className="game-title">{gameName}</h2>
+                        </div>
+                        <div className="game-preview-body">
+                            <p className="game-info">
+                                {gameSystem && <>System: {gameSystem}<br /></>}
+                                {language && <>Language: {language}<br /></>}
+                                Frequency: {frequencyNumber > 1 ? `${frequencyNumber} times per ${frequencyInterval} ${frequencyTimeFrame}` : `Once per ${frequencyTimeFrame}`}<br />
+                                {intendedGameLengthMin && intendedGameLengthMax && (intendedGameLengthMin === intendedGameLengthMax
+                                    ? `Length: ${intendedGameLengthMin} ${intendedGameLengthUnit}${intendedGameLengthMax > 1 ? 's' : ''}`
+                                    : `Length: ${intendedGameLengthMin}-${intendedGameLengthMax} ${intendedGameLengthUnit}${intendedGameLengthMax > 1 ? 's' : ''}`
+                                )}
+                            </p>
+                        </div>
+                        <div className="game-preview-footer">
+                            {minPlayers && maxPlayers && (minPlayers === maxPlayers
+                                ? <span className="players-info">Players: {minPlayers}</span>
+                                : <span className="players-info">Players: {minPlayers} - {maxPlayers}</span>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button className="create-button" onClick={handleCreateGame}>Create Game</button>
+
+
+
+
+            {showCropper && (
+            <div className="cropper-container">
+                <div className="cropper-wrapper">
+                    <Cropper
+                        image={gameImage}
+                        crop={crop}
+                        zoom={zoom}
+                        aspect={2 / 1}
+                        onCropChange={setCrop}
+                        onZoomChange={setZoom}
+                        onCropComplete={onCropComplete}
+                    />
+                </div>
+                <div className="cropper-buttons">
+                    <button onClick={handleSaveCrop}>Save</button>
+                    <button onClick={handleCancelCrop}>Cancel</button>
+                </div>
+            </div>
+        )}
+
+
+
         </div>
     );
 };
