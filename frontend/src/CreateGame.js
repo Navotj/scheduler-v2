@@ -194,15 +194,6 @@ const CreateGame = ({ username }) => {
                         </div>
                     </div>
                     <div className="age-container">
-                        <div className="min-age">
-                            <label>Min Age:</label>
-                            <input 
-                                type="number" 
-                                value={minAge} 
-                                onChange={(e) => setMinAge(e.target.value)} 
-                                min="0" 
-                            />
-                        </div>
                         <div className="max-age">
                             <label>Max Age:</label>
                             <input 
