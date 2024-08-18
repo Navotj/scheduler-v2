@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './styles.css';
 
 const CreateGame = ({ username }) => {
@@ -19,6 +19,10 @@ const CreateGame = ({ username }) => {
     const [frequencyTimeFrame, setFrequencyTimeFrame] = useState('week');
     const [gameDescription, setGameDescription] = useState('');
     const [gameImage, setGameImage] = useState(null);
+    const [enabledTags, setEnabledTags] = useState([]);
+    const [sortedTags, setSortedTags] = useState([]);
+    const [sortedSpecialTags, setSortedSpecialTags] = useState([]);
+    const [sortedSpecialTags18plus, setSortedSpecialTags18plus] = useState([]);
     const [enabledTabs, setEnabledTabs] = useState({
         classes: false,
         subclasses: false,
@@ -30,6 +34,63 @@ const CreateGame = ({ username }) => {
     const languages = ['English', 'Spanish', 'French', 'German', 'Other'];
     const timeFrames = ['day', 'week', 'month'];
     const gameLengthUnits = ['session', 'day', 'week', 'month', 'year'];
+
+    const allTags = [
+        "SCI-FI", "Medieval", "High Fantasy", "Low Fantasy", "Gritty", "Light-hearted", 
+        "Horror", "Comedy", "Mystery", "Adventure", "Dungeon Crawl", "Exploration", 
+        "Political Intrigue", "Steampunk", "Cyberpunk", "Post-Apocalyptic", "Urban Fantasy", 
+        "Sword and Sorcery", "Dark Fantasy", "Survival", "Epic", "Heroic", "Tragic", 
+        "Mythological", "Lovecraftian", "Gothic", "Time Travel", "Alternate History", 
+        "Supernatural", "Vampires", "Werewolves", "Zombies", "Alien Invasion", "Psionics", 
+        "Magic-Heavy", "Low Magic", "Technomancy", "Planar Travel", "Underwater", "Skybound", 
+        "Desert", "Jungle", "Arctic", "Pirate", "Western", "Feudal Japan", "Ancient Rome", 
+        "Ancient Egypt", "Military Campaign"
+    ];
+
+    const specialTags = [
+        "Arachnophobia", "Thalassophobia"
+    ];
+
+    const specialTags18plus = [
+        "NSFW", "Drug Use", "Suicide", "Mental Illness", 
+        "Self-Harm", "Torture", "Gore"
+    ];
+
+    useEffect(() => {
+        setSortedTags([...allTags].sort());
+        setSortedSpecialTags([...specialTags].sort());
+        setSortedSpecialTags18plus([...specialTags18plus].sort());
+    }, [allTags, specialTags, specialTags18plus]);
+
+    const handleTagClick = (tag) => {
+        if (!enabledTags.some(t => t.name === tag)) {
+            const newEnabledTags = [...enabledTags, { name: tag, isSpecial: false }].sort((a, b) => a.name.localeCompare(b.name));
+            setEnabledTags(newEnabledTags);
+        }
+    };
+
+    const handleSpecialTagClick = (tag) => {
+        if (!enabledTags.some(t => t.name === tag)) {
+            const newEnabledTags = [...enabledTags, { name: tag, isSpecial: true }].sort((a, b) => a.name.localeCompare(b.name));
+            setEnabledTags(newEnabledTags);
+            if (specialTags18plus.includes(tag) && minAge < 18) {
+                setMinAge(18);
+            }
+        }
+    };
+
+    const handleTagRemove = (tag) => {
+        setEnabledTags(enabledTags.filter(t => t.name !== tag.name));
+    };
+
+    const handleMinAgeChange = (e) => {
+        const age = e.target.value;
+        if (enabledTags.some(t => specialTags18plus.includes(t.name)) && age < 18) {
+            setMinAge(18);
+        } else {
+            setMinAge(age);
+        }
+    };
 
     const handleFrequencyNumberChange = (e) => {
         const value = e.target.value;
@@ -73,6 +134,7 @@ const CreateGame = ({ username }) => {
         if (gameImage) {
             formData.append('gameImage', gameImage);
         }
+        formData.append('enabledTags', JSON.stringify(enabledTags));
         formData.append('enabledTabs', JSON.stringify(enabledTabs));
         formData.append('owner', username);
         formData.append('createdAt', new Date().toISOString());
@@ -128,6 +190,35 @@ const CreateGame = ({ username }) => {
                             <option key={index} value={lang}>{lang}</option>
                         ))}
                     </select>
+                    <label>Available Tags:</label>
+                    <div className="tags-container">
+                        {sortedTags.map(tag => (
+                            <div key={tag} className="tag" onClick={() => handleTagClick(tag)}>
+                                {tag}
+                            </div>
+                        ))}
+                    </div>
+                    <label>Special Tags:</label>
+                    <div className="tags-container">
+                        {sortedSpecialTags.map(tag => (
+                            <div key={tag} className="special-tag" onClick={() => handleSpecialTagClick(tag)}>
+                                {tag}
+                            </div>
+                        ))}
+                        {minAge >= 18 && sortedSpecialTags18plus.map(tag => (
+                            <div key={tag} className="special-tag" onClick={() => handleSpecialTagClick(tag)}>
+                                {tag}
+                            </div>
+                        ))}
+                    </div>
+                    <label>Enabled Tags:</label>
+                    <div className="enabled-tags-container">
+                        {enabledTags.map(({ name, isSpecial }) => (
+                            <div key={name} className={`enabled-tag ${isSpecial ? 'enabled-special-tag' : ''}`}>
+                                {name} <span className="remove-tag" onClick={() => handleTagRemove({ name, isSpecial })}>X</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
                 <div className="col col-middle">
                     <label>Starting Level:</label>
@@ -194,6 +285,15 @@ const CreateGame = ({ username }) => {
                         </div>
                     </div>
                     <div className="age-container">
+                        <div className="min-age">
+                            <label>Min Age:</label>
+                            <input 
+                                type="number" 
+                                value={minAge} 
+                                onChange={(e) => setMinAge(e.target.value)} 
+                                min="0" 
+                            />
+                        </div>
                         <div className="max-age">
                             <label>Max Age:</label>
                             <input 
