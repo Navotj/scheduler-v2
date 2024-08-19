@@ -28,7 +28,7 @@ const WeekPicker = ({ username, onWeekSelect }) => {
 
         const weeksArray = [];
 
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 10; i++) {
             const startOfWeek = new Date(currentWeekStart);
             startOfWeek.setDate(currentWeekStart.getDate() + i * 7);
             const endOfWeek = new Date(startOfWeek);

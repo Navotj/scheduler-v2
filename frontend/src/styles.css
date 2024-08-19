@@ -2,11 +2,10 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #121212;
+    background-color: #282828;
     color: #e0e0e0;
     height: 100vh;
     width: 100vw;
-    overflow: hidden;
     display: flex;
 }
 
@@ -29,31 +28,6 @@ body {
     flex-direction: column;
     padding-top: 60px;
     box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-}
-
-#sidebar.collapsed {
-    width: 60px;
-}
-
-.toggle-btn {
-    position: absolute;
-    user-select: none;
-    top: 15px;
-    left: 15px;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    font-size: 24px;
-    background-color: #444;
-    border-radius: 50%;
-    color: #e0e0e0;
-    text-align: center;
-    line-height: 30px;
-    transition: all 0.3s ease; /* Smooth transition for the toggle button */
-}
-
-#sidebar.collapsed .toggle-btn {
-    left: 15px; /* Keep it centered when sidebar is collapsed */
 }
 
 #sidebar ul {
@@ -80,32 +54,14 @@ body {
     text-decoration: none;
 }
 
-#sidebar.collapsed ul li {
-    text-align: center;
-}
-
-#sidebar.collapsed ul li a {
-    font-size: 0.9em;
-}
-
 #main-content {
     margin-left: var(--sidebar-width, 150px);
-    width: calc(100vw - var(--sidebar-width, 150px));
-    flex-grow: 1;
+    width: calc(100vw - 150px);
     background-color: #282828;
-    display: flex;
-    flex-direction: column;
     height: 100vh;
-    overflow: hidden;
     padding: 20px;
     box-sizing: border-box;
 }
-
-#main-content.collapsed {
-    margin-left: 60px;
-    width: calc(100vw - 60px);
-}
-
 
 .page {
     display: none;
@@ -138,7 +94,7 @@ button:active, input[type="text"]:active, input[type="password"]:active {
 }
 
 #availabilityPickerContainer td {
-    height: calc(11.5vh); /* Each slot is 1/7th of the viewport height */
+    height: calc(3.5em); /* Each slot is 1/7th of the viewport height */
     padding: 0; /* Remove padding to ensure accurate height */
     border: 1px solid #444;
     text-align: center;
@@ -161,25 +117,29 @@ button:active, input[type="text"]:active, input[type="password"]:active {
 
 /* Vertical Week Buttons */
 .week-buttons {
-    display: flex;
-    flex-direction: column;
-    margin-left: 10px;
+    margin-left: 1em;
+    padding: 0 0;
+    height: 1em;
 }
 
 .week-buttons .week {
     background-color: #333;
     color: #fff;
     border: none;
-    padding: 5px;
     border-radius: 5px;
+    padding: 0 0;
     text-align: left;
-    padding-left: 10px;
-    margin: 5px 0;
+    font-size: 0.8em;
     cursor: pointer;
-    width: 250px;
+    width: 16em;
+    height: 1vh;
     white-space: nowrap;
     overflow: hidden;
+    vertical-align: middle; 
     text-overflow: ellipsis;
+    box-sizing: border-box;
+    display: inline-block; 
+    border: 1px solid #434343; /* Add a border to indicate selection */
 }
 
 .week-buttons .week.selected {
@@ -192,14 +152,6 @@ button:active, input[type="text"]:active, input[type="password"]:active {
     align-items: center;
     height: 100vh; /* Make the container fill the full screen height */
     transition: width 0.3s ease-in-out; /* Smooth transition for width */
-}
-
-#main-content.collapsed .login-container {
-    width: calc(100vw - 60px); /* Adjust the width when the sidebar is collapsed */
-}
-
-#main-content .login-container {
-    width: calc(100vw - 150px); /* Adjust the width when the sidebar is expanded */
 }
 
 .login-box {
@@ -240,13 +192,8 @@ button:active, input[type="text"]:active, input[type="password"]:active {
     padding: 1em;
     border-radius: 1.5em;
     box-shadow: 0px 0px 1em rgba(0, 0, 0, 0.5);
-    width: 100%; /* Ensure it takes full width */
-    max-width: 100%; /* Remove any width restrictions */
     margin: 0 auto; /* Center if there's extra space */
-    box-sizing: border-box;
-    flex-grow: 1; /* Allow the container to grow and take up available space */
-    display: flex;
-    flex-direction: column;
+    width: 65em;
     overflow-y: auto;
 }
 
@@ -264,12 +211,10 @@ button:active, input[type="text"]:active, input[type="password"]:active {
     border: none;
     padding: 10px;
     border-radius: 5px;
-    width: 100%;
     box-sizing: border-box;
 }
 
 .form-container .checkbox-container {
-    display: flex;
     align-items: center;
     justify-content: flex-start;
 }
@@ -575,20 +520,25 @@ select {
 }
 
 
+
 /* Rainbow Border for LGBT Friendly Tag */
 .tag.lgbt-friendly {
     border-image: linear-gradient(90deg, #FF0000 0%, #FF7F00 16.67%, #FFFF00 33.33%, #00FF00 50%, #0000FF 66.67%, #4B0082 83.33%, #8B00FF 100%);
     border-image-slice: 1;
     color: white;
+    clip-path: inset(0 round 5px); /* Ensure the border is rounded */
 }
 
-/* Icons for Tags */
-.tag::before {
+/* Icon for Tags */
+.tag::before, .enabled-tag::before {
     content: attr(data-icon);
     margin-right: 5px;
     font-size: 1em; /* Adjust icon size */
     color: inherit;
 }
+
+/* Other existing styles remain the same */
+
 
 /* Hover Effects */
 .tag:hover {

@@ -222,7 +222,7 @@ useEffect(() => {
     return (
         // The main container for the component, styled as a flexbox.
         <div
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 'calc(100% - 12px)', position: 'relative', height: '100vh', paddingLeft: '25px' }} // Set to full viewport height
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 'calc(100% - 12px)', position: 'relative', paddingLeft: '25px' }} // Removed height: '100vh'
         >
             <div
                 style={{ overflowX: 'auto', flexGrow: 1, width: '100%' }}
@@ -231,7 +231,7 @@ useEffect(() => {
                 <div style={{ flexGrow: 1 }}>
                     <table
                         onMouseLeave={handleMouseLeaveTable}
-                        style={{ width: '100%', tableLayout: 'fixed', height: '100%' }}
+                        style={{ width: '100%', tableLayout: 'fixed' }} // Removed height: '100%'
                     >
                     <thead>
                         <tr>
@@ -299,62 +299,63 @@ useEffect(() => {
             </div>
 
             <div
-                id="actionButtons"
-                style={{ display: 'flex', justifyContent: 'left', position: 'relative', bottom: '30px', right: '10px', width: '98%' }}
+            id="actionButtons"
+            style={{ display: 'flex', justifyContent: 'left', position: 'relative', width: '99%', marginTop: '10px', marginRight: '10px' }} // Adjusted positioning and added marginTop
+        >
+            <button
+                style={{
+                    backgroundColor: dragAction === 'add' ? 'darkgreen' : '#4a4a4a', // Highlight the add button if it's selected.
+                    color: 'white',
+                    padding: '10px',
+                    marginRight: '10px',
+                    flex: 0.23,
+                    cursor: 'pointer',
+                }}
+                onClick={() => setDragAction('add')} // Switch to adding mode when clicked.
             >
-                <button
-                    style={{
-                        backgroundColor: dragAction === 'add' ? 'darkgreen' : '#4a4a4a', // Highlight the add button if it's selected.
-                        color: 'white',
-                        padding: '10px',
-                        marginRight: '10px',
-                        flex: 0.23,
-                        cursor: 'pointer',
-                    }}
-                    onClick={() => setDragAction('add')} // Switch to adding mode when clicked.
-                >
-                    +
-                </button>
-                <button
-                    style={{
-                        backgroundColor: dragAction === 'remove' ? 'darkred' : '#4a4a4a', // Highlight the remove button if it's selected.
-                        color: 'white',
-                        padding: '10px',
-                        marginRight: '10px',
-                        flex: 0.23,
-                        cursor: 'pointer',
-                    }}
-                    onClick={() => setDragAction('remove')} // Switch to removing mode when clicked.
-                >
-                    -
-                </button>
-                <button
-                    style={{
-                        backgroundColor: '#4a4a4a',
-                        color: 'white',
-                        padding: '10px',
-                        marginRight: '10px',
-                        flex: 0.48,
-                        cursor: 'pointer',
-                    }}
-                    onClick={handleSave} // Calls handleSave to save the availability.
-                >
-                    Save
-                </button>
-                <button
-                    style={{
-                        backgroundColor: '#4a4a4a',
-                        color: 'white',
-                        padding: '10px',
-                        flex: 0.48,
-                        cursor: 'pointer',
-                    }}
-                    onClick={() => setAvailability({})} // Clear all availability slots when clicked.
-                >
-                    Clear All
-                </button>
-            </div>
+                +
+            </button>
+            <button
+                style={{
+                    backgroundColor: dragAction === 'remove' ? 'darkred' : '#4a4a4a', // Highlight the remove button if it's selected.
+                    color: 'white',
+                    padding: '10px',
+                    marginRight: '10px',
+                    flex: 0.23,
+                    cursor: 'pointer',
+                }}
+                onClick={() => setDragAction('remove')} // Switch to removing mode when clicked.
+            >
+                -
+            </button>
+            <button
+                style={{
+                    backgroundColor: '#4a4a4a',
+                    color: 'white',
+                    padding: '10px',
+                    marginRight: '10px',
+                    flex: 0.48,
+                    cursor: 'pointer',
+                }}
+                onClick={handleSave} // Calls handleSave to save the availability.
+            >
+                Save
+            </button>
+            <button
+                style={{
+                    backgroundColor: '#4a4a4a',
+                    color: 'white',
+                    padding: '10px',
+                    flex: 0.48,
+                    cursor: 'pointer',
+                }}
+                onClick={() => setAvailability({})} // Clear all availability slots when clicked.
+            >
+                Clear All
+            </button>
         </div>
+    </div>
+
     );
 };
 

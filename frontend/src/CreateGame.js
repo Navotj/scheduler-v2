@@ -33,6 +33,7 @@ const CreateGame = ({ username }) => {
         feats: false,
     });
 
+    
     const gameSystems = [
         // Dungeons & Dragons and Related Systems
         'D&D Original', 'D&D Basic/Expert', 'D&D 1e', 'D&D 2e', 'D&D 3e', 'D&D 3.5e', 'D&D 4e', 'D&D 5e',
@@ -71,15 +72,16 @@ const CreateGame = ({ username }) => {
     
     
     const languages = [
-        'English', 'Spanish', 'French', 'German', 'Mandarin', 'Cantonese', 'Japanese', 'Korean', 'Portuguese', 
-        'Italian', 'Russian', 'Hindi', 'Arabic', 'Bengali', 'Punjabi', 'Urdu', 'Persian', 'Turkish', 'Vietnamese', 
-        'Thai', 'Dutch', 'Greek', 'Swedish', 'Norwegian', 'Danish', 'Finnish', 'Polish', 'Czech', 'Hungarian', 
-        'Romanian', 'Bulgarian', 'Serbian', 'Croatian', 'Slovak', 'Slovenian', 'Hebrew', 'Yiddish', 'Malay', 
-        'Indonesian', 'Tagalog', 'Tamil', 'Telugu', 'Kannada', 'Malayalam', 'Marathi', 'Gujarati', 'Pashto', 
-        'Amharic', 'Somali', 'Swahili', 'Hausa', 'Zulu', 'Xhosa', 'Afrikaans', 'Irish', 'Welsh', 'Scots Gaelic', 
-        'Basque', 'Catalan', 'Galician', 'Icelandic', 'Latvian', 'Lithuanian', 'Estonian', 'Albanian', 'Macedonian', 
-        'Armenian', 'Georgian', 'Azerbaijani', 'Kazakh', 'Uzbek', 'Tajik', 'Kyrgyz', 'Turkmen', 'Mongolian', 
-        'Nepali', 'Sinhalese', 'Burmese', 'Khmer', 'Lao', 'Tibetan', 'Maltese', 'Luxembourgish', 'Esperanto'
+        'Afrikaans', 'Albanian', 'Amharic', 'Arabic', 'Armenian', 'Azerbaijani', 'Basque', 'Bengali', 'Bulgarian', 'Burmese', 
+        'Cantonese', 'Catalan', 'Croatian', 'Czech', 'Danish', 'Dutch', 'English', 'Esperanto', 'Estonian', 'Finnish', 
+        'French', 'Galician', 'Georgian', 'German', 'Greek', 'Gujarati', 'Hausa', 'Hebrew', 'Hindi', 'Hungarian', 
+        'Icelandic', 'Indonesian', 'Irish', 'Italian', 'Japanese', 'Kannada', 'Kazakh', 'Khmer', 'Korean', 'Kyrgyz', 
+        'Lao', 'Latvian', 'Lithuanian', 'Luxembourgish', 'Macedonian', 'Malay', 'Malayalam', 'Maltese', 'Mandarin', 
+        'Marathi', 'Mongolian', 'Nepali', 'Norwegian', 'Pashto', 'Persian', 'Polish', 'Portuguese', 'Punjabi', 'Romanian', 
+        'Russian', 'Scots Gaelic', 'Serbian', 'Sinhalese', 'Slovak', 'Slovenian', 'Somali', 'Spanish', 'Swahili', 'Swedish', 
+        'Tagalog', 'Tajik', 'Tamil', 'Telugu', 'Thai', 'Tibetan', 'Turkish', 'Turkmen', 'Ukrainian', 'Urdu', 'Uzbek', 
+        'Vietnamese', 'Welsh', 'Xhosa', 'Yiddish', 'Zulu'
+
     ];
     
     const timeFrames = ['day', 'week', 'month'];
@@ -267,6 +269,7 @@ const CreateGame = ({ username }) => {
                     {/* Use the TagsManager component here */}
                     <TagsManager 
                         enabledTags={enabledTags}
+                        minAge={minAge}  // Pass minAge to TagsManager
                         setEnabledTags={setEnabledTags}
                     />
 

@@ -104,20 +104,22 @@ const Main = () => {
                     </div>
                 )}
                 {activePage === 'mySchedule' && (
-                    <div id="mySchedule">
-                        <div id="availabilityContainer" style={{display: 'flex', flexDirection: 'row'}}>
-                            <div id="availabilityPickerContainer" style={{flexGrow: 1}}>
-                                {selectedWeek && (
-                                    <AvailabilityPicker
-                                        username={username}
-                                        week={selectedWeek}
-                                        availability={availability}
-                                        onAvailabilitySubmit={handleAvailabilitySubmit}
-                                    />
-                                )}
-                            </div>
-                            <div id="weeksList" className="week-buttons">
-                                <WeekPicker onWeekSelect={handleWeekSelect} />
+                    <div className="form-container">
+                        <div id="mySchedule">
+                            <div id="availabilityContainer" style={{display: 'flex', flexDirection: 'row'}}>
+                                <div id="availabilityPickerContainer" style={{flexGrow: 1}}>
+                                    {selectedWeek && (
+                                        <AvailabilityPicker
+                                            username={username}
+                                            week={selectedWeek}
+                                            availability={availability}
+                                            onAvailabilitySubmit={handleAvailabilitySubmit}
+                                        />
+                                    )}
+                                </div>
+                                <div id="weeksList" className="week-buttons">
+                                    <WeekPicker onWeekSelect={handleWeekSelect} />
+                                </div>
                             </div>
                         </div>
                     </div>

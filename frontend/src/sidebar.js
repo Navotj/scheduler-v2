@@ -1,11 +1,8 @@
 import React from 'react';
 
-const Sidebar = ({ sidebarCollapsed, navigateTo, toggleSidebar, isLoggedIn }) => {
+const Sidebar = ({ navigateTo, isLoggedIn }) => {
     return (
-        <div id="sidebar" className={sidebarCollapsed ? 'collapsed' : ''}>
-            <div className="toggle-btn" onClick={toggleSidebar}>
-                ☰
-            </div>
+        <div id="sidebar">
             <ul>
                 {isLoggedIn ? (
                     <>
