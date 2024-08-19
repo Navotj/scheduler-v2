@@ -422,7 +422,6 @@ const CreateGame = ({ username }) => {
                     <textarea 
                         value={gameDescription}
                         onChange={(e) => setGameDescription(e.target.value)}
-                        style={{ resize: 'none', height: '100%' }}
                     />
                     <button
                         className={"button"}
