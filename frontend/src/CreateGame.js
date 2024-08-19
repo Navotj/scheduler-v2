@@ -6,7 +6,6 @@ import TagsManager from './TagsManager'; // Import the TagsManager component
 const CreateGame = ({ username }) => {
     const [gameName, setGameName] = useState('');
     const [gameSystem, setGameSystem] = useState('');
-    const [gameModule, setGameModule] = useState('');
     const [language, setLanguage] = useState('');
     const [startingLevel, setStartingLevel] = useState('');
     const [intendedGameLengthMin, setIntendedGameLengthMin] = useState('');
@@ -187,7 +186,6 @@ const CreateGame = ({ username }) => {
         const formData = new FormData();
         formData.append('gameName', gameName);
         formData.append('gameSystem', gameSystem);
-        formData.append('gameModule', gameModule);
         formData.append('language', language);
         formData.append('startingLevel', startingLevel);
         formData.append('intendedGameLengthMin', intendedGameLengthMin);

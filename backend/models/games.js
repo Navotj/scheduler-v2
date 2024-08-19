@@ -8,7 +8,6 @@ const tagSchema = new mongoose.Schema({
 const gameSchema = new mongoose.Schema({
     gameName: { type: String, required: true },
     gameSystem: { type: String, required: true },
-    gameModule: String,
     language: { type: String, required: true },
     startingLevel: Number,
     intendedGameLengthMin: Number,

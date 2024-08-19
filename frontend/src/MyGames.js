@@ -154,7 +154,6 @@ const MyGames = ({ username }) => {
                     <div 
                         key={game._id} 
                         className="game-card" 
-                        style={{ width: '48%', transform: 'scale(0.65)', transformOrigin: 'top left' }}  // Ensure two cards fit per row
                         onClick={() => handleGameClick(game)}
                     >
                         <GamePreview

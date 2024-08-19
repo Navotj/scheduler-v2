@@ -21,7 +21,11 @@ const Main = () => {
     };
 
     const navigateTo = (page) => {
-        setActivePage(page);
+        if (!isLoggedIn && ['mySchedule', 'createGame', 'myGames'].includes(page)) {
+            setActivePage('login');
+        } else {
+            setActivePage(page);
+        }
     };
 
     const handleLoginSuccess = (user) => {

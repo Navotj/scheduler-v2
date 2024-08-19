@@ -245,6 +245,9 @@ button:active, input[type="text"]:active, input[type="password"]:active {
     margin: 0 auto; /* Center if there's extra space */
     box-sizing: border-box;
     flex-grow: 1; /* Allow the container to grow and take up available space */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
 }
 
 .form-grid {
@@ -395,12 +398,11 @@ select {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-}
-
-.game-preview-card {
     width: 100%;
-    max-width: 20em; /* Fixed width */
-    height: 30em; /* Fixed height */
+    height: calc(100vh - 20px); /* Adjust to almost full height */
+}
+.game-preview-card {
+    font-size: 0.6em;
     padding: 0em;
     background-color: #2c2c2c;
     border-radius: 15px; /* Slightly more rounded corners */
@@ -409,6 +411,11 @@ select {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    width: 66.67%; /* 2/3rds width */
+    height: 100%;
+    max-width: none; /* Allow it to stretch */
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .game-preview-header {
@@ -612,4 +619,12 @@ select {
 .remove-tag:hover {
     background-color: rgba(255, 0, 0, 0.1);
     border-radius: 3px;
+}
+
+.game-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    overflow-y: auto;
 }
