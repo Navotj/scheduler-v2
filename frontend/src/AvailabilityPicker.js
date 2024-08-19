@@ -216,8 +216,7 @@ useEffect(() => {
     
     // These arrays store the days of the week and the hours of the day to create the grid.
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    // Updated timeSlots array with ":00" suffix
-    const timeSlots = Array(24).fill(null).map((_, i) => `${i + 1}:00`); // Creates an array of hour labels with ":00" suffix.
+    const timeSlots = Array(24).fill(null).map((_, i) => `${i + 1}`); // Creates an array of hour labels with ":00" suffix.
     const weekStartDate = new Date(week.startDate); // Converts the week start date to a Date object.
 
     return (

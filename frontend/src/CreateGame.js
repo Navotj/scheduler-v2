@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './styles.css';
 import Cropper from 'react-easy-crop';
-import GamePreview from './GamePreview'; // Import GamePreview component
+import TagsManager from './TagsManager'; // Import the TagsManager component
 
 const CreateGame = ({ username }) => {
     const [gameName, setGameName] = useState('');
@@ -27,9 +27,6 @@ const CreateGame = ({ username }) => {
     const [cropArea, setCropArea] = useState(null);
     const [showCropper, setShowCropper] = useState(false);
     const [enabledTags, setEnabledTags] = useState([]);
-    const [sortedTags, setSortedTags] = useState([]);
-    const [sortedSpecialTags, setSortedSpecialTags] = useState([]);
-    const [sortedSpecialTags18plus, setSortedSpecialTags18plus] = useState([]);
     const [enabledTabs, setEnabledTabs] = useState({
         classes: false,
         subclasses: false,
@@ -38,67 +35,56 @@ const CreateGame = ({ username }) => {
     });
 
     const gameSystems = [
-        'D&D 3.5e', 'D&D 5e', 'Pathfinder', 'Pathfinder 2e', 'Call of Cthulhu', 'Starfinder', 'Shadowrun',
-        'GURPS', 'Warhammer 40k', 'Vampire: The Masquerade', 'Cyberpunk 2020', 'Cyberpunk Red',
-        'Fate', 'Savage Worlds', 'Blades in the Dark', 'Dungeon World', 'Powered by the Apocalypse',
-        'Mutants & Masterminds', 'Kids on Bikes', 'The Witcher', 'Star Wars: Edge of the Empire',
-        'Numenera', 'The One Ring', 'Alien RPG', 'Cortex Prime', 'Genesys', 'Hero System', 'Other'
+        // Dungeons & Dragons and Related Systems
+        'D&D Original', 'D&D Basic/Expert', 'D&D 1e', 'D&D 2e', 'D&D 3e', 'D&D 3.5e', 'D&D 4e', 'D&D 5e',
+        'Pathfinder', 'Pathfinder 2e', 'Dungeon Crawl Classics', 'Old-School Essentials', 'OSRIC',
+    
+        // Science Fiction and Cyberpunk
+        'Cyberpunk 2020', 'Cyberpunk Red', 'Shadowrun', 'Starfinder', 'Traveller', 'Stars Without Number', 
+        'Star Wars: Edge of the Empire', 'The Expanse', 'Alien RPG', 'Eclipse Phase', 'Mothership',
+    
+        // Horror
+        'Call of Cthulhu', 'Delta Green', 'Vampire: The Masquerade', 'Werewolf: The Apocalypse', 
+        'Mage: The Ascension', 'Hunter: The Reckoning', 'Changeling: The Dreaming', 'Wraith: The Oblivion', 
+        'Promethean: The Created', 'Demon: The Fallen', 'Cthulhu Dark', 'Ten Candles',
+    
+        // Fantasy
+        'Warhammer Fantasy Roleplay', 'Warhammer 40k: Dark Heresy', 'The One Ring', 'The Witcher', 'Earthdawn', 
+        'Symbaroum', '13th Age', 'Dark Souls: The Roleplaying Game', 'Rolemaster', 'Tunnels & Trolls',
+    
+        // Superheroes and Modern
+        'Mutants & Masterminds', 'GURPS', 'Savage Worlds', 'FATE', 'Cortex Prime', 'Champions', 
+        'Hero System', 'Marvel Super Heroes', 'DC Heroes', 'Aberrant', 'City of Mist',
+    
+        // Powered by the Apocalypse (PbtA)
+        'Powered by the Apocalypse', 'Dungeon World', 'Monster of the Week', 'Apocalypse World', 
+        'Blades in the Dark', 'Urban Shadows', 'Masks: A New Generation', 'Fellowship', 'The Sprawl',
+    
+        // Indie and Story-Driven
+        'Kids on Bikes', 'Tales from the Loop', 'Fiasco', 'The Quiet Year', 'Dread', 'Honey Heist', 
+        'Lasers & Feelings', 'Mouse Guard', 'Burning Wheel', 'Torchbearer', 'Scum and Villainy', 
+        'Bluebeard’s Bride',
+    
+        // Other / Miscellaneous
+        'Numenera', 'The Strange', 'Genesys', 'Rifts', 'Paranoia', 'Torg Eternity', 
+        'Legend of the Five Rings', 'Deadlands', 'Other'
     ];
     
-    const languages = ['English', 'Spanish', 'French', 'German', 'Other'];
+    
+    const languages = [
+        'English', 'Spanish', 'French', 'German', 'Mandarin', 'Cantonese', 'Japanese', 'Korean', 'Portuguese', 
+        'Italian', 'Russian', 'Hindi', 'Arabic', 'Bengali', 'Punjabi', 'Urdu', 'Persian', 'Turkish', 'Vietnamese', 
+        'Thai', 'Dutch', 'Greek', 'Swedish', 'Norwegian', 'Danish', 'Finnish', 'Polish', 'Czech', 'Hungarian', 
+        'Romanian', 'Bulgarian', 'Serbian', 'Croatian', 'Slovak', 'Slovenian', 'Hebrew', 'Yiddish', 'Malay', 
+        'Indonesian', 'Tagalog', 'Tamil', 'Telugu', 'Kannada', 'Malayalam', 'Marathi', 'Gujarati', 'Pashto', 
+        'Amharic', 'Somali', 'Swahili', 'Hausa', 'Zulu', 'Xhosa', 'Afrikaans', 'Irish', 'Welsh', 'Scots Gaelic', 
+        'Basque', 'Catalan', 'Galician', 'Icelandic', 'Latvian', 'Lithuanian', 'Estonian', 'Albanian', 'Macedonian', 
+        'Armenian', 'Georgian', 'Azerbaijani', 'Kazakh', 'Uzbek', 'Tajik', 'Kyrgyz', 'Turkmen', 'Mongolian', 
+        'Nepali', 'Sinhalese', 'Burmese', 'Khmer', 'Lao', 'Tibetan', 'Maltese', 'Luxembourgish', 'Esperanto'
+    ];
+    
     const timeFrames = ['day', 'week', 'month'];
     const gameLengthUnits = ['session', 'day', 'week', 'month', 'year'];
-
-    const allTags = [
-        "SCI-FI", "Medieval", "High Fantasy", "Low Fantasy", "Gritty", "Light-hearted", 
-        "Horror", "Comedy", "Mystery", "Adventure", "Dungeon Crawl", "Exploration", 
-        "Political Intrigue", "Steampunk", "Cyberpunk", "Post-Apocalyptic", "Urban Fantasy", 
-        "Sword and Sorcery", "Dark Fantasy", "Survival", "Epic", "Heroic", "Tragic", 
-        "Mythological", "Lovecraftian", "Gothic", "Time Travel", "Alternate History", 
-        "Supernatural", "Vampires", "Werewolves", "Zombies", "Alien Invasion", "Psionics", 
-        "Magic-Heavy", "Low Magic", "Technomancy", "Planar Travel", "Underwater", "Skybound", 
-        "Desert", "Jungle", "Arctic", "Pirate", "Western", "Feudal Japan", "Ancient Rome", 
-        "Ancient Egypt", "Military Campaign"
-    ];
-
-    const specialTags = [
-        "Arachnophobia", "Thalassophobia", "Claustrophobia", "Entomophobia",
-        "Trypophobia", "Acrophobia", "Blood", "Needles", "Medical Procedures",
-        "Body Horror", "Animal Harm"
-    ];
-    
-
-    const specialTags18plus = [
-        "NSFW", "Drug Use", "Suicide", "Mental Illness", "Self-Harm", "Torture", "Gore",
-        "Extreme Violence", "Body Mutilation", "Human Trafficking",
-    ];
-    
-    useEffect(() => {
-        setSortedTags([...allTags].sort());
-        setSortedSpecialTags([...specialTags].sort());
-        setSortedSpecialTags18plus([...specialTags18plus].sort());
-    }, []);  // Removed dependencies
-    
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (showCropper) {
-                if (event.key === 'Escape') {
-                    handleCancelCrop();
-                } else if (event.key === 'Enter') {
-                    handleSaveCrop(event);
-                }
-            }
-        };
-    
-        document.addEventListener('keydown', handleKeyDown);
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [showCropper]);
-
-    const onCropComplete = (croppedArea, croppedAreaPixels) => {
-        setCropArea(croppedAreaPixels);
-    };
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
@@ -154,32 +140,15 @@ const CreateGame = ({ username }) => {
         };
     };
 
+    const onCropComplete = (croppedArea, croppedAreaPixels) => {
+        setCropArea(croppedAreaPixels);
+    };
+
     const toggleTab = (tabName) => {
         setEnabledTabs((prevTabs) => ({
             ...prevTabs,
             [tabName]: !prevTabs[tabName],
         }));
-    };
-
-    const handleTagClick = (tag) => {
-        if (!enabledTags.some(t => t.name === tag)) {
-            const newEnabledTags = [...enabledTags, { name: tag, isSpecial: false }].sort((a, b) => a.name.localeCompare(b.name));
-            setEnabledTags(newEnabledTags);
-        }
-    };
-
-    const handleSpecialTagClick = (tag) => {
-        if (!enabledTags.some(t => t.name === tag)) {
-            const newEnabledTags = [...enabledTags, { name: tag, isSpecial: true }].sort((a, b) => a.name.localeCompare(b.name));
-            setEnabledTags(newEnabledTags);
-            if (specialTags18plus.includes(tag) && minAge < 18) {
-                setMinAge(18);
-            }
-        }
-    };
-
-    const handleTagRemove = (tag) => {
-        setEnabledTags(enabledTags.filter(t => t.name !== tag.name));
     };
 
     const handleMinPlayersChange = (e) => {
@@ -210,6 +179,11 @@ const CreateGame = ({ username }) => {
     };
 
     const handleCreateGame = async () => {
+        if (!gameName || !gameSystem || !language || !username) {
+            alert('Please fill in all required fields');
+            return;
+        }
+    
         const formData = new FormData();
         formData.append('gameName', gameName);
         formData.append('gameSystem', gameSystem);
@@ -234,13 +208,18 @@ const CreateGame = ({ username }) => {
         formData.append('enabledTabs', JSON.stringify(enabledTabs));
         formData.append('owner', username);
         formData.append('createdAt', new Date().toISOString());
-
+    
+        // Debugging log
+        for (let pair of formData.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]); 
+        }
+    
         try {
             const response = await fetch('http://localhost:5000/games', {
                 method: 'POST',
                 body: formData,
             });
-
+    
             if (response.ok) {
                 alert('Game created successfully!');
             } else {
@@ -251,20 +230,20 @@ const CreateGame = ({ username }) => {
             alert('An error occurred. Please try again later.');
         }
     };
+    
 
     return (
         <div className="form-container">
-            <h2>New Game</h2>
-            <div className="form-grid-four-cols">
+            <div className="form-grid-three-cols">
                 <div className="col col-left">
-                    <label>Game Title:</label>
+                    <label className="small-label">Game Title:</label>
                     <input 
                         type="text" 
                         value={gameName} 
                         onChange={(e) => setGameName(e.target.value)} 
                         required
                     />
-                    <label>Game System:</label>
+                    <label className="small-label">Game System:</label>
                     <select 
                         value={gameSystem} 
                         onChange={(e) => setGameSystem(e.target.value)} 
@@ -275,7 +254,7 @@ const CreateGame = ({ username }) => {
                             <option key={index} value={system}>{system}</option>
                         ))}
                     </select>
-                    <label>Language:</label>
+                    <label className="small-label">Language:</label>
                     <select 
                         value={language} 
                         onChange={(e) => setLanguage(e.target.value)} 
@@ -286,45 +265,23 @@ const CreateGame = ({ username }) => {
                             <option key={index} value={lang}>{lang}</option>
                         ))}
                     </select>
-                    <label>Available Tags:</label>
-                    <div className="tags-container">
-                        {sortedTags.map(tag => (
-                            <div key={tag} className="tag" onClick={() => handleTagClick(tag)}>
-                                {tag}
-                            </div>
-                        ))}
-                    </div>
-                    <label>Special Tags:</label>
-                    <div className="tags-container">
-                        {sortedSpecialTags.map(tag => (
-                            <div key={tag} className="special-tag" onClick={() => handleSpecialTagClick(tag)}>
-                                {tag}
-                            </div>
-                        ))}
-                        {minAge >= 18 && sortedSpecialTags18plus.map(tag => (
-                            <div key={tag} className="special-tag" onClick={() => handleSpecialTagClick(tag)}>
-                                {tag}
-                            </div>
-                        ))}
-                    </div>
-                    <label>Enabled Tags:</label>
-                    <div className="enabled-tags-container">
-                        {enabledTags.map(({ name, isSpecial }) => (
-                            <div key={name} className={`enabled-tag ${isSpecial ? 'enabled-special-tag' : ''}`}>
-                                {name} <span className="remove-tag" onClick={() => handleTagRemove({ name, isSpecial })}>X</span>
-                            </div>
-                        ))}
-                    </div>
+
+                    {/* Use the TagsManager component here */}
+                    <TagsManager 
+                        enabledTags={enabledTags}
+                        setEnabledTags={setEnabledTags}
+                    />
+
                 </div>
                 <div className="col col-middle">
-                    <label>Starting Level:</label>
+                    <label className="small-label">Starting Level:</label>
                     <input 
                         type="number" 
                         value={startingLevel} 
                         onChange={(e) => setStartingLevel(e.target.value)} 
                         min="0" 
                     />
-                    <label>Intended Game Length:</label>
+                    <label className="small-label">Intended Game Length:</label>
                     <div className="game-length-container">
                         <input 
                             type="number" 
@@ -352,7 +309,7 @@ const CreateGame = ({ username }) => {
                     </div>
                     <div className="age-container">
                         <div className="min-age">
-                            <label>Min Age:</label>
+                            <label className="small-label">Min Age:</label>
                             <input 
                                 type="number" 
                                 value={minAge} 
@@ -361,7 +318,7 @@ const CreateGame = ({ username }) => {
                             />
                         </div>
                         <div className="max-age">
-                            <label>Max Age:</label>
+                            <label className="small-label">Max Age:</label>
                             <input 
                                 type="number" 
                                 value={maxAge} 
@@ -372,7 +329,7 @@ const CreateGame = ({ username }) => {
                     </div>
                     <div className="player-count-container">
                         <div className="min-players">
-                            <label>Min Players:</label>
+                            <label className="small-label">Min Players:</label>
                             <input 
                                 type="number" 
                                 value={minPlayers} 
@@ -381,7 +338,7 @@ const CreateGame = ({ username }) => {
                             />
                         </div>
                         <div className="max-players">
-                            <label>Max Players:</label>
+                            <label className="small-label">Max Players:</label>
                             <input 
                                 type="number" 
                                 value={maxPlayers} 
@@ -391,7 +348,7 @@ const CreateGame = ({ username }) => {
                         </div>
                     </div>
                     <div className="game-frequency-container">
-                        <label>Game Frequency:</label>
+                        <label className="small-label">Game Frequency:</label>
                         <div className="frequency-inputs">
                             <input 
                                 type="number" 
@@ -453,10 +410,18 @@ const CreateGame = ({ username }) => {
                         </div>
                     </div>
 
-                    <label>Game Image:</label>
+                    <label className="small-label">Game Image:</label>
                     <input 
                         type="file" 
                         onChange={handleImageUpload} 
+                    />
+                </div>
+                <div className="col col-right">
+                    <label className="small-label">Game Description:</label>
+                    <textarea 
+                        value={gameDescription}
+                        onChange={(e) => setGameDescription(e.target.value)}
+                        style={{ resize: 'none', height: '100%' }}
                     />
                     <button
                         className={"button"}
@@ -464,33 +429,6 @@ const CreateGame = ({ username }) => {
                     >
                         Create Game
                     </button>
-                </div>
-                <div className="col col-right">
-                    <label>Game Description:</label>
-                    <textarea 
-                        value={gameDescription}
-                        onChange={(e) => setGameDescription(e.target.value)}
-                        style={{ resize: 'none', height: '100%' }}
-                    />
-                </div>
-                <div className="col col-preview">
-                    <label>Preview:</label>
-                    <GamePreview
-                        username={username}
-                        gameName={gameName}
-                        gameSystem={gameSystem}
-                        language={language}
-                        frequencyNumber={frequencyNumber}
-                        frequencyInterval={frequencyInterval}
-                        frequencyTimeFrame={frequencyTimeFrame}
-                        intendedGameLengthMin={intendedGameLengthMin}
-                        intendedGameLengthMax={intendedGameLengthMax}
-                        intendedGameLengthUnit={intendedGameLengthUnit}
-                        minPlayers={minPlayers}
-                        maxPlayers={maxPlayers}
-                        croppedImage={croppedImage}
-                        gameDescription={gameDescription}  // Ensure the description is passed here
-                    />
                 </div>
             </div>
 

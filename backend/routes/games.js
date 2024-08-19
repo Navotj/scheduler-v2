@@ -3,15 +3,22 @@ const Game = require('../models/games'); // Adjust the path as necessary
 
 const router = express.Router();
 
-// Create a new game
-router.post('/', async (req, res) => {
+const multer = require('multer');
+const upload = multer(); // You can configure this further as needed
+
+router.post('/', upload.none(), async (req, res) => {
     try {
+        // Parse the enabledTags field if it exists and is a string
+        if (req.body.enabledTags) {
+            req.body.enabledTags = JSON.parse(req.body.enabledTags);
+        }
+
         const newGame = new Game(req.body);
         const savedGame = await newGame.save();
         res.status(201).json(savedGame);
     } catch (error) {
-        console.error('Error creating game:', error);
-        res.status(500).json({ message: 'Failed to create game' });
+        console.error('Error creating game:', error.message, error.stack);
+        res.status(500).json({ message: 'Failed to create game', error: error.message });
     }
 });
 
