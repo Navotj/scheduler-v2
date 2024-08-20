@@ -25,6 +25,22 @@ const tagCategories = [
         ]
     },
     {
+        "name": "Homebrew",
+        "color": "#37dfc2",
+        "tags": [
+            { "name": "Homebrew Subclasses", "icon": "📜" },
+            { "name": "Homebrew Classes", "icon": "📜" },
+            { "name": "Homebrew Items", "icon": "🧰" },
+            { "name": "Homebrew Races", "icon": "🧝" },
+            { "name": "Homebrew Feats", "icon": "📜" },
+            { "name": "Homebrew Rules", "icon": "📜" },
+            { "name": "Laserllama Homebrew", "icon": "🦙" },
+            { "name": "KibbleTasty Homebrew", "icon": "🍖" }
+        ]
+
+
+    },
+    {
         "name": "Magic Level",
         "color": "#8A2BE2", // BlueViolet
         "alphabetize": false,

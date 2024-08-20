@@ -32,6 +32,26 @@ const CreateGame = ({ username }) => {
         races: false,
         feats: false,
     });
+    // Add these states in CreateGame.js
+    const [sessionLengthMin, setSessionLengthMin] = useState('');
+    const [sessionLengthMax, setSessionLengthMax] = useState('');
+    const [sessionDays, setSessionDays] = useState({
+        sun: false,
+        mon: false,
+        tue: false,
+        wed: false,
+        thu: false,
+        fri: false,
+        sat: false,
+    });
+
+    // Add these functions in CreateGame.js
+    const toggleDay = (day) => {
+        setSessionDays(prevDays => ({
+            ...prevDays,
+            [day]: !prevDays[day],
+        }));
+    };
 
     
     const gameSystems = [
@@ -233,205 +253,206 @@ const CreateGame = ({ username }) => {
     
 
     return (
-        <div className="form-container">
-            <div className="form-grid-three-cols">
-                <div className="col col-left">
-                    <label className="small-label">Game Title:</label>
-                    <input 
-                        type="text" 
-                        value={gameName} 
-                        onChange={(e) => setGameName(e.target.value)} 
-                        required
-                    />
-                    <label className="small-label">Game System:</label>
-                    <select 
-                        value={gameSystem} 
-                        onChange={(e) => setGameSystem(e.target.value)} 
-                        required
-                    >
-                        <option value="" disabled>Select Game System</option>
-                        {gameSystems.map((system, index) => (
-                            <option key={index} value={system}>{system}</option>
-                        ))}
-                    </select>
-                    <label className="small-label">Language:</label>
-                    <select 
-                        value={language} 
-                        onChange={(e) => setLanguage(e.target.value)} 
-                        required
-                    >
-                        <option value="" disabled>Select Language</option>
-                        {languages.map((lang, index) => (
-                            <option key={index} value={lang}>{lang}</option>
-                        ))}
-                    </select>
+        <div className="form-grid-three-cols">
+            <div className="col col-left">
+                <label className="small-label">Game Title:</label>
+                <input 
+                    type="text" 
+                    value={gameName} 
+                    onChange={(e) => setGameName(e.target.value)} 
+                    required
+                />
+                <label className="small-label">Game System:</label>
+                <select 
+                    value={gameSystem} 
+                    onChange={(e) => setGameSystem(e.target.value)} 
+                    required
+                >
+                    <option value="" disabled>Select Game System</option>
+                    {gameSystems.map((system, index) => (
+                        <option key={index} value={system}>{system}</option>
+                    ))}
+                </select>
+                <label className="small-label">Language:</label>
+                <select 
+                    value={language} 
+                    onChange={(e) => setLanguage(e.target.value)} 
+                    required
+                >
+                    <option value="" disabled>Select Language</option>
+                    {languages.map((lang, index) => (
+                        <option key={index} value={lang}>{lang}</option>
+                    ))}
+                </select>
 
-                    {/* Use the TagsManager component here */}
+                <label className="small-label">Starting Level:</label>
+                <input 
+                    type="number" 
+                    value={startingLevel} 
+                    onChange={(e) => setStartingLevel(e.target.value)} 
+                    min="0" 
+                />
+                <label className="small-label">Intended Game Length:</label>
+                <div className="game-length-container">
+                    <input 
+                        type="number" 
+                        value={intendedGameLengthMin} 
+                        onChange={(e) => setIntendedGameLengthMin(e.target.value)} 
+                        min="1"
+                    />
+                    <span>-</span>
+                    <input 
+                        type="number" 
+                        value={intendedGameLengthMax} 
+                        onChange={(e) => setIntendedGameLengthMax(e.target.value)} 
+                        min={intendedGameLengthMin || "1"}
+                    />
+                    <select 
+                        value={intendedGameLengthUnit} 
+                        onChange={(e) => setIntendedGameLengthUnit(e.target.value)}
+                    >
+                        {gameLengthUnits.map((unit, index) => (
+                            <option key={index} value={unit}>
+                                {unit}{intendedGameLengthMax > 1 ? 's' : ''}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="age-container">
+                    <div className="min-age">
+                        <label className="small-label">Min Age:</label>
+                        <input 
+                            type="number" 
+                            value={minAge} 
+                            onChange={(e) => setMinAge(e.target.value)} 
+                            min="0" 
+                        />
+                    </div>
+                    <div className="max-age">
+                        <label className="small-label">Max Age:</label>
+                        <input 
+                            type="number" 
+                            value={maxAge} 
+                            onChange={(e) => setMaxAge(e.target.value)} 
+                            min={minAge || "0"}
+                        />
+                    </div>
+                </div>
+                <div className="player-count-container">
+                    <div className="min-players">
+                        <label className="small-label">Min Players:</label>
+                        <input 
+                            type="number" 
+                            value={minPlayers} 
+                            onChange={handleMinPlayersChange} 
+                            min="1" 
+                        />
+                    </div>
+                    <div className="max-players">
+                        <label className="small-label">Max Players:</label>
+                        <input 
+                            type="number" 
+                            value={maxPlayers} 
+                            onChange={handleMaxPlayersChange} 
+                            min={minPlayers} 
+                        />
+                    </div>
+                </div>
+    
+
+            </div>
+            <div className="col col-middle">
+
+                <div className="game-frequency-container">
+                    <label className="small-label">Game Frequency:</label>
+                    <div className="frequency-inputs">
+                        <input 
+                            type="number" 
+                            value={frequencyNumber} 
+                            onChange={handleFrequencyNumberChange} 
+                            min="1" 
+                            max="9"
+                        />
+                        <span>per</span>
+                        <input 
+                            type="number" 
+                            value={frequencyInterval} 
+                            onChange={e => setFrequencyInterval(e.target.value)} 
+                            disabled={frequencyNumber > 1} 
+                            min="1" 
+                            max="9"
+                            style={{ backgroundColor: frequencyNumber > 1 ? '#333' : '#1e1e1e' }}
+                        />
+                        <select 
+                            value={frequencyTimeFrame} 
+                            onChange={e => setFrequencyTimeFrame(e.target.value)}
+                        >
+                            {timeFrames.map((frame, index) => (
+                                <option key={index} value={frame}>
+                                    {frame}{frequencyInterval > 1 ? 's' : ''}
+                                </option>
+                            ))}
+                        </select>
+ 
+                    </div>
+                    <div className="session-length-container">
+                        <label className="small-label">Session Length:</label>
+                        <div className="length-inputs">
+                            <input
+                                type="number"
+                                value={sessionLengthMin}
+                                onChange={(e) => setSessionLengthMin(e.target.value)}
+                                min="1"
+                                max="24"
+                            />
+                            <span>-</span>
+                            <input
+                                type="number"
+                                value={sessionLengthMax}
+                                onChange={(e) => setSessionLengthMax(e.target.value)}
+                                min={sessionLengthMin || "1"}
+                                max="24"
+                            />
+                            <button className="static-button">hours</button>
+                        </div>
+                    </div>
+
+                    <div className="session-days-container">
+                        <label className="small-label">Possible Session Day/s:</label>
+                        <div className="days-buttons">
+                            {["sun", "mon", "tue", "wed", "thu", "fri", "sat"].map((day) => (
+                                <button
+                                    key={day}
+                                    className={sessionDays[day] ? "day-button active" : "day-button"}
+                                    onClick={() => toggleDay(day)}
+                                >
+                                    {day.toUpperCase()}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <TagsManager 
                         enabledTags={enabledTags}
                         minAge={minAge}  // Pass minAge to TagsManager
                         setEnabledTags={setEnabledTags}
                     />
-
-                </div>
-                <div className="col col-middle">
-                    <label className="small-label">Starting Level:</label>
-                    <input 
-                        type="number" 
-                        value={startingLevel} 
-                        onChange={(e) => setStartingLevel(e.target.value)} 
-                        min="0" 
-                    />
-                    <label className="small-label">Intended Game Length:</label>
-                    <div className="game-length-container">
-                        <input 
-                            type="number" 
-                            value={intendedGameLengthMin} 
-                            onChange={(e) => setIntendedGameLengthMin(e.target.value)} 
-                            min="1"
-                        />
-                        <span>-</span>
-                        <input 
-                            type="number" 
-                            value={intendedGameLengthMax} 
-                            onChange={(e) => setIntendedGameLengthMax(e.target.value)} 
-                            min={intendedGameLengthMin || "1"}
-                        />
-                        <select 
-                            value={intendedGameLengthUnit} 
-                            onChange={(e) => setIntendedGameLengthUnit(e.target.value)}
-                        >
-                            {gameLengthUnits.map((unit, index) => (
-                                <option key={index} value={unit}>
-                                    {unit}{intendedGameLengthMax > 1 ? 's' : ''}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="age-container">
-                        <div className="min-age">
-                            <label className="small-label">Min Age:</label>
-                            <input 
-                                type="number" 
-                                value={minAge} 
-                                onChange={(e) => setMinAge(e.target.value)} 
-                                min="0" 
-                            />
-                        </div>
-                        <div className="max-age">
-                            <label className="small-label">Max Age:</label>
-                            <input 
-                                type="number" 
-                                value={maxAge} 
-                                onChange={(e) => setMaxAge(e.target.value)} 
-                                min={minAge || "0"}
-                            />
-                        </div>
-                    </div>
-                    <div className="player-count-container">
-                        <div className="min-players">
-                            <label className="small-label">Min Players:</label>
-                            <input 
-                                type="number" 
-                                value={minPlayers} 
-                                onChange={handleMinPlayersChange} 
-                                min="1" 
-                            />
-                        </div>
-                        <div className="max-players">
-                            <label className="small-label">Max Players:</label>
-                            <input 
-                                type="number" 
-                                value={maxPlayers} 
-                                onChange={handleMaxPlayersChange} 
-                                min={minPlayers} 
-                            />
-                        </div>
-                    </div>
-                    <div className="game-frequency-container">
-                        <label className="small-label">Game Frequency:</label>
-                        <div className="frequency-inputs">
-                            <input 
-                                type="number" 
-                                value={frequencyNumber} 
-                                onChange={handleFrequencyNumberChange} 
-                                min="1" 
-                                max="9"
-                            />
-                            <span>per</span>
-                            <input 
-                                type="number" 
-                                value={frequencyInterval} 
-                                onChange={e => setFrequencyInterval(e.target.value)} 
-                                disabled={frequencyNumber > 1} 
-                                min="1" 
-                                max="9"
-                                style={{ backgroundColor: frequencyNumber > 1 ? '#333' : '#1e1e1e' }}
-                            />
-                            <select 
-                                value={frequencyTimeFrame} 
-                                onChange={e => setFrequencyTimeFrame(e.target.value)}
-                            >
-                                {timeFrames.map((frame, index) => (
-                                    <option key={index} value={frame}>
-                                        {frame}{frequencyInterval > 1 ? 's' : ''}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                    <div className="homebrew-options">
-                        <div className="homebrew-option">
-                            <button 
-                                className={enabledTabs.classes ? 'enabled' : 'disabled'}
-                                onClick={() => toggleTab('classes')}
-                            >
-                                Homebrew Classes
-                            </button>
-                            <button 
-                                className={enabledTabs.subclasses ? 'enabled' : 'disabled'}
-                                onClick={() => toggleTab('subclasses')}
-                            >
-                                Homebrew Subclasses
-                            </button>
-                        </div>
-                        <div className="homebrew-option">
-                            <button 
-                                className={enabledTabs.races ? 'enabled' : 'disabled'}
-                                onClick={() => toggleTab('races')}
-                            >
-                                Homebrew Races
-                            </button>
-                            <button 
-                                className={enabledTabs.feats ? 'enabled' : 'disabled'}
-                                onClick={() => toggleTab('feats')}
-                            >
-                                Homebrew Feats
-                            </button>
-                        </div>
-                    </div>
-
-                    <label className="small-label">Game Image:</label>
-                    <input 
-                        type="file" 
-                        onChange={handleImageUpload} 
-                    />
-                </div>
-                <div className="col col-right">
-                    <label className="small-label">Game Description:</label>
-                    <textarea 
-                        value={gameDescription}
-                        onChange={(e) => setGameDescription(e.target.value)}
-                    />
-                    <button
-                        className={"button"}
-                        onClick={handleCreateGame}
-                    >
-                        Create Game
-                    </button>
                 </div>
             </div>
-
+            <div className="col col-right">
+                <label className="small-label">Game Description:</label>
+                <textarea 
+                    value={gameDescription}
+                    onChange={(e) => setGameDescription(e.target.value)}
+                />
+                <button
+                    className={"button"}
+                    onClick={handleCreateGame}
+                >
+                    Create Game
+                </button>
+            </div>
+    
             {showCropper && (
                 <div className="cropper-container">
                     <div className="cropper-wrapper">
@@ -453,6 +474,7 @@ const CreateGame = ({ username }) => {
             )}
         </div>
     );
+    
 };
 
 export default CreateGame;
