@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './styles.css';
 
-const Login = ({ navigateTo, onLoginSuccess }) => {
+const Login = ({ onLoginSuccess }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();  // Use useNavigate hook
 
     const handleLogin = async () => {
         try {
@@ -20,7 +22,7 @@ const Login = ({ navigateTo, onLoginSuccess }) => {
                 console.log('Login successful', data);
                 localStorage.setItem('token', data.token);
                 onLoginSuccess(username);  // Pass the username to the parent component
-                navigateTo('mySchedule');
+                navigate('/mySchedule');  // Navigate to mySchedule after login
             } else {
                 console.error('Login failed');
                 alert('Login failed, please try again.');
@@ -43,7 +45,7 @@ const Login = ({ navigateTo, onLoginSuccess }) => {
 
             if (response.ok) {
                 console.log('Sign-up successful');
-                navigateTo('login');  // Redirect to login after successful sign-up
+                navigate('/login');  // Redirect to login after successful sign-up
             } else {
                 console.error('Sign-up failed');
             }
@@ -53,21 +55,25 @@ const Login = ({ navigateTo, onLoginSuccess }) => {
     };
 
     return (
-        <div className="login-container">
+        <div>
             <div className="login-box">
                 <h2>Login</h2>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+                <div>
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
                 <button onClick={handleLogin}>Login</button>
                 <p style={{ cursor: 'pointer', fontSize: '0.9em' }} onClick={() => alert('Forgot your password? Functionality coming soon!')}>
                     Forgot your password?

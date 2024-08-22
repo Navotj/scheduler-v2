@@ -365,13 +365,15 @@ const CreateGame = ({ username }) => {
                     </div>
                 </div>
                     <label className="small-label">Visibility:</label>
-                    <select 
-                        value={visibility} 
-                        onChange={handleVisibilityChange}
-                    >
-                        <option value="public">Public</option>
-                        <option value="private">Private</option>
-                    </select>
+                    <div>
+                        <select 
+                            value={visibility} 
+                            onChange={handleVisibilityChange}
+                        >
+                            <option value="public">Public</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
     
 
             </div>
@@ -409,8 +411,8 @@ const CreateGame = ({ username }) => {
                         </select>
  
                     </div>
+                    <label className="small-label">Session Length:</label>
                     <div className="session-length-container">
-                        <label className="small-label">Session Length:</label>
                         <div className="length-inputs">
                             <input
                                 type="number"
@@ -430,9 +432,8 @@ const CreateGame = ({ username }) => {
                             <button className="static-button">hours</button>
                         </div>
                     </div>
-
+                    <label className="small-label">Possible Session Day/s:</label>
                     <div className="session-days-container">
-                        <label className="small-label">Possible Session Day/s:</label>
                         <div className="days-buttons">
                             {["sun", "mon", "tue", "wed", "thu", "fri", "sat"].map((day) => (
                                 <button

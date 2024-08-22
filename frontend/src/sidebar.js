@@ -1,28 +1,49 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
-const Sidebar = ({ navigateTo, currentPage, isLoggedIn }) => {
+const Sidebar = ({ isLoggedIn }) => {
     return (
         <div id="sidebar">
             <ul>
-                {isLoggedIn ? (
-                    <>
-                        <li className={currentPage === 'mySchedule' ? 'active' : ''} onClick={() => navigateTo('mySchedule')}>
-                            My Schedule
-                        </li>
-                        <li className={currentPage === 'createGame' ? 'active' : ''} onClick={() => navigateTo('createGame')}>
-                            Create Game
-                        </li>
-                        <li className={currentPage === 'myGames' ? 'active' : ''} onClick={() => navigateTo('myGames')}>
-                            My Games
-                        </li>
-                    </>
-                ) : (
-                    <li className={currentPage === 'login' ? 'active' : ''} onClick={() => navigateTo('login')}>
-                        Login
-                    </li>
-                )}
-                <li className={currentPage === 'findGame' ? 'active' : ''} onClick={() => navigateTo('findGame')}>
-                    Find Game
+                <li>
+                    <NavLink
+                        to={isLoggedIn ? "/profile" : "/login"}
+                        className={({ isActive }) => isActive ? 'active-link' : 'inactive-link'}
+                    >
+                        {isLoggedIn ? "Profile" : "Login"}
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        to="/mySchedule"
+                        className={({ isActive }) => isActive ? 'active-link' : 'inactive-link'}
+                    >
+                        My Schedule
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        to="/createGame"
+                        className={({ isActive }) => isActive ? 'active-link' : 'inactive-link'}
+                    >
+                        Create Game
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        to="/myGames"
+                        className={({ isActive }) => isActive ? 'active-link' : 'inactive-link'}
+                    >
+                        My Games
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink
+                        to="/findGame"
+                        className={({ isActive }) => isActive ? 'active-link' : 'inactive-link'}
+                    >
+                        Find Game
+                    </NavLink>
                 </li>
             </ul>
         </div>

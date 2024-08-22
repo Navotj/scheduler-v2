@@ -1,137 +1,41 @@
 import React, { useState } from 'react';
-import WeekPicker from './WeekPicker';
-import AvailabilityPicker from './AvailabilityPicker';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './sidebar';
 import Login from './login';
 import CreateGame from './CreateGame';
 import FindGame from './FindGame';
 import MyGames from './MyGames';
+import MySchedule from './MySchedule';
+import Profile from './Profile';
 import './styles.css';
 
 const Main = () => {
-    const [activePage, setActivePage] = useState('login');
     const [username, setUsername] = useState(''); 
-    const [isLoggedIn, setIsLoggedIn] = useState(false); 
-    const [selectedWeek, setSelectedWeek] = useState(null);
-    const [availability, setAvailability] = useState(null);
-
-    const navigateTo = (page) => {
-        if (!isLoggedIn && ['mySchedule', 'createGame', 'myGames'].includes(page)) {
-            setActivePage('login');
-        } else {
-            setActivePage(page);
-        }
-    };
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const handleLoginSuccess = (user) => {
         setUsername(user);
-        setIsLoggedIn(true); 
-        navigateTo('profile'); 
-    };
-
-    const handleWeekSelect = (week) => {
-        console.log('Week selected:', week);
-        setSelectedWeek(week);
-        fetchAvailability(username, week.weekNumber);
-    };
-
-    const fetchAvailability = async (username, weekNumber) => {
-        try {
-            const response = await fetch(`http://localhost:5000/availability/${username}/${weekNumber}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`, 
-                },
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setAvailability(data);
-            } else {
-                console.error('Failed to fetch availability');
-            }
-        } catch (error) {
-            console.error('Error fetching availability:', error);
-        }
-    };
-
-    const handleAvailabilitySubmit = async (availabilityData) => {
-        try {
-            const response = await fetch('http://localhost:5000/save', { 
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username,
-                    week: selectedWeek.weekNumber,
-                    availability: availabilityData,
-                }),
-            });
-
-            if (response.ok) {
-                console.log('Availability saved successfully');
-            } else {
-                console.error('Failed to save availability');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        setIsLoggedIn(true);
     };
 
     return (
-        <div>
-            <Sidebar 
-                navigateTo={navigateTo}
-                isLoggedIn={isLoggedIn} 
-            />
-    
+        <Router>
+            <Sidebar isLoggedIn={isLoggedIn} />
             <div id="main-content">
-                {/* The form-container is now always within main-content */}
                 <div className="form-container">
-                    {activePage === 'login' && (
-                        <Login navigateTo={navigateTo} onLoginSuccess={handleLoginSuccess} />
-                    )}
-                    {activePage === 'profile' && (
-                        <div id="profile" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                            <h1>{username}</h1>
-                        </div>
-                    )}
-                    {activePage === 'mySchedule' && (
-                        <div id="mySchedule">
-                            <div id="availabilityContainer" style={{display: 'flex', flexDirection: 'row'}}>
-                                <div id="availabilityPickerContainer" style={{flexGrow: 1}}>
-                                    {selectedWeek && (
-                                        <AvailabilityPicker
-                                            username={username}
-                                            week={selectedWeek}
-                                            availability={availability}
-                                            onAvailabilitySubmit={handleAvailabilitySubmit}
-                                        />
-                                    )}
-                                </div>
-                                <div id="weeksList" className="week-buttons">
-                                    <WeekPicker onWeekSelect={handleWeekSelect} />
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {activePage === 'createGame' && (
-                        <CreateGame username={username} />
-                    )}
-                    {activePage === 'findGame' && (
-                        <FindGame username={username} />
-                    )}
-                    {activePage === 'myGames' && (
-                        <MyGames username={username} />
-                    )}
-                    {/* Other pages remain for future implementation */}
+                    <Routes>
+                        <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
+                        <Route path="/profile" element={<Profile username={username} />} />
+                        <Route path="/mySchedule" element={<MySchedule username={username} />} />
+                        <Route path="/createGame" element={<CreateGame username={username} />} />
+                        <Route path="/findGame" element={<FindGame username={username} />} />
+                        <Route path="/myGames" element={<MyGames username={username} />} />
+                        <Route path="*" element={<Navigate to={isLoggedIn ? "/profile" : "/login"} />} />
+                    </Routes>
                 </div>
             </div>
-        </div>
+        </Router>
     );
-    
 };
 
 export default Main;

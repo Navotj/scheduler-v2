@@ -23,7 +23,6 @@ const gameSchema = new mongoose.Schema({
     gameDescription: String,
     gameImage: String,
     enabledTags: [tagSchema],  // This is now an array of objects
-    enabledTabs: Object,
     owner: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     visibility: { type: String, enum: ['public', 'private'], default: 'public' },
