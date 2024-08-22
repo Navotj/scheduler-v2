@@ -245,8 +245,10 @@ button:active, input[type="text"]:active, input[type="password"]:active {
 .player-count-container, .age-container, .game-length-container, .frequency-inputs, .age-container {
     display: flex;
     gap: 3%; /* Adds space between the two input fields */
+    width: 100%;
+    margin-bottom: 1rem; /* Ensures each container has its own row */
+    align-items: center; /* Center align items vertically within the container */
 }
-
 
 .frequency-inputs, .game-length-container {
     align-items: center;
@@ -257,9 +259,6 @@ button:active, input[type="text"]:active, input[type="password"]:active {
     color: #e0e0e0;
 }
 
-.min-players, .max-players, .min-age, .max-age {
-    flex: 1;
-}
 
 textarea {
     height: 100%;
@@ -439,7 +438,7 @@ select {
     padding: 5px;
     border: 1px solid #444;
     border-radius: 5px;
-    height: 19vh; /* Fixed height for the container */
+    height: 30vh; /* Fixed height for the container */
     overflow-y: auto; /* Enable vertical scrolling if content exceeds container height */
 }
 
@@ -537,8 +536,9 @@ select {
 .col, .min-age, .max-age, .min-players, .max-players {
     display: flex;
     flex-direction: column;
-    gap: 0.3em;
+    gap: 0.3rem;
     align-items: flex-start; /* Ensure consistent alignment */
+    width: 100%;
 }
 
 .small-label {
@@ -557,7 +557,6 @@ input, select, button {
     box-sizing: border-box;
     height: 2.5rem;
     font-size: 0.8em;  
-    box-sizing: border-box;
     
 }
 

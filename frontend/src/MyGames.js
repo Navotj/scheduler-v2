@@ -62,7 +62,7 @@ const MyGames = ({ username }) => {
 
     if (selectedGame) {
         return (
-            <div className="form-container">
+            <div>
                 <h2>{isEditing ? 'Edit Game' : 'Game Details'}</h2>
                 <div className="form-grid-four-cols">
                     <div className="col col-left">
@@ -148,7 +148,7 @@ const MyGames = ({ username }) => {
     }
 
     return (
-        <div className="form-container">  {/* Add the form-container class here */}
+        <div>
             <div className="game-list" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                 {games.map((game) => (
                     <div 

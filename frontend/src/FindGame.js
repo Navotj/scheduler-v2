@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import GamePreview from './GamePreview';  // Make sure this path is correct
+import './styles.css';
 
-const FindGame = ({ username }) => {
+const FindGame = () => {
     const [games, setGames] = useState([]);
 
     useEffect(() => {
@@ -17,21 +19,29 @@ const FindGame = ({ username }) => {
         fetchGames();
     }, []);
 
-    const handleJoinGame = async (gameId) => {
-        // Implement join game logic here
-    };
-
     return (
-        <div>
-            <h2>Find Game</h2>
-            <div className="game-list">
+        <div className="find-game-container">
+            <h2>Find a Game</h2>
+            <div className="game-cards-grid">
                 {games.map((game) => (
-                    <div key={game.id} className={`game-card ${game.players.length > game.maxPlayers ? 'overfull' : ''}`}>
-                        <h3>{game.gameName}</h3>
-                        <p>System: {game.gameSystem}</p>
-                        <p>Language: {game.language}</p>
-                        <p>Players: {game.players.length}/{game.maxPlayers}</p>
-                        <button onClick={() => handleJoinGame(game.id)}>Join Game</button>
+                    <div key={game._id} className="game-card-wrapper">
+                        <GamePreview 
+                            username={game.owner}
+                            gameName={game.gameName}
+                            gameSystem={game.gameSystem}
+                            language={game.language}
+                            frequencyNumber={game.frequencyNumber}
+                            frequencyInterval={game.frequencyInterval}
+                            frequencyTimeFrame={game.frequencyTimeFrame}
+                            intendedGameLengthMin={game.intendedGameLengthMin}
+                            intendedGameLengthMax={game.intendedGameLengthMax}
+                            intendedGameLengthUnit={game.intendedGameLengthUnit}
+                            minPlayers={game.minPlayers}
+                            maxPlayers={game.maxPlayers}
+                            croppedImage={game.gameImage}
+                            gameDescription={game.gameDescription}
+                            enabledTags={game.enabledTags}
+                        />
                     </div>
                 ))}
             </div>

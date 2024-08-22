@@ -26,7 +26,10 @@ const gameSchema = new mongoose.Schema({
     enabledTabs: Object,
     owner: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
+    visibility: { type: String, enum: ['public', 'private'], default: 'public' },
+    
 });
+
 
 const Game = mongoose.model('Game', gameSchema);
 

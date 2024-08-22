@@ -13,6 +13,8 @@ router.post('/', upload.none(), async (req, res) => {
             req.body.enabledTags = JSON.parse(req.body.enabledTags);
         }
 
+        req.body.visibility = req.body.visibility || 'public';
+
         const newGame = new Game(req.body);
         const savedGame = await newGame.save();
         res.status(201).json(savedGame);

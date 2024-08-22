@@ -45,6 +45,12 @@ const CreateGame = ({ username }) => {
         sat: false,
     });
 
+    const [visibility, setVisibility] = useState('public');
+
+    const handleVisibilityChange = (e) => {
+        setVisibility(e.target.value);
+    };
+
     // Add these functions in CreateGame.js
     const toggleDay = (day) => {
         setSessionDays(prevDays => ({
@@ -358,6 +364,14 @@ const CreateGame = ({ username }) => {
                         />
                     </div>
                 </div>
+                    <label className="small-label">Visibility:</label>
+                    <select 
+                        value={visibility} 
+                        onChange={handleVisibilityChange}
+                    >
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                    </select>
     
 
             </div>

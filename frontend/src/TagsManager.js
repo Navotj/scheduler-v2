@@ -11,20 +11,6 @@ const tagCategories = [
         ]
     },
     {
-        "name": "Triggers",
-        "color": "#DC143C", // Crimson
-        "alphabetize": true,
-        "tags": [
-            { "name": "Blood", "icon": "🩸" },
-            { "name": "Needles", "icon": "💉" },
-            { "name": "Medical Procedures", "icon": "🏥" },
-            { "name": "Body Horror", "icon": "👁️" },
-            { "name": "Animal Harm", "icon": "🐾" },
-            { "name": "Child Harm", "icon": "🚸" },
-            
-        ]
-    },
-    {
         "name": "Homebrew",
         "color": "#37dfc2",
         "tags": [
@@ -173,6 +159,20 @@ const tagCategories = [
             { "name": "Noob Friendly", "icon": "🎮" },
             { "name": "Rules-Light", "icon": "📖" },
             { "name": "Rules-Heavy", "icon": "📚" }
+        ]
+    },
+    {
+        "name": "Triggers",
+        "color": "#DC143C", // Crimson
+        "alphabetize": true,
+        "tags": [
+            { "name": "Blood", "icon": "🩸" },
+            { "name": "Needles", "icon": "💉" },
+            { "name": "Medical Procedures", "icon": "🏥" },
+            { "name": "Body Horror", "icon": "👁️" },
+            { "name": "Animal Harm", "icon": "🐾" },
+            { "name": "Child Harm", "icon": "🚸" },
+            
         ]
     },
     {
