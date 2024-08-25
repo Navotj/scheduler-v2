@@ -1,39 +1,22 @@
-/* profile.css */
 
-.profile-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #1e1e1e;
-    border-radius: 8px;
-    color: #ffffff;
+.profile-info,
+.change-password {
+    width: 40%; /* Adjust the width as needed to create two columns */
+    display: inline-block;
+    vertical-align: top;
 }
 
-.profile-info label {
+
+.profile-info label,
+.change-password label {
     font-weight: bold;
-    margin-top: 10px;
     display: block;
 }
 
-.profile-info p {
-    margin-bottom: 10px;
-}
 
-.profile-info input, .profile-info textarea {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border: 1px solid #444;
-    background-color: #2e2e2e;
-    color: #ffffff;
-}
-
-.change-password h3 {
-    margin-top: 20px;
-}
-
-.change-password input {
+.input,
+.textarea,
+button {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
@@ -44,13 +27,12 @@
 }
 
 button {
-    background-color: #4caf50;
-    color: white;
-    padding: 10px 20px;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 button:hover {

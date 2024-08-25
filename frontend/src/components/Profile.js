@@ -32,7 +32,6 @@ const Profile = ({ username }) => {
 
     return (
         <div>
-            <h2>Profile</h2>
             <div className="profile-info">
                 <label>Username:</label>
                 <p>{username}</p>
@@ -108,7 +107,6 @@ const Profile = ({ username }) => {
             </div>
 
             <div className="change-password">
-                <h3>Change Password</h3>
                 <input 
                     type="password" 
                     placeholder="Current Password" 

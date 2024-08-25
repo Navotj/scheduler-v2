@@ -153,7 +153,6 @@ const MyGames = ({ username }) => {
                 {games.map((game) => (
                     <div 
                         key={game._id} 
-                        className="game-card" 
                         onClick={() => handleGameClick(game)}
                     >
                         <GamePreview

@@ -84,6 +84,16 @@ const tagCategories = [
         ]
     },
     {
+        "name": "Adventure Type",
+        "color": "#bdd9c4", // Light Green
+        "alphabetize": true,
+        "tags": [
+            { "name": "Official Module", "icon": "📜" },
+            { "name": "Homebrew Module", "icon": "🎨" },
+            { "name": "Sandbox", "icon": "⛱️" }
+        ]
+    },
+    {
         "name": "Supernatural Elements",
         "color": "#800080", // Purple
         "alphabetize": true,

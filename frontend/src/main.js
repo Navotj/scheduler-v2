@@ -25,12 +25,18 @@ const Main = () => {
                 <div className="form-container">
                     <Routes>
                         <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
-                        <Route path="/profile" element={<Profile username={username} />} />
-                        <Route path="/mySchedule" element={<MySchedule username={username} />} />
-                        <Route path="/createGame" element={<CreateGame username={username} />} />
-                        <Route path="/findGame" element={<FindGame username={username} />} />
-                        <Route path="/myGames" element={<MyGames username={username} />} />
-                        <Route path="*" element={<Navigate to={isLoggedIn ? "/profile" : "/login"} />} />
+                        {isLoggedIn ? (
+                            <>
+                                <Route path="/profile" element={<Profile username={username} />} />
+                                <Route path="/mySchedule" element={<MySchedule username={username} />} />
+                                <Route path="/createGame" element={<CreateGame username={username} />} />
+                                <Route path="/findGame" element={<FindGame username={username} />} />
+                                <Route path="/myGames" element={<MyGames username={username} />} />
+                                <Route path="*" element={<Navigate to="/profile" />} />
+                            </>
+                        ) : (
+                            <Route path="*" element={<Navigate to="/login" />} />
+                        )}
                     </Routes>
                 </div>
             </div>

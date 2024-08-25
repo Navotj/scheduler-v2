@@ -8,20 +8,6 @@
     padding: 20px;
 }
 
-.game-card {
-    cursor: pointer;
-    flex: 1 1 calc(33.33% - 20px);
-    margin: 10px;
-    padding: 20px;
-    background-color: #1e1e1e;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease-in-out;
-}
-
-.game-card:hover {
-    transform: scale(1.05);
-}
 
 .form-grid-four-cols {
     display: grid;
