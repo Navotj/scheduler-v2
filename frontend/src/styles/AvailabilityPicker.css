@@ -1,0 +1,89 @@
+/* availabilitypicker.css */
+
+/* Styling for table headers and cells */
+.timeLabel, .dayLabel {
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.timeLabel {
+    min-width: 20px;
+    max-width: 40px;
+}
+
+.slot {
+    min-width: 20px;
+    max-width: 40px;
+    height: 20px;
+    cursor: pointer;
+    border-right: 2px solid #555;
+}
+
+/* Highlight selected slots */
+.slot.clicked {
+    background-color: #0f0;
+}
+
+/* Dragging styles */
+.slot[data-dragging="true"] {
+    background-color: rgba(0, 255, 0, 0.5); /* Green for adding */
+}
+
+.slot[data-dragging="false"] {
+    background-color: rgba(255, 0, 0, 0.5); /* Red for removing */
+}
+
+/* Action buttons */
+#actionButtons {
+    display: flex;
+    justify-content: left;
+    width: 99%;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+#actionButtons button {
+    background-color: #4a4a4a;
+    color: white;
+    padding: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+    flex-grow: 1;
+    text-align: center;
+}
+
+#actionButtons button.add {
+    background-color: darkgreen;
+}
+
+#actionButtons button.remove {
+    background-color: darkred;
+}
+
+/* Table background for AvailabilityPicker */
+table {
+    background-color: #1e1e1e;
+    border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
+    user-select: none;
+}
+
+table th, table td {
+    height: calc(3.5em); /* Each slot is 1/7th of the viewport height */
+    padding: 0; /* Remove padding to ensure accurate height */
+    border: 1px solid #444;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Set background color for the entire first row */
+table thead th {
+    background-color: #333;
+    color: #fff; /* Ensure text is visible on dark background */
+    border: none;
+}
+

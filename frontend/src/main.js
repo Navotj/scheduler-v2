@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Sidebar from './sidebar';
-import Login from './login';
-import CreateGame from './CreateGame';
-import FindGame from './FindGame';
-import MyGames from './MyGames';
-import MySchedule from './MySchedule';
-import Profile from './Profile';
-import './styles.css';
+import Sidebar from './components/Sidebar';
+import Login from './components/Login';
+import CreateGame from './components/CreateGame';
+import FindGame from './components/FindGame';
+import MyGames from './components/MyGames';
+import MySchedule from './components/MySchedule';
+import Profile from './components/Profile';
+import './styles/main.css';
 
 const Main = () => {
     const [username, setUsername] = useState(''); 

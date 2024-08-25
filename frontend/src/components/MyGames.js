@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import GamePreview from './GamePreview'; // Import the regular GamePreview component
-import './styles.css';
+import '../styles/MyGames.css';
 
 const MyGames = ({ username }) => {
     const [games, setGames] = useState([]);

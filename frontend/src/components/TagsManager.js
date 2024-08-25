@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './styles.css';
+import '../styles/TagsManager.css';
 
 const tagCategories = [
     {
@@ -9,22 +9,6 @@ const tagCategories = [
         "tags": [
             { "name": "Paid", "icon": "💲" }
         ]
-    },
-    {
-        "name": "Homebrew",
-        "color": "#37dfc2",
-        "tags": [
-            { "name": "Homebrew Subclasses", "icon": "📜" },
-            { "name": "Homebrew Classes", "icon": "📜" },
-            { "name": "Homebrew Items", "icon": "🧰" },
-            { "name": "Homebrew Races", "icon": "🧝" },
-            { "name": "Homebrew Feats", "icon": "📜" },
-            { "name": "Homebrew Rules", "icon": "📜" },
-            { "name": "Laserllama Homebrew", "icon": "🦙" },
-            { "name": "KibbleTasty Homebrew", "icon": "🍖" }
-        ]
-
-
     },
     {
         "name": "Magic Level",
@@ -162,6 +146,22 @@ const tagCategories = [
         ]
     },
     {
+        "name": "Homebrew",
+        "color": "#37dfc2",
+        "tags": [
+            { "name": "Homebrew Subclasses", "icon": "📜" },
+            { "name": "Homebrew Classes", "icon": "📜" },
+            { "name": "Homebrew Items", "icon": "🧰" },
+            { "name": "Homebrew Races", "icon": "🧝" },
+            { "name": "Homebrew Feats", "icon": "📜" },
+            { "name": "Homebrew Rules", "icon": "📜" },
+            { "name": "Laserllama Homebrew", "icon": "🦙" },
+            { "name": "KibbleTasty Homebrew", "icon": "🍖" }
+        ]
+
+
+    },
+    {
         "name": "Triggers",
         "color": "#DC143C", // Crimson
         "alphabetize": true,
@@ -249,31 +249,35 @@ const TagsManager = ({ enabledTags, setEnabledTags, minAge }) => {
     );
 
     return (
-        <div>
-            <label className="small-label">Available Tags:</label>
-            <div className="tags-container">
-                {tagCategories.map(category =>
-                    category.tags
-                        .filter(tag => availableTags.includes(tag.name))
-                        .map(tag => renderTag(tag, category))
-                )}
+        <div className="tags-wrapper">
+            <div className="tags-half">
+                <label className="small-label">Available Tags:</label>
+                <div className="tags-container">
+                    {tagCategories.map(category =>
+                        category.tags
+                            .filter(tag => availableTags.includes(tag.name))
+                            .map(tag => renderTag(tag, category))
+                    )}
+                </div>
             </div>
-            <label className="small-label">Enabled Tags:</label>
-            <div className="enabled-tags-container">
-                {enabledTags.map(tag => {
-                    const category = tagCategories.find(category => category.tags.some(t => t.name === tag.name));
-                    return (
-                        <div
-                            key={tag.name}
-                            className="enabled-tag"
-                            style={{ borderColor: category.color }}
-                            data-icon={tag.icon}
-                        >
-                            {tag.name} 
-                            <span className="remove-tag" onClick={() => handleTagRemove(tag)}>X</span>
-                        </div>
-                    );
-                })}
+            <div className="tags-half">
+                <label className="small-label">Enabled Tags:</label>
+                <div className="enabled-tags-container">
+                    {enabledTags.map(tag => {
+                        const category = tagCategories.find(category => category.tags.some(t => t.name === tag.name));
+                        return (
+                            <div
+                                key={tag.name}
+                                className="enabled-tag"
+                                style={{ borderColor: category.color }}
+                                data-icon={tag.icon}
+                            >
+                                {tag.name} 
+                                <span className="remove-tag" onClick={() => handleTagRemove(tag)}>X</span>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );

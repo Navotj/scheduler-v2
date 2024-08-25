@@ -1,0 +1,80 @@
+/* tagsmanager.css */
+
+.small-label {
+    font-size: 0.8em;
+    margin-bottom: 0.5em;
+}
+
+.tags-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.tags-half {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0; /* Ensures proper behavior when flexing within a column */
+}
+
+.tags-container, .enabled-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2em;
+    align-content: flex-start;
+    align-items: flex-start;
+    padding: 5px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    overflow-y: auto;
+    height: 100%; /* Force the container to stay within its half of the parent */
+}
+
+.tag, .enabled-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2em 0.4em;
+    border: 0.15em solid;
+    border-radius: 5px;
+    background-color: #2e2e2e;
+    cursor: pointer;
+    color: #ccc;
+    font-size: 0.7em;
+    gap: 0.2em;
+    flex-shrink: 0;
+    flex-grow: 0;
+    max-width: max-content;
+    width: auto;
+}
+
+.enabled-tag {
+    background-color: #333;
+}
+
+.tag.lgbt-friendly {
+    border-image: linear-gradient(90deg, #FF0000 0%, #FF7F00 16.67%, #FFFF00 33.33%, #00FF00 50%, #0000FF 66.67%, #4B0082 83.33%, #8B00FF 100%);
+    border-image-slice: 1;
+    color: white;
+    clip-path: inset(0 round 5px);
+}
+
+.remove-tag {
+    color: red;
+    margin-left: 5px;
+    cursor: pointer;
+    padding: 0px;
+}
+
+.remove-tag:hover {
+    background-color: rgba(255, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+.tag::before, .enabled-tag::before {
+    content: attr(data-icon);
+    margin-right: 0.3em;
+    font-size: 1em; /* Adjust font size as needed */
+}

@@ -1,0 +1,19 @@
+/* weekpicker.css */
+
+.week {
+    cursor: pointer;
+    margin: 2px 0;
+    padding: 20px;
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: left;
+    flex: 1;
+}
+
+.week.selected {
+    border: 1px solid #4caf50;
+    background-color: #444;
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/WeekPicker.css'
 
 const WeekPicker = ({ username, onWeekSelect }) => {
     const [weeks, setWeeks] = useState([]);

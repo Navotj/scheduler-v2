@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import WeekPicker from './WeekPicker';
 import AvailabilityPicker from './AvailabilityPicker';
+import '../styles/MySchedule.css'
 
 const MySchedule = ({ username }) => {
     const [selectedWeek, setSelectedWeek] = useState(null);

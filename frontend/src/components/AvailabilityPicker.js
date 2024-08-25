@@ -1,5 +1,6 @@
 // Import necessary modules from React
 import React, { useState, useEffect } from 'react';
+import '../styles/AvailabilityPicker.css'
 
 /**
  * AvailabilityPicker is a React component that allows users to select their availability

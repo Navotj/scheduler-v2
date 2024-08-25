@@ -1,0 +1,49 @@
+/* myschedule.css */
+
+#mySchedule {
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+}
+
+#availabilityContainer {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+#availabilityPickerContainer {
+    flex-grow: 1;
+}
+
+.week-buttons {
+    margin-left: 1em;
+    padding: 0;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.week-buttons .week {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5em 1em;
+    text-align: left;
+    font-size: 0.8em;
+    cursor: pointer;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+    display: inline-block;
+    border: 1px solid #434343;
+}
+
+.week-buttons .week.selected {
+    border: 1px solid #4caf50;
+    background-color: #444;
+}

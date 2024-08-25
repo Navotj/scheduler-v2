@@ -1,0 +1,55 @@
+/* login.css */
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    transition: width 0.3s ease-in-out;
+}
+
+.login-box {
+    text-align: center;
+}
+
+.login-box input {
+    margin-bottom: 15px;
+    width: 30%;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.login-box button {
+    margin-top: 10px;
+    width: 30%;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-box button:hover {
+    background-color: #444;
+}
+
+.login-box button:active {
+    background-color: #555;
+}
+
+.login-box p {
+    cursor: pointer;
+    font-size: 0.9em;
+    color: #e0e0e0;
+    margin-top: 10px;
+}
+
+.login-box p:hover {
+    text-decoration: underline;
+}

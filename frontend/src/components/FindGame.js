@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import GamePreview from './GamePreview';  // Make sure this path is correct
-import './styles.css';
+import '../styles/FindGame.css';
 
 const FindGame = () => {
     const [games, setGames] = useState([]);

@@ -1,5 +1,5 @@
 import React from 'react';
-import './styles.css';
+import '../styles/GamePreview.css';
 
 const GamePreview = ({ username, gameName, gameSystem, language, frequencyNumber, frequencyInterval, frequencyTimeFrame, intendedGameLengthMin, intendedGameLengthMax, intendedGameLengthUnit, minPlayers, maxPlayers, croppedImage, gameDescription }) => {
     return (
