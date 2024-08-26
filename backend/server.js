@@ -20,7 +20,9 @@ const saltRounds = 10;
 const jwtSecret = '9e0274ce3e08ef40f347bdce8d9ccbae19de135972384a164d4a0fa09108f13a7156326849ff324b6edcc2124891db0f9c70ca6c4d316bcc359a64b23dea706d';  // Replace with your own secret
 
 app.use(bodyParser.json());
-app.use('/', availabilityRoutes);
+
+// Mount routes
+app.use('/availability', availabilityRoutes);
 app.use('/games', gameRoutes); // Use the game routes
 
 // MongoDB connection to the "scheduler" database

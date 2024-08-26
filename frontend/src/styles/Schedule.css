@@ -23,6 +23,7 @@
     table-layout: fixed;
     border-collapse: collapse;
     margin: 0; /* No extra margin or padding */
+    
 }
 
 /* Styling for table headers and cells */
@@ -49,12 +50,6 @@
     background-clip: padding-box; /* Ensure background doesn't bleed into shadow */
 }
 
-/* Highlight selected slots */
-.selected-slot {
-    background-color: #007bff; /* Bright blue background to indicate selection */
-    color: #fff; /* Ensure text remains white and visible */
-}
-
 .action-buttons {
     display: flex;
     flex-direction: column;
@@ -67,7 +62,7 @@
 
 .action-buttons button {
     width: 40px;
-    height: 300px;
+        height: 500px;
     background-color: #222; /* Blue background */
     color: #e0e0e0; /* White text */
     border: none;
@@ -174,7 +169,7 @@
     left: 0;
     background-color: #222;
     z-index: 5;
-    min-width: 100px;
+    width: 100px;
     text-align: left;
     vertical-align: middle;
     background-clip: padding-box;
@@ -191,15 +186,16 @@
 }
 
 .scheduler-table thead tr {
-    transform: translateX(-19px); /* Adjust the value to match the width of one slot */
+    transform: translateX(calc(var(--timeSlotWidth)));
 }
 
 .time-slot {
-    min-width: 13px; /* Ensure the minimum width is also set */
+    min-width: calc(var(--timeSlotWidth) - 6px); /* Use the calculated width or fallback to 33px */
 }
 
+
 .end-of-week-border {
-    border-bottom: 3px solid #fff; /* Bolder vertical line to indicate the end of the week */
+    border-bottom: 3px solid #999999; /* Bolder vertical line to indicate the end of the week */
 }
 
 .scheduler-time-header {
@@ -215,3 +211,19 @@
     border: none; /* Remove any border from th elements */
     box-shadow: none; /* Remove box-shadow that could simulate borders */
 }
+
+/* More specific selector to ensure hover effect is applied */
+.scheduler-table td.time-slot.hovered-slot {
+    background-color: #7a7a7a;
+}
+
+.scheduler-table td.time-slot.selected-slot {
+    background-color: #1c9500; 
+}
+
+/* Special color for hovered selected slot in remove mode */
+.scheduler-table td.time-slot.selected-slot.hovered-slot-remove {
+    background-color: #cd7120; /* Red background to indicate removal */
+    z-index: 2;
+}
+

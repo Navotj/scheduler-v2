@@ -1,65 +1,46 @@
 const express = require('express');
 const router = express.Router();
-const WeekAvailability = require('../models/WeekAvailability');
+const Availability = require('../models/Availability');
 
-// API to save user availability
-router.post('/save', async (req, res) => {
-    const { username, week, availability } = req.body;
-    console.log('Received save request:', req.body);
+// Save availability data
+router.post('/availability', async (req, res) => {
+    const { username, times } = req.body;
 
     try {
-        let weekAvailability = await WeekAvailability.findOne({ username, week });
-        console.log('Found week availability:', weekAvailability);
+        let availability = await Availability.findOne({ username });
 
-        if (weekAvailability) {
-            weekAvailability.availability = [{ times: availability }];
-            console.log('Updating existing week availability');
+        if (availability) {
+            // Update existing availability
+            availability.times = times;
         } else {
-            weekAvailability = new WeekAvailability({
-                username,
-                week,
-                availability: [{ times: availability }]
-            });
-            console.log('Creating new week availability');
+            // Create new availability
+            availability = new Availability({ username, times });
         }
 
-        await weekAvailability.save();
-        console.log('Availability successfully saved');
-        res.send('User week availability saved');
-    } catch (error) {
-        console.error('Error saving user availability:', error);
-        res.status(500).send('Error saving user availability');
+        await availability.save();
+        res.status(200).json({ message: 'Availability saved successfully' });
+    } catch (err) {
+        console.error('Error saving availability:', err);
+        res.status(500).json({ error: 'Failed to save availability' });
     }
 });
 
-router.get('/availability/:username/:week', async (req, res) => {
-    const { username, week } = req.params;
-    console.log(`Fetching availability for user: ${username}, week: ${week}`);
+// Fetch availability data
+router.get('/availability', async (req, res) => {
+    const { username } = req.query;
 
     try {
-        const weekAvailability = await WeekAvailability.findOne({ username, week });
-        if (weekAvailability) {
-            console.log('Found availability:', weekAvailability);
-            res.json({
-                username: weekAvailability.username,
-                week: weekAvailability.week,
-                availability: weekAvailability.availability.length > 0 ? weekAvailability.availability[0].times : [],
-                __v: weekAvailability.__v
-            });
+        const availability = await Availability.findOne({ username });
+
+        if (availability) {
+            res.json(availability);
         } else {
-            console.log('No availability found for the user and week:', { username, week });
-            res.json({
-                username,
-                week,
-                availability: [],
-                __v: 0
-            });
+            res.status(404).json({ error: 'No availability found' });
         }
-    } catch (error) {
-        console.error('Error fetching user availability:', error);
-        res.status(500).send('Error fetching user availability');
+    } catch (err) {
+        console.error('Error fetching availability:', err);
+        res.status(500).json({ error: 'Failed to fetch availability' });
     }
 });
-
 
 module.exports = router;
