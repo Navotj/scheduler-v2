@@ -5,7 +5,7 @@ import Login from './components/Login';
 import CreateGame from './components/CreateGame';
 import FindGame from './components/FindGame';
 import MyGames from './components/MyGames';
-import MySchedule from './components/MySchedule';
+import MySchedule from './components/Schedule';
 import Profile from './components/Profile';
 import './styles/main.css';
 

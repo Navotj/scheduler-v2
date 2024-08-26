@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const availabilitySchema = new mongoose.Schema({
-    times: [{ start: Number, end: Number }]
+    start: Date,
+    end: Date
 });
 
 const weekAvailabilitySchema = new mongoose.Schema({
