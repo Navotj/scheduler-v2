@@ -21,7 +21,6 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
             const daySlotWidth = 100; // Adjust based on your specific day slot width
             const actionButtonWidth = actionButtons.clientWidth || 100;
     
-            // Assuming a typical scrollbar width (you might need to fine-tune this for your specific layout)
             const scrollbarWidth = tableWrapper.offsetWidth - tableWrapper.clientWidth;    
             const availableWidth = wrapperWidth - daySlotWidth - actionButtonWidth - scrollbarWidth;
             const numberOfTimeSlots = 48;
@@ -29,26 +28,42 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     
             document.documentElement.style.setProperty('--timeSlotWidth', `${timeSlotWidth}px`);
         }
-
+    
         const fetchAvailability = async () => {
             try {
-                const response = await fetch(`/availability?username=${username}`);
+                const response = await fetch(`http://localhost:5000/availability?username=${username}`);
                 if (response.ok) {
                     const data = await response.json();
-                    const loadedSlots = new Set();
-                    data.times.forEach(({ startDate }) => {
-                        const date = new Date(startDate);
-                        const dayIndex = Math.floor((date - new Date()) / (1000 * 60 * 60 * 24));
-                        const timeIndex = date.getHours() * 2 + (date.getMinutes() / 30);
-                        loadedSlots.add(`${dayIndex}-${timeIndex}`);
-                    });
-                    setSelectedSlots(loadedSlots);
+                    console.log('Fetched data:', data);
+                    markSlots(data.times);
+                } else {
+                    console.log('Failed to fetch availability');
                 }
             } catch (error) {
                 console.error('Error fetching availability:', error);
             }
         };
-
+    
+        const markSlots = (times) => {
+            const newSelectedSlots = new Set();
+            const now = new Date();
+        
+            times.forEach(({ startDate, endDate }) => {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+        
+                let dayIndex = Math.floor((start - now) / (1000 * 60 * 60 * 24));
+                let startTimeIndex = Math.floor(start.getHours() * 2 + start.getMinutes() / intervalMinutes);
+                let endTimeIndex = Math.ceil(end.getHours() * 2 + end.getMinutes() / intervalMinutes);
+        
+                for (let i = startTimeIndex; i < endTimeIndex; i++) {
+                    newSelectedSlots.add(`${dayIndex}-${i}`);
+                }
+            });
+        
+            setSelectedSlots(newSelectedSlots);
+        };
+        
         fetchAvailability();
     }, [username]);
 
@@ -99,44 +114,55 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
 
     const condenseTimeSlots = (slots) => {
         if (slots.length === 0) return [];
-
+        
         const sortedSlots = slots.sort((a, b) => {
             const [aDay, aTime] = a.split('-').map(Number);
             const [bDay, bTime] = b.split('-').map(Number);
             return aDay - bDay || aTime - bTime;
         });
-
+        
         const condensed = [];
-        let start = generateTimeSlot(...sortedSlots[0].split('-').map(Number)).startDate;
-        let end = generateTimeSlot(...sortedSlots[0].split('-').map(Number)).endDate;
-
-        for (let i = 1; i < sortedSlots.length; i++) {
-            const [dayIndex, timeIndex] = sortedSlots[i].split('-').map(Number);
+        let currentRange = null;
+        
+        sortedSlots.forEach(slot => {
+            const [dayIndex, timeIndex] = slot.split('-').map(Number);
             const { startDate, endDate } = generateTimeSlot(dayIndex, timeIndex);
-
-            if (startDate === end) {
-                end = endDate;
+        
+            if (currentRange) {
+                if (startDate <= currentRange.endDate + 1000 * 60 * intervalMinutes) {
+                    currentRange.endDate = Math.max(currentRange.endDate, endDate);
+                } else {
+                    condensed.push(currentRange);
+                    currentRange = { startDate, endDate };
+                }
             } else {
-                condensed.push({ startDate: start, endDate: end });
-                start = startDate;
-                end = endDate;
+                currentRange = { startDate, endDate };
             }
+        });
+        
+        if (currentRange) {
+            condensed.push(currentRange);
         }
-        condensed.push({ startDate: start, endDate: end });
-
+        
         return condensed;
     };
-
+    
     const generateTimeSlot = (dayIndex, timeIndex) => {
         const startTime = new Date();
         startTime.setHours(0, 0, 0, 0);
         startTime.setDate(startTime.getDate() + dayIndex);
         startTime.setMinutes(timeIndex * intervalMinutes);
-
+    
         const endTime = new Date(startTime);
         endTime.setMinutes(startTime.getMinutes() + intervalMinutes);
-
-        return { startDate: startTime.toISOString(), endDate: endTime.toISOString() };
+    
+        // Avoid the end time being exactly the same as the next slot's start time
+        endTime.setSeconds(endTime.getSeconds() - 1);
+    
+        return {
+            startDate: startTime.getTime(), // Use epoch time
+            endDate: endTime.getTime(),     // Use epoch time
+        };
     };
 
     const handleSave = async () => {
@@ -145,9 +171,9 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
             username: username,
             times: times.map(({ startDate, endDate }) => ({ startDate, endDate })),
         };
-    
+
         try {
-            const response = await fetch('/availability', {
+            const response = await fetch('http://localhost:5000/availability', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -163,7 +189,6 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
             console.error('Error saving data:', error);
         }
     };
-    
 
     const timeSlots = Array.from({ length: 48 }, (_, index) => {
         const hours = Math.floor(index / 2).toString().padStart(2, '0');
@@ -174,6 +199,7 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     return (
         <div className="scheduler-container" onMouseUp={handleMouseUp}>
             <div className="scheduler-table-wrapper">
+                <div className="scheduler-background-bar"></div>
                 <table className="scheduler-table">
                     <thead>
                         <tr>
@@ -181,7 +207,7 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                             {timeSlots.map((time, timeIndex) => {
                                 if (time.endsWith(":00")) {
                                     let hour = time.split(':')[0];
-                                    hour = (parseInt(hour.startsWith('0') ? hour.substring(1) : hour) + 1).toString().padStart(2, '0');
+                                    hour = (parseInt(hour.startsWith('0') ? hour.substring(1) : hour) + 1).toString();
                                     return (
                                         <th key={timeIndex} className="scheduler-time-header" colSpan="2">
                                             {hour}
@@ -235,7 +261,7 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                     onClick={toggleMode}
                 >+</button>
                 <button
-                    className={!isAddMode ? 'active' : ''}
+                    className={!isAddMode ? 'active' : ''} 
                     onClick={toggleMode}
                 >-</button>
                 <button onClick={handleSave}>Save</button>

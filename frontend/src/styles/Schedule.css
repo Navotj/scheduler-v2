@@ -41,15 +41,6 @@
     
 }
 
-/* Sticky day headers at the top */
-.scheduler-day-header {
-    position: sticky;
-    top: 0;
-    background-color: #222; /* Darker background for sticky day headers */
-    cursor: default; /* Change cursor to default (normal arrow) */
-    background-clip: padding-box; /* Ensure background doesn't bleed into shadow */
-}
-
 .action-buttons {
     display: flex;
     flex-direction: column;
@@ -168,7 +159,7 @@
     position: sticky;
     left: 0;
     background-color: #222;
-    z-index: 5;
+    z-index: 0;
     width: 100px;
     text-align: left;
     vertical-align: middle;
@@ -190,26 +181,24 @@
 }
 
 .time-slot {
-    min-width: calc(var(--timeSlotWidth) - 6px); /* Use the calculated width or fallback to 33px */
+    min-width: calc(var(--timeSlotWidth) - 6.5px); /* Use the calculated width or fallback to 33px */
 }
 
 
 .end-of-week-border {
-    border-bottom: 3px solid #999999; /* Bolder vertical line to indicate the end of the week */
+    border-bottom: 2px solid #888; /* Bolder vertical line to indicate the end of the week */
 }
+
 
 .scheduler-time-header {
     position: sticky;
     top: 0;
-    background-color: #222; /* Keep background color */
-    z-index: 10; /* Ensure it's above other content */
-    border: none; /* Remove border */
-    box-shadow: none; /* Remove shadow that simulates a border */
+    z-index: 5; /* Ensure it's above other content */
+    
 }
 
 .scheduler-table th {
-    border: none; /* Remove any border from th elements */
-    box-shadow: none; /* Remove box-shadow that could simulate borders */
+    box-shadow: none;
 }
 
 /* More specific selector to ensure hover effect is applied */
@@ -227,3 +216,25 @@
     z-index: 2;
 }
 
+
+
+.scheduler-background-bar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 22px; /* This matches the height of your header slots */
+    background-color: #333;
+    z-index: 0; /* Place it between the time markers (z-index: 10) and the rest of the table (default z-index) */
+    margin-top: -22px; /* Pull it back up to prevent moving the table */
+}
+
+.scheduler-table td:nth-child(2n),
+.scheduler-table th:nth-child(2n) {
+    border-right: 1px solid #555;
+}
+
+.scheduler-table td,
+.scheduler-table th {
+    border-right: 1px solid #999;
+}

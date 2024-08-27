@@ -2,18 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Availability = require('../models/Availability');
 
-// Save availability data
-router.post('/availability', async (req, res) => {
+// Existing routes...
+router.post('/', async (req, res) => {
     const { username, times } = req.body;
 
     try {
         let availability = await Availability.findOne({ username });
 
         if (availability) {
-            // Update existing availability
             availability.times = times;
         } else {
-            // Create new availability
             availability = new Availability({ username, times });
         }
 
@@ -25,13 +23,14 @@ router.post('/availability', async (req, res) => {
     }
 });
 
-// Fetch availability data
-router.get('/availability', async (req, res) => {
+router.get('/', async (req, res) => {
+    console.log('GET /availability called with:', req.query.username);
     const { username } = req.query;
 
     try {
-        const availability = await Availability.findOne({ username });
-
+        const availability = await Availability.findOne({ username: username.trim() });
+        console.log('Query Result:', availability);
+        
         if (availability) {
             res.json(availability);
         } else {
@@ -42,5 +41,6 @@ router.get('/availability', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch availability' });
     }
 });
+
 
 module.exports = router;
