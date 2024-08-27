@@ -176,7 +176,7 @@
 }
 
 .time-slot {
-    min-width: calc(var(--timeSlotWidth) - 6.5px); /* Use the calculated width or fallback to 33px */
+    min-width: calc(var(--timeSlotWidth) - 6.5  px); /* Use the calculated width or fallback to 33px */
 }
 
 
