@@ -24,6 +24,14 @@ const Sidebar = ({ isLoggedIn }) => {
                 </li>
                 <li>
                     <NavLink
+                        to="/defaultWeek"
+                        className={({ isActive }) => isActive ? 'active-link' : 'inactive-link'}
+                    >
+                        Default Week
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink
                         to="/createGame"
                         className={({ isActive }) => isActive ? 'active-link' : 'inactive-link'}
                     >

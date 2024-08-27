@@ -7,6 +7,7 @@ import FindGame from './components/FindGame';
 import MyGames from './components/MyGames';
 import MySchedule from './components/Schedule';
 import Profile from './components/Profile';
+import DefaultWeek from './components/DefaultWeek';
 import './styles/main.css';
 
 const Main = () => {
@@ -32,6 +33,7 @@ const Main = () => {
                                 <Route path="/createGame" element={<CreateGame username={username} />} />
                                 <Route path="/findGame" element={<FindGame username={username} />} />
                                 <Route path="/myGames" element={<MyGames username={username} />} />
+                                <Route path="/defaultWeek" element={<DefaultWeek username={username} />} /> {/* Add DefaultWeek route */}
                                 <Route path="*" element={<Navigate to="/profile" />} />
                             </>
                         ) : (

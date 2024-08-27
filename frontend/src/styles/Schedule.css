@@ -49,17 +49,19 @@
     margin-left: 10px;
     height: 100%; /* Make the action-buttons container take up the full height */
     text-align: center;
+    padding: 0;
 }
 
 .action-buttons button {
     width: 40px;
-        height: 500px;
+    height: 500px;
     background-color: #222; /* Blue background */
     color: #e0e0e0; /* White text */
     border: none;
     cursor: pointer;
     font-size: 14px;
     border-radius: 4px;
+    padding: 0;
 }
 
 .scheduler-time-slot::after {
@@ -127,13 +129,6 @@
     scrollbar-color: #555 #222; /* Thumb color | Track color */
 }
 
-/* Other existing styles */
-
-
-.action-buttons button {
-    background-color: #222; /* Default background */
-}
-
 /* Ensure clickable elements are above other content */
 .scheduler-table td.time-slot {
     cursor: pointer;
@@ -194,11 +189,14 @@
     position: sticky;
     top: 0;
     z-index: 5; /* Ensure it's above other content */
+    box-shadow: none;
+    border: none;
     
 }
 
 .scheduler-table th {
     box-shadow: none;
+    border: none;
 }
 
 /* More specific selector to ensure hover effect is applied */
@@ -237,4 +235,17 @@
 .scheduler-table td,
 .scheduler-table th {
     border-right: 1px solid #999;
+}
+
+.default-week-container .scheduler-table td {
+    height: 11vh; /* Increased height for time slots in DefaultWeek */
+}
+
+.default-week-container .scheduler-table th {
+    height: 16px; /* Original height for the header row */
+}
+
+.time-slot.clear-week-hover {
+    background-color: #ff0000; /* Red background for hovering */
+    z-index: 10;
 }

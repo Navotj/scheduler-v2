@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Availability = require('../models/Availability');
+const DefaultAvailability = require('../models/DefaultAvailability');
 
-// Existing routes...
+// Route for saving availability
 router.post('/', async (req, res) => {
     const { username, times } = req.body;
 
@@ -23,6 +24,7 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Route for fetching availability
 router.get('/', async (req, res) => {
     console.log('GET /availability called with:', req.query.username);
     const { username } = req.query;
@@ -42,5 +44,43 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Route for saving default availability
+router.post('/default', async (req, res) => {
+    const { username, defaultWeek } = req.body;
+
+    try {
+        let defaultAvailability = await DefaultAvailability.findOne({ username });
+
+        if (defaultAvailability) {
+            defaultAvailability.defaultWeek = defaultWeek;
+        } else {
+            defaultAvailability = new DefaultAvailability({ username, defaultWeek });
+        }
+
+        await defaultAvailability.save();
+        res.status(200).json({ message: 'Default availability saved successfully' });
+    } catch (err) {
+        console.error('Error saving default availability:', err);
+        res.status(500).json({ error: 'Failed to save default availability' });
+    }
+});
+
+// Route for fetching default availability
+router.get('/default', async (req, res) => {
+    const { username } = req.query;
+
+    try {
+        const defaultAvailability = await DefaultAvailability.findOne({ username: username.trim() });
+        
+        if (defaultAvailability) {
+            res.json(defaultAvailability);
+        } else {
+            res.status(404).json({ error: 'No default availability found' });
+        }
+    } catch (err) {
+        console.error('Error fetching default availability:', err);
+        res.status(500).json({ error: 'Failed to fetch default availability' });
+    }
+});
 
 module.exports = router;
