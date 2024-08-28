@@ -10,6 +10,8 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     const [lastMode, setLastMode] = useState('add');
     const [templates, setTemplates] = useState([]);
     const [selectedTemplate, setSelectedTemplate] = useState('');
+    const [isSaving, setIsSaving] = useState(false);  // New state for saving indication
+
 
     const intervalMinutes = 30;
     const totalDays = 60;
@@ -76,12 +78,14 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     }, [username]);
 
     const toggleMode = (mode) => {
-        if (activeMode === mode) {
-            setActiveMode('');
+        if (mode === 'add' && activeMode === 'add') {
+            setActiveMode('remove');
+        } else if (mode === 'remove' && activeMode === 'remove') {
+            setActiveMode('add');
         } else {
             setActiveMode(mode);
-            setHoveredSlots(new Set());
         }
+        setHoveredSlots(new Set());
     };
 
     const handleApplyTemplate = (template) => {
@@ -101,6 +105,14 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     const handleTemplateChange = (event) => {
         const templateName = event.target.value;
         setSelectedTemplate(templateName);
+    };
+
+    const handleApplyTemplateClick = () => {
+        if (!selectedTemplate) {
+            alert("Please select a template first.");
+            return;
+        }
+        toggleMode('applyTemplate');
     };
 
     const handleSlotClick = (dayIndex, timeIndex) => {
@@ -207,22 +219,33 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     const markSlots = (times) => {
         const newSelectedSlots = new Set();
         const now = new Date();
-
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
         times.forEach(({ startDate, endDate }) => {
             const start = new Date(startDate);
             const end = new Date(endDate);
-
-            let dayIndex = Math.floor((start - now) / (1000 * 60 * 60 * 24));
+    
+            let startDayIndex = Math.floor((start - startOfToday) / (1000 * 60 * 60 * 24));
+            let endDayIndex = Math.floor((end - startOfToday) / (1000 * 60 * 60 * 24));
+    
             let startTimeIndex = Math.floor(start.getHours() * 2 + start.getMinutes() / intervalMinutes);
             let endTimeIndex = Math.ceil(end.getHours() * 2 + end.getMinutes() / intervalMinutes);
-
-            for (let i = startTimeIndex; i < endTimeIndex; i++) {
-                newSelectedSlots.add(`${dayIndex}-${i}`);
+    
+            for (let day = startDayIndex; day <= endDayIndex; day++) {
+                let timeStart = (day === startDayIndex) ? startTimeIndex : 0;
+                let timeEnd = (day === endDayIndex) ? endTimeIndex : 48;
+    
+                for (let timeIndex = timeStart; timeIndex < timeEnd; timeIndex++) {
+                    newSelectedSlots.add(`${day}-${timeIndex}`);
+                }
             }
         });
-
+    
         setSelectedSlots(newSelectedSlots);
     };
+    
+    
+    
 
     const condenseTimeSlots = (slots) => {
         if (slots.length === 0) return [];
@@ -277,12 +300,13 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     };
 
     const handleSave = async () => {
+        setIsSaving(true);  // Indicate saving has started
         const times = condenseTimeSlots(Array.from(selectedSlots));
         const scheduleData = {
             username: username,
             times: times.map(({ startDate, endDate }) => ({ startDate, endDate })),
         };
-
+    
         try {
             const response = await fetch('http://localhost:5000/availability', {
                 method: 'POST',
@@ -293,13 +317,22 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
             });
             if (response.ok) {
                 console.log('Data saved successfully');
+                setIsSaving("saved");  // Update to "saved" status
+                setTimeout(() => {
+                    document.querySelector('.saving-indicator').classList.add('fade-out');
+                    setTimeout(() => setIsSaving(false), 500);  // Wait for fade-out to complete
+                }, 1000);  // Persist "Saved." for 2 seconds
             } else {
                 console.log('Failed to save data');
+                setIsSaving(false);
             }
         } catch (error) {
             console.error('Error saving data:', error);
+            setIsSaving(false);
         }
     };
+    
+
 
     const timeSlots = Array.from({ length: 48 }, (_, index) => {
         const hours = Math.floor(index / 2).toString().padStart(2, '0');
@@ -310,6 +343,12 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     return (
         <div className="scheduler-container" onMouseUp={handleMouseUp}>
             <div className="scheduler-table-wrapper">
+                {/* Display a saving indicator */}
+                {isSaving && (
+                    <div className="saving-indicator">
+                        {isSaving === true ? "Saving..." : "Saved."}
+                    </div>
+                )}
                 <div className="scheduler-background-bar"></div>
                 <table className="scheduler-table">
                     <thead>
@@ -335,7 +374,7 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                             currentDay.setDate(currentDay.getDate() + dayIndex);
                             const dayOfWeek = currentDay.getDay();
                             const isEndOfWeek = dayOfWeek === 6;
-
+    
                             return (
                                 <tr key={dayIndex}>
                                     <td className={`scheduler-day-slot ${isEndOfWeek ? 'end-of-week' : ''}`}>
@@ -375,16 +414,11 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                         </option>
                     ))}
                 </select>
-                <button onClick={() => toggleMode('applyTemplate')}>Apply Template</button>
-                <button className={activeMode === 'add' ? 'active' : ''} onClick={() => toggleMode('add')}>+</button>
-                <button className={activeMode === 'remove' ? 'active' : ''} onClick={() => toggleMode('remove')}>-</button>
+                <button className={`apply-template-button ${activeMode === 'applyTemplate' ? 'active' : ''}`} onClick={handleApplyTemplateClick}>Apply Template</button>
+                <button className={`add-button ${activeMode === 'add' ? 'active' : ''}`} onClick={() => toggleMode('add')}>+</button>
+                <button className={`remove-button ${activeMode === 'remove' ? 'active' : ''}`} onClick={() => toggleMode('remove')}>-</button>
+                <button className={`clear-week-button ${activeMode === 'clearWeek' ? 'active' : ''}`} onClick={handleClearWeek}>Clear Week</button>
                 <button onClick={handleSave}>Save</button>
-                <button 
-                    className={activeMode === 'clearWeek' ? 'active' : ''} 
-                    onClick={handleClearWeek}
-                >
-                    Clear Week
-                </button>
             </div>
         </div>
     );
