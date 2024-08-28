@@ -6,34 +6,37 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     const [dragging, setDragging] = useState(false);
     const [dragStart, setDragStart] = useState(null);
     const [hoveredSlots, setHoveredSlots] = useState(new Set());
-    const [activeMode, setActiveMode] = useState('add'); // Default to add mode
-    const [lastMode, setLastMode] = useState('add'); // Tracks the last mode before clearWeek
+    const [activeMode, setActiveMode] = useState('add');
+    const [lastMode, setLastMode] = useState('add');
+    const [templates, setTemplates] = useState([]);
+    const [selectedTemplate, setSelectedTemplate] = useState('');
 
-    const intervalMinutes = 30; // 30 minutes per slot
-    const totalDays = 60; // 60 days for 2 months
+    const intervalMinutes = 30;
+    const totalDays = 60;
 
-    // Helper function to calculate the start of the week (Sunday)
     const getWeekStartIndex = (dayIndex) => {
-        const dayOfWeek = dayIndex % 7; // Get the day of the week (0 = Sunday, 6 = Saturday)
-        return dayIndex - dayOfWeek; // Calculate the start of the week (Sunday)
+        const currentDay = new Date();
+        currentDay.setDate(currentDay.getDate() + dayIndex);
+        const dayOfWeek = currentDay.getDay();
+        return dayIndex - dayOfWeek;
     };
 
     useEffect(() => {
-        const tableWrapper = document.querySelector('.scheduler-table-wrapper');
-        const actionButtons = document.querySelector('.action-buttons');
+        const fetchTemplates = async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/availability/templates?username=${username}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setTemplates(data.templates || []);
+                } else {
+                    console.log('Failed to fetch templates');
+                }
+            } catch (error) {
+                console.error('Error fetching templates:', error);
+            }
+        };
 
-        if (tableWrapper && actionButtons) {
-            const wrapperWidth = tableWrapper.clientWidth;
-            const daySlotWidth = 100; // Adjust based on your specific day slot width
-            const actionButtonWidth = actionButtons.clientWidth || 100;
-
-            const scrollbarWidth = tableWrapper.offsetWidth - tableWrapper.clientWidth;
-            const availableWidth = wrapperWidth - daySlotWidth - actionButtonWidth - scrollbarWidth;
-            const numberOfTimeSlots = 49;
-            const timeSlotWidth = availableWidth / numberOfTimeSlots;
-
-            document.documentElement.style.setProperty('--timeSlotWidth', `${timeSlotWidth}px`);
-        }
+        fetchTemplates();
 
         const fetchAvailability = async () => {
             try {
@@ -49,75 +52,95 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
             }
         };
 
-        const fetchDefaultWeek = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/defaultavailability?username=${username}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    applyDefaultWeek(data.defaultWeek);
-                } else {
-                    console.log('Failed to fetch default week');
-                }
-            } catch (error) {
-                console.error('Error fetching default week:', error);
+        fetchAvailability();
+
+        const calculateSlotDimensions = () => {
+            const tableWrapper = document.querySelector('.scheduler-table-wrapper');
+
+            if (tableWrapper) {
+                const wrapperWidth = tableWrapper.clientWidth;
+                const daySlotWidth = 100; 
+                const scrollbarWidth = tableWrapper.offsetWidth - tableWrapper.clientWidth;
+                const availableWidth = wrapperWidth - daySlotWidth - scrollbarWidth - 5;
+                const numberOfTimeSlots = 49;
+                const timeSlotWidth = availableWidth / numberOfTimeSlots;
+
+                document.documentElement.style.setProperty('--TimeSlotWidth', `${timeSlotWidth}px`);
             }
         };
 
-        const markSlots = (times) => {
-            const newSelectedSlots = new Set();
-            const now = new Date();
+        calculateSlotDimensions();
+        window.addEventListener('resize', calculateSlotDimensions);
 
-            times.forEach(({ startDate, endDate }) => {
-                const start = new Date(startDate);
-                const end = new Date(endDate);
-
-                let dayIndex = Math.floor((start - now) / (1000 * 60 * 60 * 24));
-                let startTimeIndex = Math.floor(start.getHours() * 2 + start.getMinutes() / intervalMinutes);
-                let endTimeIndex = Math.ceil(end.getHours() * 2 + end.getMinutes() / intervalMinutes);
-
-                for (let i = startTimeIndex; i < endTimeIndex; i++) {
-                    newSelectedSlots.add(`${dayIndex}-${i}`);
-                }
-            });
-
-            setSelectedSlots(newSelectedSlots);
-        };
-
-        const applyDefaultWeek = (defaultWeek) => {
-            const newSelectedSlots = new Set();
-
-            defaultWeek.forEach(({ day, time }) => {
-                for (let dayIndex = 0; dayIndex < totalDays; dayIndex += 7) {
-                    const slotKey = `${dayIndex + day}-${time}`;
-                    newSelectedSlots.add(slotKey);
-                }
-            });
-
-            setSelectedSlots(newSelectedSlots);
-        };
-
-        fetchAvailability();
-        fetchDefaultWeek();
+        return () => window.removeEventListener('resize', calculateSlotDimensions);
     }, [username]);
 
     const toggleMode = (mode) => {
         if (activeMode === mode) {
-            setActiveMode(''); // Toggle off the mode
+            setActiveMode('');
         } else {
-            setActiveMode(mode); // Set the new active mode
-            setHoveredSlots(new Set()); // Clear hover indication when changing mode
+            setActiveMode(mode);
+            setHoveredSlots(new Set());
         }
     };
 
-    const handleClearWeek = () => {
-        if (activeMode === 'clearWeek') {
-            // Deactivate Clear Week mode and restore the last mode
+    const handleApplyTemplate = (template) => {
+        const newSelectedSlots = new Set();
+        const now = new Date();
+
+        template.weekTemplate.forEach(({ day, time }) => {
+            for (let dayIndex = 0; dayIndex < totalDays; dayIndex += 7) {
+                const slotKey = `${dayIndex + day}-${time}`;
+                newSelectedSlots.add(slotKey);
+            }
+        });
+
+        setSelectedSlots(newSelectedSlots);
+    };
+
+    const handleTemplateChange = (event) => {
+        const templateName = event.target.value;
+        setSelectedTemplate(templateName);
+    };
+
+    const handleSlotClick = (dayIndex, timeIndex) => {
+        if (activeMode === 'applyTemplate') {
+            const template = templates.find(t => t.templateName === selectedTemplate);
+            if (template) {
+                const startOfWeek = getWeekStartIndex(dayIndex);
+                const newSelectedSlots = new Set(selectedSlots);
+
+                for (let day = startOfWeek; day <= startOfWeek + 6; day++) {
+                    for (let timeIndex = 0; timeIndex < 48; timeIndex++) {
+                        newSelectedSlots.delete(`${day}-${timeIndex}`);
+                    }
+                }
+
+                template.weekTemplate.forEach(({ day, time }) => {
+                    const slotKey = `${startOfWeek + day}-${time}`;
+                    newSelectedSlots.add(slotKey);
+                });
+
+                setSelectedSlots(newSelectedSlots);
+                setHoveredSlots(new Set());
+                setActiveMode(lastMode);
+            }
+        } else if (activeMode === 'clearWeek') {
+            const newSelectedSlots = new Set(selectedSlots);
+            const startOfWeek = getWeekStartIndex(dayIndex);
+            const endOfWeek = startOfWeek + 6;
+
+            for (let day = startOfWeek; day <= endOfWeek; day++) {
+                for (let timeIndex = 0; timeIndex < 48; timeIndex++) {
+                    newSelectedSlots.delete(`${day}-${timeIndex}`);
+                }
+            }
+
+            setSelectedSlots(newSelectedSlots);
+            setHoveredSlots(new Set());
             setActiveMode(lastMode);
-            setHoveredSlots(new Set()); // Clear hover indication
         } else {
-            // Activate Clear Week mode and save the last mode
-            setLastMode(activeMode || 'add'); // Save current mode before switching to clearWeek
-            setActiveMode('clearWeek');
+            handleMouseUp();
         }
     };
 
@@ -140,10 +163,9 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                 }
             }
             setHoveredSlots(newHoveredSlots);
-        } else if (activeMode === 'clearWeek') {
-            // Handle Clear Week Hover
-            const startOfWeek = getWeekStartIndex(dayIndex); // Start of the week is Sunday
-            const endOfWeek = startOfWeek + 6; // End of the week is Saturday
+        } else if (activeMode === 'clearWeek' || activeMode === 'applyTemplate') {
+            const startOfWeek = getWeekStartIndex(dayIndex);
+            const endOfWeek = startOfWeek + 6;
             const newHoveredSlots = new Set();
 
             for (let day = startOfWeek; day <= endOfWeek; day++) {
@@ -171,42 +193,53 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
         setDragging(false);
         setDragStart(null);
     };
-    
-    const handleSlotClick = (dayIndex, timeIndex) => {
+
+    const handleClearWeek = () => {
         if (activeMode === 'clearWeek') {
-            const newSelectedSlots = new Set(selectedSlots);
-            const startOfWeek = getWeekStartIndex(dayIndex); // Start of the week is Sunday
-            const endOfWeek = startOfWeek + 6; // End of the week is Saturday
-    
-            for (let day = startOfWeek; day <= endOfWeek; day++) {
-                for (let timeIndex = 0; timeIndex < 48; timeIndex++) {
-                    newSelectedSlots.delete(`${day}-${timeIndex}`);
-                }
-            }
-    
-            setSelectedSlots(newSelectedSlots);
-            setHoveredSlots(new Set()); // Clear hover indication
-            setActiveMode(lastMode); // Restore the last mode after clearing
-        } else if (activeMode === 'add' || activeMode === 'remove') {
-            handleMouseUp();
+            setActiveMode(lastMode);
+            setHoveredSlots(new Set());
+        } else {
+            setLastMode(activeMode || 'add');
+            setActiveMode('clearWeek');
         }
     };
+
+    const markSlots = (times) => {
+        const newSelectedSlots = new Set();
+        const now = new Date();
+
+        times.forEach(({ startDate, endDate }) => {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            let dayIndex = Math.floor((start - now) / (1000 * 60 * 60 * 24));
+            let startTimeIndex = Math.floor(start.getHours() * 2 + start.getMinutes() / intervalMinutes);
+            let endTimeIndex = Math.ceil(end.getHours() * 2 + end.getMinutes() / intervalMinutes);
+
+            for (let i = startTimeIndex; i < endTimeIndex; i++) {
+                newSelectedSlots.add(`${dayIndex}-${i}`);
+            }
+        });
+
+        setSelectedSlots(newSelectedSlots);
+    };
+
     const condenseTimeSlots = (slots) => {
         if (slots.length === 0) return [];
-        
+
         const sortedSlots = slots.sort((a, b) => {
             const [aDay, aTime] = a.split('-').map(Number);
             const [bDay, bTime] = b.split('-').map(Number);
             return aDay - bDay || aTime - bTime;
         });
-        
+
         const condensed = [];
         let currentRange = null;
-        
+
         sortedSlots.forEach(slot => {
             const [dayIndex, timeIndex] = slot.split('-').map(Number);
             const { startDate, endDate } = generateTimeSlot(dayIndex, timeIndex);
-        
+
             if (currentRange) {
                 if (startDate <= currentRange.endDate + 1000 * 60 * intervalMinutes) {
                     currentRange.endDate = Math.max(currentRange.endDate, endDate);
@@ -218,29 +251,28 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                 currentRange = { startDate, endDate };
             }
         });
-        
+
         if (currentRange) {
             condensed.push(currentRange);
         }
-        
+
         return condensed;
     };
-    
+
     const generateTimeSlot = (dayIndex, timeIndex) => {
         const startTime = new Date();
         startTime.setHours(0, 0, 0, 0);
         startTime.setDate(startTime.getDate() + dayIndex);
         startTime.setMinutes(timeIndex * intervalMinutes);
-    
+
         const endTime = new Date(startTime);
         endTime.setMinutes(startTime.getMinutes() + intervalMinutes);
-    
-        // Avoid the end time being exactly the same as the next slot's start time
+
         endTime.setSeconds(endTime.getSeconds() - 1);
-    
+
         return {
-            startDate: startTime.getTime(), // Use epoch time
-            endDate: endTime.getTime(),     // Use epoch time
+            startDate: startTime.getTime(),
+            endDate: endTime.getTime(),
         };
     };
 
@@ -300,7 +332,7 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                     <tbody>
                         {Array.from({ length: totalDays }).map((_, dayIndex) => {
                             const currentDay = new Date();
-                            currentDay.setDate(currentDay.getDate() + dayIndex); // Start from the current day
+                            currentDay.setDate(currentDay.getDate() + dayIndex);
                             const dayOfWeek = currentDay.getDay();
                             const isEndOfWeek = dayOfWeek === 6;
 
@@ -315,9 +347,7 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                                         const isSelected = selectedSlots.has(slotKey);
                                         const className = `time-slot ${isEndOfWeek ? 'end-of-week-border' : ''} ${
                                             isSelected ? 'selected-slot' : ''
-                                        } ${
-                                            isHovered && activeMode === 'clearWeek' ? 'clear-week-hover' : isHovered ? 'hovered-slot' : ''
-                                        }`;
+                                        } ${isHovered && activeMode === 'applyTemplate' ? 'hovered-slot' : isHovered ? 'hovered-slot' : ''}`;
                                         
                                         return (
                                             <td
@@ -334,18 +364,20 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                             );
                         })}
                     </tbody>
-
                 </table>
             </div>
             <div className="action-buttons">
-                <button
-                    className={activeMode === 'add' ? 'active' : ''} 
-                    onClick={() => toggleMode('add')}
-                >+</button>
-                <button
-                    className={activeMode === 'remove' ? 'active' : ''} 
-                    onClick={() => toggleMode('remove')}
-                >-</button>
+                <select value={selectedTemplate} onChange={handleTemplateChange}>
+                    <option value="" disabled>Select Template</option>
+                    {templates.map(template => (
+                        <option key={template.templateName} value={template.templateName}>
+                            {template.templateName}
+                        </option>
+                    ))}
+                </select>
+                <button onClick={() => toggleMode('applyTemplate')}>Apply Template</button>
+                <button className={activeMode === 'add' ? 'active' : ''} onClick={() => toggleMode('add')}>+</button>
+                <button className={activeMode === 'remove' ? 'active' : ''} onClick={() => toggleMode('remove')}>-</button>
                 <button onClick={handleSave}>Save</button>
                 <button 
                     className={activeMode === 'clearWeek' ? 'active' : ''} 
@@ -353,7 +385,6 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                 >
                     Clear Week
                 </button>
-                <button onClick={handleClearWeek}>Reset Week</button> {/* Placeholder for Reset Week Button */}
             </div>
         </div>
     );

@@ -24,10 +24,10 @@ const Sidebar = ({ isLoggedIn }) => {
                 </li>
                 <li>
                     <NavLink
-                        to="/defaultWeek"
+                        to="/WeekTemplate"
                         className={({ isActive }) => isActive ? 'active-link' : 'inactive-link'}
                     >
-                        Default Week
+                        Templates
                     </NavLink>
                 </li>
                 <li>

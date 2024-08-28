@@ -1,29 +1,24 @@
-/* Container for the scheduler to handle layout and scrolling */
 .scheduler-container {
     display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* No scrolling at the container level */
-    user-select: none; /* For modern browsers */
-    -webkit-user-select: none; /* For Safari */
-    -moz-user-select: none; /* For Firefox */
-    -ms-user-select: none; /* For older versions of Internet Explorer */
-
+    overflow: hidden;
+    user-select: none;
 }
 
 .scheduler-table-wrapper {
-    width: calc(100% - 60px); /* Adjust width based on button size */
-    overflow-x: auto; /* Allow horizontal scrolling for the table */
-    overflow-y: auto; /* Allow vertical scrolling for the table */
+    flex-grow: 1;
+    width: 100%;
+    height: 0; /* Adjust this to fit your layout */
+    overflow-x: auto;
+    overflow-y: auto;
 }
-
-/* Table styling for fixed layout and consistent cell sizing */
 .scheduler-table {
-    width: max-content; /* Ensures the table expands horizontally to fit 60 days */
+    width: max-content;
     table-layout: fixed;
     border-collapse: collapse;
-    margin: 0; /* No extra margin or padding */
-    
+    margin: 0;
 }
 
 /* Styling for table headers and cells */
@@ -43,26 +38,23 @@
 
 .action-buttons {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Distribute buttons evenly in the vertical space */
-    align-items: center;
-    margin-left: 10px;
-    height: 100%; /* Make the action-buttons container take up the full height */
-    text-align: center;
-    padding: 0;
+    justify-content: center;
+    padding: 10px;
+    gap: 10px;
 }
 
-.action-buttons button {
-    width: 40px;
-    height: 500px;
-    background-color: #222; /* Blue background */
-    color: #e0e0e0; /* White text */
+.action-buttons button,
+.action-buttons select {
+    background-color: #333;
+    color: #e0e0e0;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    border-radius: 4px;
-    padding: 0;
+    height: 40px;
+    margin-bottom: 0;
 }
+
 
 .scheduler-time-slot::after {
     content: '';
@@ -172,11 +164,11 @@
 }
 
 .scheduler-table thead tr {
-    transform: translateX(calc(var(--timeSlotWidth)));
+    transform: translateX(calc(var(--TimeSlotWidth)));
 }
 
 .time-slot {
-    min-width: calc(var(--timeSlotWidth) - 6.5  px); /* Use the calculated width or fallback to 33px */
+    min-width: calc(var(--TimeSlotWidth) - 6.5px); /* Use the calculated width or fallback to 33px */
 }
 
 
@@ -249,3 +241,22 @@
     background-color: #ff0000; /* Red background for hovering */
     z-index: 10;
 }
+
+/* Adjusted styles for WeekTemplate only */
+.week-template-container {
+    display: flex;
+    flex-direction: column; /* Column direction for this component */
+    width: 100%;
+}
+
+.week-template-table-wrapper {
+    width: 100%; /* Use full width */
+    height:100%;
+    overflow-x: auto; 
+    overflow-y: auto; 
+}
+
+.week-template-table-wrapper .time-slot {
+    height: 9vh;
+}
+
