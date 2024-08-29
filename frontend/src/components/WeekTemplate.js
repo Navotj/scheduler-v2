@@ -276,9 +276,9 @@ const WeekTemplate = ({ username }) => {
                     ))}
                 </select>
                 <button onClick={handleSaveTemplate}>Save Template</button>
-                <button onClick={handleDeleteTemplate}>Delete Template</button> {/* Add this line */}
-                <button className={isAddMode ? 'active' : ''} onClick={toggleMode}>+</button>
-                <button className={!isAddMode ? 'active' : ''} onClick={toggleMode}>-</button>
+                <button onClick={handleDeleteTemplate}>Delete Template</button>
+                <button className={`add-button ${isAddMode ? 'active' : ''}`} onClick={toggleMode}>+</button>
+                <button className={`remove-button ${!isAddMode ? 'active' : ''}`} onClick={toggleMode}>-</button>
             </div>
         </div>
     );

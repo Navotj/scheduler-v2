@@ -205,6 +205,7 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
         setDragging(false);
         setDragStart(null);
     };
+    
 
     const handleClearWeek = () => {
         if (activeMode === 'clearWeek') {

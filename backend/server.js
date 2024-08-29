@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const availabilityRoutes = require('./routes/availability.js');
 const gameRoutes = require('./routes/games'); // Add game routes
+const groupRoutes = require('./routes/Groups.js'); // Add group routes
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 // Mount routes
 app.use('/availability', availabilityRoutes);
 app.use('/games', gameRoutes); // Use the game routes
+app.use('/groups', groupRoutes); // Use the group routes
 
 // MongoDB connection to the "scheduler" database
 mongoose.connect('mongodb://localhost:27017/scheduler', {

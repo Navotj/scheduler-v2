@@ -54,6 +54,15 @@ const Sidebar = ({ isLoggedIn }) => {
                         Find Game
                     </NavLink>
                 </li>
+                <li>
+                    <NavLink
+                        to="/groups"
+                        className={({ isActive }) => isActive ? 'active-link' : 'inactive-link'}
+                    >
+                        Groups
+                    </NavLink>
+                </li>
+
             </ul>
         </div>
     );
