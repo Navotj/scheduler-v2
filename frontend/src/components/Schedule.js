@@ -12,6 +12,15 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     const [selectedTemplate, setSelectedTemplate] = useState('');
     const [isSaving, setIsSaving] = useState(false);  // New state for saving indication
 
+    useEffect(() => {
+        return () => {
+            // If the component is unmounting, immediately remove the saving indicator
+            if (isSaving) {
+                setIsSaving(false);
+            }
+        };
+    }, [isSaving]);
+
 
     const intervalMinutes = 30;
     const totalDays = 60;
@@ -320,9 +329,11 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                 console.log('Data saved successfully');
                 setIsSaving("saved");  // Update to "saved" status
                 setTimeout(() => {
-                    document.querySelector('.saving-indicator').classList.add('fade-out');
-                    setTimeout(() => setIsSaving(false), 500);  // Wait for fade-out to complete
-                }, 1000);  // Persist "Saved." for 2 seconds
+                    if (isSaving === "saved") {  // Only proceed with fade-out if still in "saved" state
+                        document.querySelector('.saving-indicator').classList.add('fade-out');
+                        setTimeout(() => setIsSaving(false), 500);  // Wait for fade-out to complete
+                    }
+                }, 2000);  // Keep "Saved." displayed for 2 seconds
             } else {
                 console.log('Failed to save data');
                 setIsSaving(false);
@@ -332,6 +343,7 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
             setIsSaving(false);
         }
     };
+
     
 
 

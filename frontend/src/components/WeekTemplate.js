@@ -13,6 +13,7 @@ const WeekTemplate = ({ username }) => {
 
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+    
     useEffect(() => {
         const fetchTemplates = async () => {
             try {
@@ -31,7 +32,7 @@ const WeekTemplate = ({ username }) => {
         fetchTemplates();
 
         const calculateSlotDimensions = () => {
-            const tableWrapper = document.querySelector('.scheduler-table-wrapper');
+            const tableWrapper = document.querySelector('week-template-table-wrapper');
 
             if (tableWrapper) {
                 const wrapperWidth = tableWrapper.clientWidth;
