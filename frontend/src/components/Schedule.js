@@ -232,8 +232,16 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
         times.forEach(({ startDate, endDate }) => {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
+            let start = new Date(startDate);
+            let end = new Date(endDate);
+    
+            // Skip slots that end before today
+            if (end < startOfToday) return;
+    
+            // Adjust the start date if it is before today
+            if (start < startOfToday) {
+                start = startOfToday;
+            }
     
             let startDayIndex = Math.floor((start - startOfToday) / (1000 * 60 * 60 * 24));
             let endDayIndex = Math.floor((end - startOfToday) / (1000 * 60 * 60 * 24));
@@ -255,43 +263,51 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
     };
     
     
-    
 
     const condenseTimeSlots = (slots) => {
         if (slots.length === 0) return [];
-
+    
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
         const sortedSlots = slots.sort((a, b) => {
             const [aDay, aTime] = a.split('-').map(Number);
             const [bDay, bTime] = b.split('-').map(Number);
             return aDay - bDay || aTime - bTime;
         });
-
+    
         const condensed = [];
         let currentRange = null;
-
+    
         sortedSlots.forEach(slot => {
             const [dayIndex, timeIndex] = slot.split('-').map(Number);
             const { startDate, endDate } = generateTimeSlot(dayIndex, timeIndex);
-
+    
+            // Skip slots that end before today
+            if (endDate < startOfToday.getTime()) return;
+    
+            // Adjust start date if necessary
+            const adjustedStartDate = startDate < startOfToday.getTime() ? startOfToday.getTime() : startDate;
+    
             if (currentRange) {
-                if (startDate <= currentRange.endDate + 1000 * 60 * intervalMinutes) {
+                if (adjustedStartDate <= currentRange.endDate + 1000 * 60 * intervalMinutes) {
                     currentRange.endDate = Math.max(currentRange.endDate, endDate);
                 } else {
                     condensed.push(currentRange);
-                    currentRange = { startDate, endDate };
+                    currentRange = { startDate: adjustedStartDate, endDate };
                 }
             } else {
-                currentRange = { startDate, endDate };
+                currentRange = { startDate: adjustedStartDate, endDate };
             }
         });
-
+    
         if (currentRange) {
             condensed.push(currentRange);
         }
-
+    
         return condensed;
     };
-
+    
     const generateTimeSlot = (dayIndex, timeIndex) => {
         const startTime = new Date();
         startTime.setHours(0, 0, 0, 0);
