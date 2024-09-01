@@ -9,7 +9,7 @@ const Login = ({ onLoginSuccess }) => {
 
     const handleLogin = async () => {
         try {
-            const response = await fetch('http://localhost:5000/login', {
+            const response = await fetch('http://localhost:5000/users/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -20,9 +20,9 @@ const Login = ({ onLoginSuccess }) => {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Login successful', data);
-                localStorage.setItem('token', data.token);
+                localStorage.setItem('token', data.token); // Normally, you'd handle a token here
                 onLoginSuccess(username);
-                navigate('/mySchedule');
+                navigate('/profile');
             } else {
                 console.error('Login failed');
                 alert('Login failed, please try again.');
@@ -35,7 +35,7 @@ const Login = ({ onLoginSuccess }) => {
 
     const handleSignUp = async () => {
         try {
-            const response = await fetch('http://localhost:5000/signup', {
+            const response = await fetch('http://localhost:5000/users/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

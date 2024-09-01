@@ -35,4 +35,22 @@ button {
     box-sizing: border-box;
 }
 
+/* Sleek Scrollbars (Global) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
 
+::-webkit-scrollbar-thumb {
+    background-color: #555; /* Dark grey for scrollbar thumb */
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #777; /* Lighter grey on hover */
+}
+
+::-webkit-scrollbar-track {
+    background-color: #222; /* Darker background for scrollbar track */
+    border-radius: 4px;
+}

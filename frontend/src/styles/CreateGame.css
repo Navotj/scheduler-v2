@@ -1,3 +1,36 @@
+.create-game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.banner-image-container {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    margin-bottom: 1em;
+}
+
+.banner-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.banner-upload {
+    margin-bottom: 1em;
+    cursor: pointer;
+    color: #e0e0e0;
+    background-color: #333;
+    border: none;
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
 .form-grid-three-cols {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Equal columns */
@@ -6,7 +39,6 @@
     box-sizing: border-box;
     overflow: hidden;
     max-height: 100%;
-
 }
 
 .col {
@@ -17,7 +49,6 @@
     flex-grow: 1;
     box-sizing: border-box;
 }
-
 
 .small-label {
     font-size: 0.8em;
@@ -61,15 +92,12 @@ textarea {
     color: #fff;
     border: none;
     cursor: pointer;
-    padding: 0.3em 0.5em;
     font-size: 0.8em;
     border-radius: 5px;
     flex: 1; /* Make buttons take equal space */
     text-align: center; /* Center the text in the buttons */
     margin: 0; /* Remove default margins */
 }
-
-
 
 .day-button.active {
     background-color: #4caf50;
@@ -101,6 +129,7 @@ textarea {
     margin-top: 20px;
     display: flex;
     gap: 10px;
+    z-index: 10000; /* Ensure buttons are on top */
 }
 
 .cropper-buttons button {
@@ -124,4 +153,3 @@ textarea {
     flex-grow: 1; /* Ensure it takes up the remaining vertical space */
     min-height: 0; /* Ensure flex items don't force min-height */
 }
-

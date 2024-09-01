@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import GamePreview from './GamePreview';  // Make sure this path is correct
-import '../styles/FindGame.css';
+import '../styles/Games.css';
 
 const FindGame = () => {
     const [games, setGames] = useState([]);
@@ -21,7 +21,6 @@ const FindGame = () => {
 
     return (
         <div className="find-game-container">
-            <h2>Find a Game</h2>
             <div className="game-cards-grid">
                 {games.map((game) => (
                     <div key={game._id} className="game-card-wrapper">

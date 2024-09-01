@@ -88,41 +88,6 @@
     z-index: 5; /* Ensure it stays above the text */
 }
 
-/* Sleek Scrollbars */
-.scheduler-container::-webkit-scrollbar,
-.scheduler-table-wrapper::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-.scheduler-container::-webkit-scrollbar-thumb,
-.scheduler-table-wrapper::-webkit-scrollbar-thumb {
-    background-color: #555; /* Dark grey for scrollbar thumb */
-    border-radius: 4px;
-}
-
-.scheduler-container::-webkit-scrollbar-thumb:hover,
-.scheduler-table-wrapper::-webkit-scrollbar-thumb:hover {
-    background-color: #777; /* Lighter grey on hover */
-}
-
-.scheduler-container::-webkit-scrollbar-track,
-.scheduler-table-wrapper::-webkit-scrollbar-track {
-    background-color: #222; /* Darker background for scrollbar track */
-    border-radius: 4px;
-}
-
-/* Firefox scrollbar styling */
-.scheduler-container {
-    scrollbar-width: thin; /* Thin scrollbar */
-    scrollbar-color: #555 #222; /* Thumb color | Track color */
-}
-
-.scheduler-table-wrapper {
-    scrollbar-width: thin; /* Thin scrollbar */
-    scrollbar-color: #555 #222; /* Thumb color | Track color */
-}
-
 /* Ensure clickable elements are above other content */
 .scheduler-table td.time-slot {
     cursor: pointer;

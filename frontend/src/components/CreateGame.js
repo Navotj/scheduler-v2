@@ -26,13 +26,6 @@ const CreateGame = ({ username }) => {
     const [cropArea, setCropArea] = useState(null);
     const [showCropper, setShowCropper] = useState(false);
     const [enabledTags, setEnabledTags] = useState([]);
-    const [enabledTabs, setEnabledTabs] = useState({
-        classes: false,
-        subclasses: false,
-        races: false,
-        feats: false,
-    });
-    // Add these states in CreateGame.js
     const [sessionLengthMin, setSessionLengthMin] = useState('');
     const [sessionLengthMax, setSessionLengthMax] = useState('');
     const [sessionDays, setSessionDays] = useState({
@@ -46,12 +39,12 @@ const CreateGame = ({ username }) => {
     });
 
     const [visibility, setVisibility] = useState('public');
+    const [bannerImage, setBannerImage] = useState(null); // New state for banner image
 
     const handleVisibilityChange = (e) => {
         setVisibility(e.target.value);
     };
 
-    // Add these functions in CreateGame.js
     const toggleDay = (day) => {
         setSessionDays(prevDays => ({
             ...prevDays,
@@ -59,7 +52,6 @@ const CreateGame = ({ username }) => {
         }));
     };
 
-    
     const gameSystems = [
         // Dungeons & Dragons and Related Systems
         'D&D Original', 'D&D Basic/Expert', 'D&D 1e', 'D&D 2e', 'D&D 3e', 'D&D 3.5e', 'D&D 4e', 'D&D 5e',
@@ -96,7 +88,6 @@ const CreateGame = ({ username }) => {
         'Legend of the Five Rings', 'Deadlands', 'Other'
     ];
     
-    
     const languages = [
         'Afrikaans', 'Albanian', 'Amharic', 'Arabic', 'Armenian', 'Azerbaijani', 'Basque', 'Bengali', 'Bulgarian', 'Burmese', 
         'Cantonese', 'Catalan', 'Croatian', 'Czech', 'Danish', 'Dutch', 'English', 'Esperanto', 'Estonian', 'Finnish', 
@@ -107,19 +98,18 @@ const CreateGame = ({ username }) => {
         'Russian', 'Scots Gaelic', 'Serbian', 'Sinhalese', 'Slovak', 'Slovenian', 'Somali', 'Spanish', 'Swahili', 'Swedish', 
         'Tagalog', 'Tajik', 'Tamil', 'Telugu', 'Thai', 'Tibetan', 'Turkish', 'Turkmen', 'Ukrainian', 'Urdu', 'Uzbek', 
         'Vietnamese', 'Welsh', 'Xhosa', 'Yiddish', 'Zulu'
-
     ];
-    
+
     const timeFrames = ['day', 'week', 'month'];
     const gameLengthUnits = ['session', 'day', 'week', 'month', 'year'];
 
-    const handleImageUpload = (e) => {
+    const handleBannerUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = () => {
-                setGameImage(reader.result);
-                setShowCropper(true); // Show the cropper immediately after image is uploaded
+                setBannerImage(reader.result);
+                setShowCropper(true); // Show cropper after upload
             };
             reader.readAsDataURL(file);
         }
@@ -127,27 +117,22 @@ const CreateGame = ({ username }) => {
 
     const handleCancelCrop = () => {
         setShowCropper(false);
-        setGameImage(null); // Reset the game image if canceled
+        setBannerImage(null); // Reset the banner image if canceled
     };
-    
-    const handleSaveCrop = (event) => {
-        if (event) {
-            event.preventDefault(); // Prevent the default form submission behavior
-        }
-        handleCropImage();
-    };
-    
-    const handleCropImage = () => {
-        if (!cropArea || !gameImage) return;
 
+    const handleSaveCrop = () => {
+        if (!cropArea || !bannerImage) return;
+    
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         const image = new Image();
-        image.src = gameImage;
+        image.src = bannerImage;
         image.onload = () => {
-            const aspectRatio = 2 / 1;
-            canvas.width = cropArea.width;
-            canvas.height = cropArea.width / aspectRatio;
+            const aspectRatio = 3 / 1;
+            const newWidth = 150; // Compress to 300 pixels wide
+            const newHeight = newWidth / aspectRatio;
+            canvas.width = newWidth;
+            canvas.height = newHeight;
             context.drawImage(
                 image,
                 cropArea.x,
@@ -159,23 +144,15 @@ const CreateGame = ({ username }) => {
                 canvas.width,
                 canvas.height
             );
-            canvas.toBlob(blob => {
-                const url = URL.createObjectURL(blob);
-                setCroppedImage(url);
-                setShowCropper(false); // Hide cropper after cropping is done
-            });
+            const base64Image = canvas.toDataURL('image/jpeg'); // Convert to Base64 string
+            setCroppedImage(base64Image);
+            setShowCropper(false); // Hide cropper after cropping
         };
     };
+    
 
     const onCropComplete = (croppedArea, croppedAreaPixels) => {
         setCropArea(croppedAreaPixels);
-    };
-
-    const toggleTab = (tabName) => {
-        setEnabledTabs((prevTabs) => ({
-            ...prevTabs,
-            [tabName]: !prevTabs[tabName],
-        }));
     };
 
     const handleMinPlayersChange = (e) => {
@@ -185,7 +162,7 @@ const CreateGame = ({ username }) => {
             setMaxPlayers(value); // Adjust maxPlayers to match minPlayers if it's lower
         }
     };
-    
+
     const handleMaxPlayersChange = (e) => {
         const value = parseInt(e.target.value, 10);
         if (value >= minPlayers) {
@@ -198,7 +175,7 @@ const CreateGame = ({ username }) => {
     const handleFrequencyNumberChange = (e) => {
         const value = e.target.value;
         setFrequencyNumber(value);
-        
+
         // Reset the frequencyInterval to "1" if the frequencyNumber is changed from "1"
         if (value !== "1") {
             setFrequencyInterval("1");
@@ -211,44 +188,47 @@ const CreateGame = ({ username }) => {
             return;
         }
     
-        const formData = new FormData();
-        formData.append('gameName', gameName);
-        formData.append('gameSystem', gameSystem);
-        formData.append('language', language);
-        formData.append('startingLevel', startingLevel);
-        formData.append('intendedGameLengthMin', intendedGameLengthMin);
-        formData.append('intendedGameLengthMax', intendedGameLengthMax);
-        formData.append('intendedGameLengthUnit', intendedGameLengthUnit);
-        formData.append('minAge', minAge);
-        formData.append('maxAge', maxAge);
-        formData.append('minPlayers', minPlayers);
-        formData.append('maxPlayers', maxPlayers);
-        formData.append('frequencyNumber', frequencyNumber);
-        formData.append('frequencyInterval', frequencyInterval);
-        formData.append('frequencyTimeFrame', frequencyTimeFrame);
-        formData.append('gameDescription', gameDescription);
-        if (croppedImage) {
-            formData.append('gameImage', croppedImage);
-        }
-        formData.append('enabledTags', JSON.stringify(enabledTags));
-        formData.append('enabledTabs', JSON.stringify(enabledTabs));
-        formData.append('owner', username);
-        formData.append('createdAt', new Date().toISOString());
-    
-        // Debugging log
-        for (let pair of formData.entries()) {
-            console.log(pair[0]+ ', ' + pair[1]); 
-        }
+        const formData = {
+            gameName,
+            gameSystem,
+            language,
+            startingLevel,
+            intendedGameLengthMin,
+            intendedGameLengthMax,
+            intendedGameLengthUnit,
+            minAge,
+            maxAge,
+            minPlayers,
+            maxPlayers,
+            frequencyNumber,
+            frequencyInterval,
+            frequencyTimeFrame,
+            gameDescription,
+            gameImage: croppedImage || "",  // Ensure it's a string or empty string if undefined
+            enabledTags: enabledTags.length > 0 ? JSON.stringify(enabledTags) : "[]",  // Stringify or default to an empty array
+            owner: username,
+            visibility,
+            sessionLengthMin,
+            sessionLengthMax,
+            sessionDays,  // Include the sessionDays in the form data
+        };
+
+        console.log('Form Data:', formData);  // Log formData to check sessionDays content
     
         try {
-            const response = await fetch('http://localhost:5000/games', {
+            const response = await fetch('http://localhost:5000/games/create', {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
             });
     
             if (response.ok) {
                 alert('Game created successfully!');
             } else {
+                const errorData = await response.json();
+                console.error('Failed to create game:', errorData);
                 alert('Failed to create game.');
             }
         } catch (error) {
@@ -258,236 +238,256 @@ const CreateGame = ({ username }) => {
     };
     
 
+
     return (
-        <div className="form-grid-three-cols">
-            <div className="col">
-                <label className="small-label">Game Title:</label>
-                <div className="unified-container">
-                    <input
-                        type="text"
-                        value={gameName}
-                        onChange={(e) => setGameName(e.target.value)}
-                        required
-                    />
-                </div>
-                <label className="small-label">Game System:</label>
-                <div className="unified-container">
-                    <select
-                        value={gameSystem}
-                        onChange={(e) => setGameSystem(e.target.value)}
-                        required
-                    >
-                        <option value="" disabled>Select Game System</option>
-                        {gameSystems.map((system, index) => (
-                            <option key={index} value={system}>{system}</option>
-                        ))}
-                    </select>
-                </div>
-                <label className="small-label">Language:</label>
-                <div className="unified-container">
-                    <select
-                        value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
-                        required
-                    >
-                        <option value="" disabled>Select Language</option>
-                        {languages.map((lang, index) => (
-                            <option key={index} value={lang}>{lang}</option>
-                        ))}
-                    </select>
-                </div>
-                <label className="small-label">Starting Level:</label>
-                <div className="unified-container">
-                    <input
-                        type="number"
-                        value={startingLevel}
-                        onChange={(e) => setStartingLevel(e.target.value)}
-                        min="0"
-                    />
-                </div>
-                <label className="small-label">Age Range:</label>
-                <div className="unified-container">
-                    <div>
+        <div className="create-game-container">
+            <div className="form-grid-three-cols">
+                <div className="col">
+                    <label className="small-label">Game Title:</label>
+                    <div className="unified-container">
+                        <input
+                            type="text"
+                            value={gameName}
+                            onChange={(e) => setGameName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <label className="small-label">Game System:</label>
+                    <div className="unified-container">
+                        <select
+                            value={gameSystem}
+                            onChange={(e) => setGameSystem(e.target.value)}
+                            required
+                        >
+                            <option value="" disabled>Select Game System</option>
+                            {gameSystems.map((system, index) => (
+                                <option key={index} value={system}>{system}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <label className="small-label">Language:</label>
+                    <div className="unified-container">
+                        <select
+                            value={language}
+                            onChange={(e) => setLanguage(e.target.value)}
+                            required
+                        >
+                            <option value="" disabled>Select Language</option>
+                            {languages.map((lang, index) => (
+                                <option key={index} value={lang}>{lang}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <label className="small-label">Starting Level:</label>
+                    <div className="unified-container">
                         <input
                             type="number"
-                            value={minAge}
-                            onChange={(e) => setMinAge(e.target.value)}
+                            value={startingLevel}
+                            onChange={(e) => setStartingLevel(e.target.value)}
                             min="0"
                         />
                     </div>
-                    <span>-</span>
-                    <div>
+                    <label className="small-label">Age Range:</label>
+                    <div className="unified-container">
+                        <div>
+                            <input
+                                type="number"
+                                value={minAge}
+                                onChange={(e) => setMinAge(e.target.value)}
+                                min="0"
+                            />
+                        </div>
+                        <span>-</span>
+                        <div>
+                            <input
+                                type="number"
+                                value={maxAge}
+                                onChange={(e) => setMaxAge(e.target.value)}
+                                min={minAge || "0"}
+                            />
+                        </div>
+                    </div>
+                    <label className="small-label">Player Count:</label>
+                    <div className="unified-container">
+                        <div>
+                            <input
+                                type="number"
+                                value={minPlayers}
+                                onChange={handleMinPlayersChange}
+                                min="1"
+                            />
+                        </div>
+                        <span>-</span>
+                        <div>
+                            <input
+                                type="number"
+                                value={maxPlayers}
+                                onChange={handleMaxPlayersChange}
+                                min={minPlayers}
+                            />
+                        </div>
+                    </div>
+
+                    <label className="small-label">Visibility:</label>
+                    <div className="unified-container">
+                        <select
+                            value={visibility}
+                            onChange={handleVisibilityChange}
+                        >
+                            <option value="public">Public</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+                    
+                    <label className="small-label">Banner:</label>
+                    <div className="unified-container">
                         <input
-                            type="number"
-                            value={maxAge}
-                            onChange={(e) => setMaxAge(e.target.value)}
-                            min={minAge || "0"}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleBannerUpload}
+                            className="banner-upload"
                         />
                     </div>
+                    {croppedImage && (
+                        <div className="banner-image-container">
+                            <img src={croppedImage} alt="Cropped Banner" className="banner-image" />
+                        </div>
+                    )}
                 </div>
-                <label className="small-label">Player Count:</label>
-                <div className="unified-container">
-                    <div>
+
+                <div className="col">
+                    <label className="small-label">Intended Game Length:</label>
+                    <div className="unified-container">
                         <input
                             type="number"
-                            value={minPlayers}
-                            onChange={(e) => setMinPlayers(e.target.value)}
+                            value={intendedGameLengthMin}
+                            onChange={(e) => setIntendedGameLengthMin(e.target.value)}
                             min="1"
                         />
-                    </div>
-                    <span>-</span>
-                    <div>
+                        <span>-</span>
                         <input
                             type="number"
-                            value={maxPlayers}
-                            onChange={(e) => setMaxPlayers(e.target.value)}
-                            min={minPlayers}
+                            value={intendedGameLengthMax}
+                            onChange={(e) => setIntendedGameLengthMax(e.target.value)}
+                            min={intendedGameLengthMin || "1"}
                         />
-                    </div>
-                </div>
-
-                <label className="small-label">Visibility:</label>
-                    <div className="unified-container">
-                    <select
-                        value={visibility}
-                        onChange={(e) => setVisibility(e.target.value)}
-                    >
-                        <option value="public">Public</option>
-                        <option value="private">Private</option>
-                    </select>
-                </div>
-            </div>
-
-            <div className="col">
-                <label className="small-label">Intended Game Length:</label>
-                <div className="unified-container">
-                    <input
-                        type="number"
-                        value={intendedGameLengthMin}
-                        onChange={(e) => setIntendedGameLengthMin(e.target.value)}
-                        min="1"
-                    />
-                    <span>-</span>
-                    <input
-                        type="number"
-                        value={intendedGameLengthMax}
-                        onChange={(e) => setIntendedGameLengthMax(e.target.value)}
-                        min={intendedGameLengthMin || "1"}
-                    />
-                    <select
-                        value={intendedGameLengthUnit}
-                        onChange={(e) => setIntendedGameLengthUnit(e.target.value)}
-                    >
-                        {gameLengthUnits.map((unit, index) => (
-                            <option key={index} value={unit}>
-                                {unit}{intendedGameLengthMax > 1 ? 's' : ''}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <label className="small-label">Game Frequency:</label>
-                <div className="unified-container">
-                    <input
-                        type="number"
-                        value={frequencyNumber}
-                        onChange={(e) => setFrequencyNumber(e.target.value)}
-                        min="1"
-                        max="9"
-                    />
-                    <span>per</span>
-                    <input
-                        type="number"
-                        value={frequencyInterval}
-                        onChange={(e) => setFrequencyInterval(e.target.value)}
-                        disabled={frequencyNumber > 1}
-                        min="1"
-                        max="9"
-                        style={{ backgroundColor: frequencyNumber > 1 ? '#333' : '#1e1e1e' }}
-                    />
-                    <select
-                        value={frequencyTimeFrame}
-                        onChange={(e) => setFrequencyTimeFrame(e.target.value)}
-                    >
-                        {timeFrames.map((frame, index) => (
-                            <option key={index} value={frame}>
-                                {frame}{frequencyInterval > 1 ? 's' : ''}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <label className="small-label">Session Length:</label>
-                <div className="unified-container">
-                    <input
-                        type="number"
-                        value={sessionLengthMin}
-                        onChange={(e) => setSessionLengthMin(e.target.value)}
-                        min="1"
-                        max="24"
-                    />
-                    <span>-</span>
-                    <input
-                        type="number"
-                        value={sessionLengthMax}
-                        onChange={(e) => setSessionLengthMax(e.target.value)}
-                        min={sessionLengthMin || "1"}
-                        max="24"
-                    />
-                    <button className="static-button">hours</button>
-                </div>
-                <label className="small-label">Possible Session Day/s:</label>
-                <div className="unified-container days-buttons">
-                    {["sun", "mon", "tue", "wed", "thu", "fri", "sat"].map((day) => (
-                        <button
-                            key={day}
-                            className={sessionDays[day] ? "day-button active" : "day-button"}
-                            onClick={() => toggleDay(day)}
+                        <select
+                            value={intendedGameLengthUnit}
+                            onChange={(e) => setIntendedGameLengthUnit(e.target.value)}
                         >
-                            {day.toUpperCase()}
-                        </button>
-                    ))}
-                </div>
-                <div className="tags-wrapper">
-                    <TagsManager
-                        enabledTags={enabledTags}
-                        setEnabledTags={setEnabledTags}
-                        minAge={minAge}
-                    />
-                </div>
-            </div>
-
-            <div className="col">
-                <label className="small-label">Game Description:</label>
-                <textarea
-                    value={gameDescription}
-                    onChange={(e) => setGameDescription(e.target.value)}
-                />
-                <button
-                    className="button"
-                    onClick={handleCreateGame}
-                >
-                    Create Game
-                </button>
-            </div>
-
-            {showCropper && (
-                <div className="cropper-container">
-                    <div className="cropper-wrapper">
-                        <Cropper
-                            image={gameImage}
-                            crop={crop}
-                            zoom={zoom}
-                            aspect={2 / 1}
-                            onCropChange={setCrop}
-                            onZoomChange={setZoom}
-                            onCropComplete={onCropComplete}
+                            {gameLengthUnits.map((unit, index) => (
+                                <option key={index} value={unit}>
+                                    {unit}{intendedGameLengthMax > 1 ? 's' : ''}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <label className="small-label">Game Frequency:</label>
+                    <div className="unified-container">
+                        <input
+                            type="number"
+                            value={frequencyNumber}
+                            onChange={(e) => setFrequencyNumber(e.target.value)}
+                            min="1"
+                            max="9"
+                        />
+                        <span>per</span>
+                        <input
+                            type="number"
+                            value={frequencyInterval}
+                            onChange={(e) => setFrequencyInterval(e.target.value)}
+                            disabled={frequencyNumber > 1}
+                            min="1"
+                            max="9"
+                            style={{ backgroundColor: frequencyNumber > 1 ? '#333' : '#1e1e1e' }}
+                        />
+                        <select
+                            value={frequencyTimeFrame}
+                            onChange={(e) => setFrequencyTimeFrame(e.target.value)}
+                        >
+                            {timeFrames.map((frame, index) => (
+                                <option key={index} value={frame}>
+                                    {frame}{frequencyInterval > 1 ? 's' : ''}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <label className="small-label">Session Length:</label>
+                    <div className="unified-container">
+                        <input
+                            type="number"
+                            value={sessionLengthMin}
+                            onChange={(e) => setSessionLengthMin(e.target.value)}
+                            min="1"
+                            max="24"
+                        />
+                        <span>-</span>
+                        <input
+                            type="number"
+                            value={sessionLengthMax}
+                            onChange={(e) => setSessionLengthMax(e.target.value)}
+                            min={sessionLengthMin || "1"}
+                            max="24"
+                        />
+                        <button className="static-button">hours</button>
+                    </div>
+                    <label className="small-label">Possible Session Day/s:</label>
+                    <div className="unified-container days-buttons">
+                        {["sun", "mon", "tue", "wed", "thu", "fri", "sat"].map((day) => (
+                            <button
+                                key={day}
+                                className={sessionDays[day] ? "day-button active" : "day-button"}
+                                onClick={() => toggleDay(day)}
+                            >
+                                {day.toUpperCase()}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="tags-wrapper">
+                        <TagsManager
+                            enabledTags={enabledTags}
+                            setEnabledTags={setEnabledTags}
+                            minAge={minAge}
                         />
                     </div>
-                    <div className="cropper-buttons">
-                        <button onClick={handleSaveCrop}>Save</button>
-                        <button onClick={handleCancelCrop}>Cancel</button>
-                    </div>
                 </div>
-            )}
+
+                <div className="col">
+                    <label className="small-label">Game Description:</label>
+                    <textarea
+                        value={gameDescription}
+                        onChange={(e) => setGameDescription(e.target.value)}
+                    />
+                    <button
+                        className="button"
+                        onClick={handleCreateGame}
+                    >
+                        Create Game
+                    </button>
+
+
+                </div>
+
+                {showCropper && (
+                    <div className="cropper-container">
+                        <div className="cropper-wrapper">
+                            <Cropper
+                                image={bannerImage}
+                                crop={crop}
+                                zoom={zoom}
+                                aspect={3 / 1} // 3:1 aspect ratio
+                                onCropChange={setCrop}
+                                onZoomChange={setZoom}
+                                onCropComplete={onCropComplete}
+                            />
+                        </div>
+                        <div className="cropper-buttons">
+                            <button onClick={handleSaveCrop}>Save</button>
+                            <button onClick={handleCancelCrop}>Cancel</button>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

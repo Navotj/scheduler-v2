@@ -22,12 +22,12 @@ body {
 
 .form-container {
     background-color: #333;
-    padding: 1rem;
-    border-radius: 1.5em;
-    box-shadow: 0px 0px 1em rgba(0, 0, 0, 0.5);
+    padding: 1vw;
+    border-radius: 1.5vw;
+    box-shadow: 0px 0px 2vh rgba(0, 0, 0, 0.5);
     margin: 1%;
-    width: 85.8%;
-    height: 90%;
+    width: 86vw;
+    height: 92vh;
     flex: auto;
     overflow: hidden;
     position: absolute;
@@ -45,7 +45,3 @@ body {
     box-sizing: border-box;
 }
 
-/* General scrollbar styling */
-::-webkit-scrollbar-button {
-    display: none;
-}

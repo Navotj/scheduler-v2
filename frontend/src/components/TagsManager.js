@@ -208,6 +208,32 @@ const tagCategories = [
 
 const ageRestrictedTags = ["NSFW", "Drug Use", "Suicide", "Mental Illness", "Self-Harm", "Torture", "Gore", "Extreme Violence", "Body Mutilation", "Human Trafficking", "Sexual Content", "Sexual Assault"];
 
+const renderTag = (tag, category, handleTagClick, handleTagRemove, enabledTags) => {
+    if (!category) {
+        console.error(`Category not found for tag: ${tag.name}`);
+        return (
+            <div key={tag.name} className="tag undefined-tag">
+                {tag.name}
+            </div>
+        );
+    }
+
+    const isEnabled = enabledTags.some(t => t.name === tag.name);
+    const handleClick = isEnabled ? () => handleTagRemove(tag) : () => handleTagClick(tag);
+
+    return (
+        <div
+            key={tag.name}
+            className={`tag ${isEnabled ? "enabled-tag" : ""} ${tag.name === "LGBT Friendly" ? "lgbt-friendly" : ""}`}
+            style={{ borderColor: category.color }}
+            onClick={handleClick}
+        >
+            {tag.icon && <span className="tag-icon" style={{ marginRight: '5px' }}>{tag.icon}</span>}
+            {tag.name}
+        </div>
+    );
+};
+
 const TagsManager = ({ enabledTags, setEnabledTags, minAge }) => {
     const [availableTags, setAvailableTags] = useState([]);
 
@@ -218,14 +244,13 @@ const TagsManager = ({ enabledTags, setEnabledTags, minAge }) => {
             }
             return category.tags;
         });
-    
+
         const filteredTags = combinedTags
             .filter(tag => !(minAge < 18 && ageRestrictedTags.includes(tag.name)))
             .map(tag => tag.name);
-    
+
         setAvailableTags(filteredTags);
-    
-        // Automatically remove age-restricted tags if minAge is below 18
+
         if (minAge < 18) {
             const updatedEnabledTags = enabledTags.filter(tag => !ageRestrictedTags.includes(tag.name));
             if (updatedEnabledTags.length !== enabledTags.length) {
@@ -233,30 +258,18 @@ const TagsManager = ({ enabledTags, setEnabledTags, minAge }) => {
             }
         }
     }, [minAge, enabledTags, setEnabledTags]);
-    
 
     const handleTagClick = (tag) => {
         if (!enabledTags.some(t => t.name === tag.name)) {
-            const newEnabledTags = [...enabledTags, tag].sort((a, b) => a.name.localeCompare(b.name));
+            const newEnabledTags = [...enabledTags, { ...tag }].sort((a, b) => a.name.localeCompare(b.name));
             setEnabledTags(newEnabledTags);
         }
     };
 
     const handleTagRemove = (tag) => {
-        setEnabledTags(enabledTags.filter(t => t.name !== tag.name));
+        const newEnabledTags = enabledTags.filter(t => t.name !== tag.name);
+        setEnabledTags(newEnabledTags);
     };
-
-    const renderTag = (tag, category) => (
-        <div
-            key={tag.name}
-            className={`tag ${tag.name === "LGBT Friendly" ? "lgbt-friendly" : ""}`}
-            style={{ borderColor: category.color }}
-            onClick={() => handleTagClick(tag)}
-            data-icon={tag.icon}
-        >
-            {tag.name}
-        </div>
-    );
 
     return (
         <div className="tags-wrapper">
@@ -266,7 +279,7 @@ const TagsManager = ({ enabledTags, setEnabledTags, minAge }) => {
                     {tagCategories.map(category =>
                         category.tags
                             .filter(tag => availableTags.includes(tag.name))
-                            .map(tag => renderTag(tag, category))
+                            .map(tag => renderTag(tag, category, handleTagClick, handleTagRemove, enabledTags))
                     )}
                 </div>
             </div>
@@ -280,10 +293,10 @@ const TagsManager = ({ enabledTags, setEnabledTags, minAge }) => {
                                 key={tag.name}
                                 className="enabled-tag"
                                 style={{ borderColor: category.color }}
-                                data-icon={tag.icon}
+                                onClick={() => handleTagRemove(tag)}
                             >
-                                {tag.name} 
-                                <span className="remove-tag" onClick={() => handleTagRemove(tag)}>X</span>
+                                {tag.name}
+                                <span className="remove-tag">X</span>
                             </div>
                         );
                     })}
@@ -293,4 +306,5 @@ const TagsManager = ({ enabledTags, setEnabledTags, minAge }) => {
     );
 };
 
+export { renderTag, tagCategories };
 export default TagsManager;

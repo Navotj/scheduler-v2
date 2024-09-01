@@ -30,7 +30,7 @@
     border: 1px solid #444;
     border-radius: 5px;
     overflow-y: auto;
-    height: 100%; /* Force the container to stay within its half of the parent */
+    height: 20vh; /* Force the container to stay within its half of the parent */
 }
 
 .tag, .enabled-tag {
@@ -77,4 +77,9 @@
     content: attr(data-icon);
     margin-right: 0.3em;
     font-size: 1em; /* Adjust font size as needed */
+}
+
+.game-preview-card .tags-container, .game-preview-card .enabled-tags-container {
+    overflow-y: none;
+    height: auto;
 }
