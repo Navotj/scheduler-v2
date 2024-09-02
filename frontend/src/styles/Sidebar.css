@@ -21,8 +21,8 @@
 }
 
 #sidebar ul li {
-    padding: 0.5vh 1vh;
-    margin: 0.5vh 0;
+    padding: 0.8vh 1vh;
+    margin: 0.8vh 0;
     text-align: left;
     color: #e0e0e0;
     cursor: pointer;
@@ -33,7 +33,7 @@
 #sidebar ul li::after {
     content: "";
     display: block;
-    height: 0.1vh;
+    height: 0.2vh;
     width: 100%;
     background: linear-gradient(to left, transparent, grey, transparent);
     position: absolute;

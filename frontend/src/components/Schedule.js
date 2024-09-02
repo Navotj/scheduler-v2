@@ -72,7 +72,7 @@ const Schedule = ({ username, onAvailabilitySubmit }) => {
                 const wrapperWidth = tableWrapper.clientWidth;
                 const daySlotWidth = 100; 
                 const scrollbarWidth = tableWrapper.offsetWidth - tableWrapper.clientWidth;
-                const availableWidth = wrapperWidth - daySlotWidth - scrollbarWidth - 5;
+                const availableWidth = wrapperWidth - daySlotWidth - scrollbarWidth - 15;
                 const numberOfTimeSlots = 49;
                 const timeSlotWidth = availableWidth / numberOfTimeSlots;
 

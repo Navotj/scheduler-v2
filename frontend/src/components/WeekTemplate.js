@@ -32,13 +32,13 @@ const WeekTemplate = ({ username }) => {
         fetchTemplates();
 
         const calculateSlotDimensions = () => {
-            const tableWrapper = document.querySelector('week-template-table-wrapper');
+            const tableWrapper = document.querySelector('.week-template-table-wrapper');
 
             if (tableWrapper) {
                 const wrapperWidth = tableWrapper.clientWidth;
                 const daySlotWidth = 100; 
                 const scrollbarWidth = tableWrapper.offsetWidth - tableWrapper.clientWidth;
-                const availableWidth = wrapperWidth - daySlotWidth - scrollbarWidth - 5;
+                const availableWidth = wrapperWidth - daySlotWidth - scrollbarWidth - 15;
                 const numberOfTimeSlots = 49;
                 const timeSlotWidth = availableWidth / numberOfTimeSlots;
 
@@ -51,6 +51,7 @@ const WeekTemplate = ({ username }) => {
 
         return () => window.removeEventListener('resize', calculateSlotDimensions);
     }, [username]);
+
 
     const timeSlots = Array.from({ length: 48 }, (_, index) => {
         const hours = Math.floor(index / 2).toString().padStart(2, '0');

@@ -3,7 +3,7 @@ import '../styles/Games.css';
 import '../styles/TagsManager.css';  // Import the TagsManager styles for consistent tag styling
 import moment from 'moment-timezone';
 import { renderTag, tagCategories } from './TagsManager';  // Import the renderTag function and tagCategories
-import { FaClock, FaUser, FaCalendar, FaGamepad, FaMapMarkerAlt  } from 'react-icons/fa'; // Import icons
+import { FaClock, FaUser, FaCalendar, FaGamepad, FaMapMarkerAlt, faLanguage, FaLanguage  } from 'react-icons/fa'; // Import icons
 
 const GamePreview = ({
     username, gameName, gameSystem, language, frequencyNumber, frequencyInterval, frequencyTimeFrame,
@@ -59,11 +59,12 @@ const GamePreview = ({
             </div>
             {croppedImage && <div className="game-preview-banner" style={{ backgroundImage: `url(${croppedImage})`, backgroundSize: 'cover' }}></div>}
             <div className="game-preview-body">
-                {location && (
-                    <div className="long-info">
-                        <FaMapMarkerAlt /> {location}
-                    </div>
-                )}
+                <div className="long-info">
+                    <FaMapMarkerAlt /> {location}
+                </div>
+                <div className="long-info">
+                    <FaLanguage /> {language}
+                </div>
                 <div className="long-info">
                     <FaCalendar />
                     {formatFrequency()}
@@ -93,7 +94,6 @@ const GamePreview = ({
                                 {minAge && maxAge && `, ages ${minAge} to ${maxAge}`}
                             </>
                         )}
-                        {`, ${language} speaking`}
                     </div>
                 )}
 
