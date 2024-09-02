@@ -24,6 +24,8 @@ router.post('/create', async (req, res) => {
         enabledTags,
         owner,
         visibility,
+        location,
+        startHour,
         sessionLengthMin,
         sessionLengthMax,
         sessionDays  // Save the sessionDays to the database
@@ -52,6 +54,8 @@ router.post('/create', async (req, res) => {
             visibility,
             sessionLengthMin,
             sessionLengthMax,
+            location,
+            startHour,
             sessionDays  // Include sessionDays in the new game
         });
 

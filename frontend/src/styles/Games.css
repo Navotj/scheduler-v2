@@ -28,11 +28,11 @@
 
 /* Game Preview Styles */
 .game-preview-card {
-    font-size: 0.6em;
+    font-size: 0.7em;
     padding: 0;
     background-color: #2c2c2c;
     border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -43,6 +43,7 @@
     width: 100%;
     justify-content: space-between; /* Ensures footer is at the bottom */
     height: 100%; /* Ensures the card takes up the full height of its container */
+    aspect-ratio: 3/4;
 }
 
 
@@ -59,7 +60,7 @@
     background-position: center;
     background-repeat: no-repeat;
     flex-shrink: 0; /* Prevent the banner from shrinking */
-    margin: 2.5%;
+    margin: 2.5%;;
 }
 
 .game-preview-header {
@@ -88,13 +89,25 @@
     position: absolute;
     top: 5px;
     left: 8px;
+    font-weight: bold;
+
 }
 
 .game-title {
-    font-size: 1.5em;
+    font-size: 2em;
     color: #fff;
     margin: 0; /* Remove any default margins */
     padding: 0;
+    font-weight: bold;
+    text-shadow: 
+    -2px -2px 0 #000,  
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000,
+    2px 0px 0 #000,
+    -2px 0px 0 #000,
+    0px 2px 0 #000,
+    0px -2px 0 #000;
 
 }
 
@@ -108,8 +121,11 @@
 .game-preview-body {
     display: flex;
     flex-direction: column;
-    height: 100%;
     padding: 8px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .long-info {
@@ -121,15 +137,12 @@
 }
 
 .game-description {
+    flex: 1;
+    overflow-y: auto;
     margin-top: 1em;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: normal;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
+    padding: 3px;
 }
-
 .game-preview-footer {
     background-color: #333;
     padding: 1em;
@@ -175,6 +188,7 @@ textarea {
 }
 
 .game-preview-card .tags-footer-container {
+    font-size: 1.2em;
     overflow-x: auto; /* Enables horizontal scrolling */
     white-space: nowrap;
     padding: 5px 0;

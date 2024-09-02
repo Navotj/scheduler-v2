@@ -46,6 +46,8 @@ const MyGames = ({ username }) => {
                             minAge={game.minAge}
                             maxAge={game.maxAge}
                             startingLevel={game.startingLevel}
+                            location={game.location}
+                            startHour={game.startHour}
                         />
                     </div>
                 ))}

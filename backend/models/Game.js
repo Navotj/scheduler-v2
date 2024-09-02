@@ -20,6 +20,14 @@ const GameSchema = new mongoose.Schema({
     enabledTags: Array,
     owner: String,
     visibility: String,
+    location: {
+        type: String,
+        enum: ['Online', 'In-person', 'Play-by-post'],
+        required: true
+    },
+    startHour: {
+        type: Date,
+    },
     sessionLengthMin: Number,
     sessionLengthMax: Number,
     sessionDays: {

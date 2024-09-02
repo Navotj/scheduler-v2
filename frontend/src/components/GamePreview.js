@@ -1,17 +1,22 @@
 import React from 'react';
 import '../styles/Games.css';
 import '../styles/TagsManager.css';  // Import the TagsManager styles for consistent tag styling
+import moment from 'moment-timezone';
 import { renderTag, tagCategories } from './TagsManager';  // Import the renderTag function and tagCategories
-import { FaClock, FaUser, FaCalendar, FaGamepad } from 'react-icons/fa'; // Import icons
+import { FaClock, FaUser, FaCalendar, FaGamepad, FaMapMarkerAlt  } from 'react-icons/fa'; // Import icons
 
 const GamePreview = ({
     username, gameName, gameSystem, language, frequencyNumber, frequencyInterval, frequencyTimeFrame,
     intendedGameLengthMin, intendedGameLengthMax, intendedGameLengthUnit, minPlayers, maxPlayers,
     minAge, maxAge, croppedImage, gameDescription, enabledTags, sessionLengthMin, sessionLengthMax, sessionDays,
-    startingLevel
+    startingLevel, location, startHour
 }) => {
     // Logging the sessionDays to ensure it's passed correctly
     console.log('Session Days:', sessionDays);
+
+    // Get the user's timezone
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 
     const formatFrequency = () => {
         let frequencyText;
@@ -54,12 +59,26 @@ const GamePreview = ({
             </div>
             {croppedImage && <div className="game-preview-banner" style={{ backgroundImage: `url(${croppedImage})`, backgroundSize: 'cover' }}></div>}
             <div className="game-preview-body">
+                {location && (
+                    <div className="long-info">
+                        <FaMapMarkerAlt /> {location}
+                    </div>
+                )}
                 <div className="long-info">
                     <FaCalendar />
                     {formatFrequency()}
                     {formatSessionDays() && `, ${formatSessionDays()}`}
+                {(sessionLengthMin || sessionLengthMax || startHour) && (
+                    <>
+                        {startHour && (
+                            `, ${moment.utc(startHour).tz(userTimezone).format('h:mm a')} start`
+                        )}
+                        {(sessionLengthMin || sessionLengthMax) && (
+                            `, ${sessionLengthMin && sessionLengthMax ? `${sessionLengthMin}-${sessionLengthMax}` : sessionLengthMin || sessionLengthMax} hour${(sessionLengthMin > 1 || sessionLengthMax > 1) ? 's' : ''}`
+                        )}
+                    </>
+                )}
                 </div>
-
                 <div className="long-info">
                 {(minPlayers || maxPlayers || minAge || maxAge) && (
                     <div className="long-info">
@@ -80,6 +99,7 @@ const GamePreview = ({
 
                 </div>
                 <div className="long-info">
+                <div className="long-info">
                 {(intendedGameLengthMin || intendedGameLengthMax) && (
                     <div className="long-info">
                         <FaClock />
@@ -88,6 +108,7 @@ const GamePreview = ({
                         {intendedGameLengthMin && intendedGameLengthMax && `${intendedGameLengthMin} to ${intendedGameLengthMax} ${intendedGameLengthUnit}${(intendedGameLengthMax > 1 || intendedGameLengthMin > 1) ? 's' : ''}`}
                     </div>
                 )}
+            </div>
                 </div>
                 <div className="long-info">
                 {startingLevel && (

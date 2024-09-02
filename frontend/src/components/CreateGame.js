@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../styles/CreateGame.css';
 import Cropper from 'react-easy-crop';
 import TagsManager from './TagsManager'; // Import the TagsManager component
+import moment from 'moment-timezone';
 
 const CreateGame = ({ username }) => {
     const [gameName, setGameName] = useState('');
@@ -40,6 +41,11 @@ const CreateGame = ({ username }) => {
 
     const [visibility, setVisibility] = useState('public');
     const [bannerImage, setBannerImage] = useState(null); // New state for banner image
+    const [selectedLocation, setSelectedLocation] = useState(''); // State for location
+    const [startHour, setStartHour] = useState(''); // State for start hour
+
+    // User's timezone (can be fetched from settings or browser)
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     const handleVisibilityChange = (e) => {
         setVisibility(e.target.value);
@@ -150,7 +156,6 @@ const CreateGame = ({ username }) => {
         };
     };
     
-
     const onCropComplete = (croppedArea, croppedAreaPixels) => {
         setCropArea(croppedAreaPixels);
     };
@@ -183,17 +188,17 @@ const CreateGame = ({ username }) => {
     };
 
     const handleCreateGame = async () => {
-        if (!gameName || !gameSystem || !language || !username) {
-            alert('Please fill in all required fields');
+        if (!gameName || !gameSystem || !language || !username || !selectedLocation) {
+            alert('Please fill in all required fields, including the location and start hour.');
             return;
         }
-    
-        // Transform sessionDays object into an array of { day: 'dayname', available: boolean } objects
-        const transformedSessionDays = Object.keys(sessionDays).map(day => ({
-            day,
-            available: sessionDays[day],
-        }));
-    
+
+        // Convert startHour to a UTC date object
+        const startHourUTC = moment.tz(startHour, 'HH:mm', userTimezone).utc().toDate();
+
+        console.log("Converted Start Hour UTC:", startHourUTC);
+        console.log("Selected Location:", selectedLocation);
+
         const formData = {
             gameName,
             gameSystem,
@@ -214,13 +219,18 @@ const CreateGame = ({ username }) => {
             enabledTags: enabledTags.length > 0 ? JSON.stringify(enabledTags) : "[]",  // Stringify or default to an empty array
             owner: username,
             visibility,
+            location: selectedLocation,
+            startHour: startHourUTC,  // Store the UTC time
             sessionLengthMin,
             sessionLengthMax,
-            sessionDays: transformedSessionDays,  // Send the transformed sessionDays array
+            sessionDays: Object.keys(sessionDays).map(day => ({
+                day,
+                available: sessionDays[day],
+            }))
         };
-    
-        console.log('Form Data:', formData);  // Log formData to check sessionDays content
-    
+
+        console.log("Form Data:", formData);
+
         try {
             const response = await fetch('http://localhost:5000/games/create', {
                 method: 'POST',
@@ -229,7 +239,7 @@ const CreateGame = ({ username }) => {
                 },
                 body: JSON.stringify(formData),
             });
-    
+
             if (response.ok) {
                 alert('Game created successfully!');
             } else {
@@ -242,15 +252,18 @@ const CreateGame = ({ username }) => {
             alert('An error occurred. Please try again later.');
         }
     };
-    
-    
 
+    const timeOptions = [];
+    for (let hour = 0; hour < 24; hour++) {
+        const hourFormatted = hour.toString().padStart(2, '0');
+        timeOptions.push(`${hourFormatted}:00`, `${hourFormatted}:30`);
+    }
 
     return (
         <div className="create-game-container">
             <div className="form-grid-three-cols">
                 <div className="col">
-                    <label className="small-label">Game Title:</label>
+                    <label className="small-label">Game Title:<span style={{color: 'red'}}>*</span></label>
                     <div className="unified-container">
                         <input
                             type="text"
@@ -259,7 +272,7 @@ const CreateGame = ({ username }) => {
                             required
                         />
                     </div>
-                    <label className="small-label">Game System:</label>
+                    <label className="small-label">Game System:<span style={{color: 'red'}}>*</span></label>
                     <div className="unified-container">
                         <select
                             value={gameSystem}
@@ -272,7 +285,7 @@ const CreateGame = ({ username }) => {
                             ))}
                         </select>
                     </div>
-                    <label className="small-label">Language:</label>
+                    <label className="small-label">Language:<span style={{color: 'red'}}>*</span></label>
                     <div className="unified-container">
                         <select
                             value={language}
@@ -285,6 +298,19 @@ const CreateGame = ({ username }) => {
                             ))}
                         </select>
                     </div>
+                    <label className="small-label">Location: <span style={{color: 'red'}}>*</span></label>
+                    <div className="unified-container">
+                        {['Online', 'In-person', 'Play-by-post'].map((location) => (
+                            <button
+                                key={location}
+                                className={`location-button ${selectedLocation === location ? 'active' : ''}`}
+                                onClick={() => setSelectedLocation(location)}
+                            >
+                                {location}
+                            </button>
+                        ))}
+                    </div>
+
                     <label className="small-label">Starting Level:</label>
                     <div className="unified-container">
                         <input
@@ -345,7 +371,8 @@ const CreateGame = ({ username }) => {
                             <option value="private">Private</option>
                         </select>
                     </div>
-                    
+
+
                     <label className="small-label">Banner:</label>
                     <div className="unified-container">
                         <input
@@ -450,6 +477,20 @@ const CreateGame = ({ username }) => {
                             </button>
                         ))}
                     </div>
+                    <label className="small-label">Start Hour:</label>
+                    <div className="unified-container">
+                        <select
+                            value={startHour}
+                            onChange={(e) => setStartHour(e.target.value)}
+                            required
+                        >
+                            <option value="" disabled>Select Start Hour</option>
+                            {timeOptions.map((time, index) => (
+                                <option key={index} value={time}>{time}</option>
+                            ))}
+                        </select>
+                    </div>
+                    
                     <div className="tags-wrapper">
                         <TagsManager
                             enabledTags={enabledTags}
@@ -460,6 +501,8 @@ const CreateGame = ({ username }) => {
                 </div>
 
                 <div className="col">
+
+
                     <label className="small-label">Game Description:</label>
                     <textarea
                         value={gameDescription}
@@ -471,8 +514,6 @@ const CreateGame = ({ username }) => {
                     >
                         Create Game
                     </button>
-
-
                 </div>
 
                 {showCropper && (

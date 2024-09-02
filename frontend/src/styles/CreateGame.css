@@ -153,3 +153,21 @@ textarea {
     flex-grow: 1; /* Ensure it takes up the remaining vertical space */
     min-height: 0; /* Ensure flex items don't force min-height */
 }
+
+.location-button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8em;
+    border-radius: 5px;
+    flex: 1; /* Make buttons take equal space */
+    text-align: center;
+    margin: 0 0.2rem; /* Space between buttons */
+    padding: 0.5em;
+    transition: background-color 0.3s ease;
+}
+
+.location-button.active {
+    background-color: #4caf50;
+}
