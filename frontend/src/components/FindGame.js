@@ -40,6 +40,9 @@ const FindGame = () => {
                             croppedImage={game.gameImage}
                             gameDescription={game.gameDescription}
                             enabledTags={game.enabledTags}
+                            sessionLengthMin={game.sessionLengthMin}
+                            sessionLengthMax={game.sessionLengthMax}
+                            sessionDays={game.sessionDays}
                         />
                     </div>
                 ))}

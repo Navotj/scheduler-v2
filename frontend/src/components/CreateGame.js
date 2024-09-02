@@ -128,8 +128,8 @@ const CreateGame = ({ username }) => {
         const image = new Image();
         image.src = bannerImage;
         image.onload = () => {
-            const aspectRatio = 3 / 1;
-            const newWidth = 150; // Compress to 300 pixels wide
+            const aspectRatio = 5 / 2;
+            const newWidth = 300; // Compress to 300 pixels wide
             const newHeight = newWidth / aspectRatio;
             canvas.width = newWidth;
             canvas.height = newHeight;
@@ -188,6 +188,12 @@ const CreateGame = ({ username }) => {
             return;
         }
     
+        // Transform sessionDays object into an array of { day: 'dayname', available: boolean } objects
+        const transformedSessionDays = Object.keys(sessionDays).map(day => ({
+            day,
+            available: sessionDays[day],
+        }));
+    
         const formData = {
             gameName,
             gameSystem,
@@ -210,9 +216,9 @@ const CreateGame = ({ username }) => {
             visibility,
             sessionLengthMin,
             sessionLengthMax,
-            sessionDays,  // Include the sessionDays in the form data
+            sessionDays: transformedSessionDays,  // Send the transformed sessionDays array
         };
-
+    
         console.log('Form Data:', formData);  // Log formData to check sessionDays content
     
         try {
@@ -236,6 +242,7 @@ const CreateGame = ({ username }) => {
             alert('An error occurred. Please try again later.');
         }
     };
+    
     
 
 

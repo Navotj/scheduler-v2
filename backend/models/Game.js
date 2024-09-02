@@ -1,15 +1,5 @@
 const mongoose = require('mongoose');
 
-const sessionDaysSchema = new mongoose.Schema({
-    sun: { type: Boolean, default: false },
-    mon: { type: Boolean, default: false },
-    tue: { type: Boolean, default: false },
-    wed: { type: Boolean, default: false },
-    thu: { type: Boolean, default: false },
-    fri: { type: Boolean, default: false },
-    sat: { type: Boolean, default: false }
-});
-
 const GameSchema = new mongoose.Schema({
     gameName: String,
     gameSystem: String,
@@ -32,7 +22,23 @@ const GameSchema = new mongoose.Schema({
     visibility: String,
     sessionLengthMin: Number,
     sessionLengthMax: Number,
-    sessionDays: sessionDaysSchema  // Use the explicitly defined schema for sessionDays
+    sessionDays: {
+        type: [
+            {
+                day: { type: String, enum: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'], required: true },
+                available: { type: Boolean, default: false, required: true }
+            }
+        ],
+        default: [
+            { day: 'sun', available: false },
+            { day: 'mon', available: false },
+            { day: 'tue', available: false },
+            { day: 'wed', available: false },
+            { day: 'thu', available: false },
+            { day: 'fri', available: false },
+            { day: 'sat', available: false }
+        ]
+    }
 });
 
 const Game = mongoose.model('Game', GameSchema);
