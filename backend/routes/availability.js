@@ -1,107 +1,94 @@
 const express = require('express');
 const router = express.Router();
-const Game = require('../models/Game');
+const Availability = require('../models/Availability');
+const WeekTemplate = require('../models/WeekTemplates');
 
-// Route to create a new game
-router.post('/create', async (req, res) => {
-    const {
-        gameName,
-        gameSystem,
-        language,
-        startingLevel,
-        intendedGameLengthMin,
-        intendedGameLengthMax,
-        intendedGameLengthUnit,
-        minAge,
-        maxAge,
-        minPlayers,
-        maxPlayers,
-        frequencyNumber,
-        frequencyInterval,
-        frequencyTimeFrame,
-        gameDescription,
-        gameImage,
-        enabledTags,
-        owner,
-        visibility,
-        sessionLengthMin,
-        sessionLengthMax,
-        sessionDays  // Expect sessionDays as an array of objects with day and available properties
-    } = req.body;
+// Route for saving availability
+router.post('/', async (req, res) => {
+    const { username, times } = req.body;
 
     try {
-        const game = new Game({
-            gameName,
-            gameSystem,
-            language,
-            startingLevel,
-            intendedGameLengthMin,
-            intendedGameLengthMax,
-            intendedGameLengthUnit,
-            minAge,
-            maxAge,
-            minPlayers,
-            maxPlayers,
-            frequencyNumber,
-            frequencyInterval,
-            frequencyTimeFrame,
-            gameDescription,
-            gameImage,
-            enabledTags: JSON.parse(enabledTags),
-            owner,
-            visibility,
-            sessionLengthMin,
-            sessionLengthMax,
-            sessionDays  // Store the sessionDays array of objects
-        });
+        let availability = await Availability.findOne({ username });
 
-        await game.save();
-        res.status(200).json({ gameId: game._id });
-    } catch (err) {
-        console.error('Error creating game:', err.message || err);
-        res.status(500).json({ error: 'Failed to create game' });
-    }
-});
-
-// Route to get a game by ID
-router.get('/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const game = await Game.findById(id).lean();
-        if (!game) {
-            return res.status(404).json({ error: 'Game not found' });
+        if (availability) {
+            availability.times = times;
+        } else {
+            availability = new Availability({ username, times });
         }
-        res.status(200).json(game);
+
+        await availability.save();
+        res.status(200).json({ message: 'Availability saved successfully' });
     } catch (err) {
-        console.error('Error fetching game:', err.message || err);
-        res.status(500).json({ error: 'Failed to fetch game' });
+        console.error('Error saving availability:', err);
+        res.status(500).json({ error: 'Failed to save availability' });
     }
 });
 
-// Route to fetch all public games
-router.get('/public', async (req, res) => {
-    try {
-        const games = await Game.find({ visibility: 'public' });
-        res.status(200).json(games);
-    } catch (err) {
-        console.error('Error fetching public games:', err.message || err);
-        res.status(500).json({ error: 'Failed to fetch games' });
-    }
-});
+// Route for fetching availability
+router.get('/', async (req, res) => {
+    console.log('GET /availability called with:', req.query.username);
+    const { username } = req.query;
 
-// Route to fetch all games created by a specific user
-router.get('/user/:username', async (req, res) => {
-    const { username } = req.params;
     try {
-        const games = await Game.find({ owner: username });
-        if (!games) {
-            return res.status(404).json({ error: 'No games found for this user' });
+        const availability = await Availability.findOne({ username: username.trim() });
+        console.log('Query Result:', availability);
+        
+        if (availability) {
+            res.json(availability);
+        } else {
+            res.status(404).json({ error: 'No availability found' });
         }
-        res.status(200).json(games);
     } catch (err) {
-        console.error('Error fetching user games:', err.message || err);
-        res.status(500).json({ error: 'Failed to fetch games' });
+        console.error('Error fetching availability:', err);
+        res.status(500).json({ error: 'Failed to fetch availability' });
     }
 });
+
+router.post('/templates', async (req, res) => {
+    const { username, templateName, weekTemplate } = req.body;
+
+    try {
+        const newTemplate = new WeekTemplate({ username, templateName, weekTemplate });
+        await newTemplate.save();
+        res.status(200).json({ message: 'Template saved successfully' });
+    } catch (err) {
+        console.error('Error saving template:', err);
+        res.status(500).json({ error: 'Failed to save template' });
+    }
+});
+
+// Route for fetching templates
+router.get('/templates', async (req, res) => {
+    const { username } = req.query;
+
+    try {
+        const templates = await WeekTemplate.find({ username: username.trim() });
+        res.json({ templates });
+    } catch (err) {
+        console.error('Error fetching templates:', err);
+        res.status(500).json({ error: 'Failed to fetch templates' });
+    }
+});
+
+
+router.delete('/templates', async (req, res) => {
+    const { username, templateName } = req.body;
+
+    try {
+        const result = await WeekTemplate.deleteOne({ username: username.trim(), templateName });
+        if (result.deletedCount > 0) {
+            res.status(200).json({ message: 'Template deleted successfully' });
+        } else {
+            res.status(404).json({ error: 'Template not found' });
+        }
+    } catch (err) {
+        console.error('Error deleting template:', err);
+        res.status(500).json({ error: 'Failed to delete template' });
+    }
+});
+
+// Existing exports...
+
+
 
 module.exports = router;

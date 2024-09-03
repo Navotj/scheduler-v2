@@ -226,3 +226,10 @@ textarea {
     border-radius: 10px; /* Rounded scrollbar thumb */
 }
 
+
+.banner-upload {
+    display: block;
+    margin: 0; /* Reset margin to avoid extra space */
+    vertical-align: middle; /* Center vertically within inline elements */
+    height: auto; /* Ensure the input field adjusts to its content */
+}
