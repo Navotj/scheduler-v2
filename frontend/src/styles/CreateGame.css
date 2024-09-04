@@ -154,7 +154,7 @@ textarea {
 
 .tags-wrapper {
     flex-grow: 1; /* Ensure it takes up the remaining vertical space */
-    min-height: 0; /* Ensure flex items don't force min-height */
+    min-height: 50%; /* Ensure flex items don't force min-height */
 }
 
 .location-button {

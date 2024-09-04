@@ -490,7 +490,11 @@ const CreateGame = ({ username }) => {
                             ))}
                         </select>
                     </div>
-                    
+                            
+                </div>
+
+                <div className="col">
+                
                     <div className="tags-wrapper">
                         <TagsManager
                             enabledTags={enabledTags}
@@ -498,9 +502,7 @@ const CreateGame = ({ username }) => {
                             minAge={minAge}
                         />
                     </div>
-                </div>
 
-                <div className="col">
 
 
                     <label className="small-label">Game Description:</label>
