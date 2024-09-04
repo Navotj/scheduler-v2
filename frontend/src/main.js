@@ -5,9 +5,9 @@ import Login from './components/Login';
 import CreateGame from './components/CreateGame';
 import FindGame from './components/FindGame';
 import MyGames from './components/MyGames';
-import MySchedule from './components/Schedule';
+import MySchedule from './scheduling/pages/SchedulePage';
 import Profile from './components/Profile';
-import WeekTemplate from './components/WeekTemplate';
+import WeekTemplate from './scheduling/pages/WeekTemplatePage';
 import Group from './components/Group';
 import './styles/main.css';
 
