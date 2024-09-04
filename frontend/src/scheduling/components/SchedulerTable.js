@@ -20,11 +20,18 @@ const SchedulerTable = ({ selectedSlots = new Set(), hoveredSlots = new Set(), h
                     {days.map((day, dayIndex) => {
                         const dayDate = new Date(day);
                         const isEndOfWeek = dayDate.getDay() === 6;  // Saturday is day 6
+                        const dayOfWeek = dayDate.toLocaleDateString('en-US', { weekday: 'short' });  // e.g., "Sun"
+                        const formattedDate = dayDate.toLocaleDateString();  // e.g., "9/6/2024"
 
                         return (
                             <React.Fragment key={dayIndex}>
                                 <tr className={isEndOfWeek ? 'end-of-week' : ''}>
-                                    <td className="scheduler-day-slot">{day}</td>
+                                    <td className="scheduler-day-slot">
+                                        <div className="day-wrapper">
+                                            <span className="day-name">{dayOfWeek}</span>
+                                            <span className="day-date">{formattedDate}</span>
+                                        </div>
+                                    </td>
                                     {timeSlots.map((_, timeIndex) => {
                                         const slotKey = `${dayIndex}-${timeIndex}`;
                                         const isSelected = selectedSlots.has(slotKey);

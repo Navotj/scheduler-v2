@@ -150,6 +150,27 @@
 }
 
 
+.day-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding-right: 10px;  /* Optional: add a little space between text and cell border */
+}
+
+.day-name {
+    text-align: left;
+    flex-grow: 1;
+    font-family: 'Ubuntu Mono', monospace; /* or any of the fonts listed */
+    letter-spacing: 1px;  /* Optional: Add slight spacing between letters */
+    font-weight: bold;
+}
+
+.day-date {
+    text-align: right;
+    flex-grow: 1;
+    color: #bbb; /* Slightly lighter color for date */
+}
+
 
 .scheduler-table td.time-slot.selected-slot {
     background-color: #1c9500; 
