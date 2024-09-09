@@ -11,22 +11,42 @@ const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fri
 
 const WeekTemplatePage = ({ username }) => {
     const { activeMode, toggleMode, resetMode } = UseToggleMode();
-    
-    // UseTemplateHandling should return applyTemplateToSlots function
+
+    // Initialize selectedTemplate and selectedSlots
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
+
+    // Initialize template handling first to ensure applyTemplateToSlots is available
     const {
         templates,
-        selectedTemplate,
         newTemplateName,
         handleSaveTemplate,
         handleApplyTemplate,
-        applyTemplateToSlots,  // Get the function from UseTemplateHandling
+        applyTemplateToSlots,  // This will now be available before it is used in UseSlotSelection
         handleDeleteTemplate,
         handleTemplateChange,
         handleSave,
-    } = UseTemplateHandling({ username, selectedSlots, setSelectedSlots });
+    } = UseTemplateHandling({ username, selectedSlots: [], setSelectedSlots: () => {} });  // Pass dummy slots initially
 
-    // Make sure applyTemplateToSlots is passed to UseSlotSelection
+    // Now initialize selectedSlots using UseSlotSelection
     const { selectedSlots, hoveredSlots, handleSlotClick, handleMouseDown, handleMouseOver, handleMouseUp, setSelectedSlots } = UseSlotSelection(activeMode, daysOfWeek, resetMode, selectedTemplate, applyTemplateToSlots);
+
+    // Ensure slots get updated when a template is applied
+    const applyTemplate = (template) => {
+        if (template && template.weekTemplate) {
+            const newSelectedSlots = new Set();
+            template.weekTemplate.forEach(({ day, time }) => {
+                newSelectedSlots.add(`${day}-${time}`);
+            });
+            setSelectedSlots(newSelectedSlots); // Update selectedSlots to reflect template application
+        }
+    };
+
+    useEffect(() => {
+        if (selectedTemplate) {
+            const template = templates.find(t => t.templateName === selectedTemplate);
+            applyTemplate(template); // Apply template when selectedTemplate changes
+        }
+    }, [selectedTemplate, templates]);
 
     useEffect(() => {
         calculateSlotDimensions();
@@ -38,7 +58,7 @@ const WeekTemplatePage = ({ username }) => {
         <div className="template-container">
             <div className="scheduler-container" onMouseUp={handleMouseUp}>
                 <SchedulerTable
-                    selectedSlots={selectedSlots}
+                    selectedSlots={selectedSlots}  // Pass updated selectedSlots to SchedulerTable
                     hoveredSlots={hoveredSlots}
                     handleSlotClick={handleSlotClick}
                     handleMouseDown={handleMouseDown}
@@ -53,7 +73,7 @@ const WeekTemplatePage = ({ username }) => {
                     handleSaveTemplate={handleSave}
                     selectedTemplate={selectedTemplate}
                     newTemplateName={newTemplateName}
-                    handleTemplateChange={handleTemplateChange}
+                    handleTemplateChange={(event) => setSelectedTemplate(event.target.value)}  // Update selectedTemplate
                     toggleMode={toggleMode}
                     activeMode={activeMode}
                     handleDeleteTemplate={handleDeleteTemplate}
