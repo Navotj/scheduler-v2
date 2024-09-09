@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import slotUtils from '../utils/slotUtils';
 
-const useScheduleFetching = ({ username, selectedSlots, onAvailabilitySubmit }) => {
+const UseSaveAvailability = ({ username, selectedSlots, onAvailabilitySubmit }) => {
     const [isSaving, setIsSaving] = useState(false);
 
     const handleSave = async () => {
@@ -34,4 +34,4 @@ const useScheduleFetching = ({ username, selectedSlots, onAvailabilitySubmit }) 
     return { isSaving, handleSave };
 };
 
-export default useScheduleFetching;
+export default UseSaveAvailability;

@@ -1,13 +1,44 @@
-// ActionBar.js
-const ActionBar = ({ isSaving, handleSave, templates, handleApplyTemplate, mode, selectedTemplate, handleTemplateChange, toggleMode, activeMode }) => {
+const ActionBar = ({
+    isSaving, 
+    handleSaveTemplate, 
+    handleSave, 
+    templates, 
+    handleApplyTemplate, 
+    handleDeleteTemplate, 
+    mode, 
+    selectedTemplate, 
+    newTemplateName, 
+    handleTemplateChange, 
+    toggleMode, 
+    activeMode
+}) => {
     return (
         <div className="action-buttons">
-            {mode === "schedule" && (
+            {mode === "template" && (
                 <>
                     <select value={selectedTemplate} onChange={handleTemplateChange}>
                         <option value="" disabled>Select Template</option>
+                        <option value="new">{newTemplateName || "Create New Template"}</option>
                         {templates.map(template => (
-                            <option key={template.templateName} value={template.templateName}>
+                            <option key={`${template.templateName}-${Math.random()}`} value={template.templateName}>
+                                {template.templateName}
+                            </option>
+                        ))}
+                    </select>
+
+                    <button onClick={handleSaveTemplate}>Save Template</button>
+                    <button onClick={() => handleDeleteTemplate(selectedTemplate)}>Delete Template</button>
+                    <button className={`add-button ${activeMode === 'add' ? 'active' : ''}`} onClick={() => toggleMode('add')}>+</button>
+                    <button className={`remove-button ${activeMode === 'remove' ? 'active' : ''}`} onClick={() => toggleMode('remove')}>-</button>
+                </>
+            )}
+            {mode === "schedule" && (
+                <>
+                    <select value={selectedTemplate || newTemplateName} onChange={handleTemplateChange}>
+                        <option value="" disabled>{newTemplateName || "Select Template"}</option>
+                        <option value="new">Create New Template</option>
+                        {templates.map(template => (
+                            <option key={`${template.templateName}-${Math.random()}`} value={template.templateName}>
                                 {template.templateName}
                             </option>
                         ))}

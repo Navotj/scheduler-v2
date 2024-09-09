@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const useSlotSelection = (activeMode, days) => {
+const useSlotSelection = (activeMode, days, resetMode, selectedTemplate, applyTemplateToSlots) => {
     const [selectedSlots, setSelectedSlots] = useState(new Set());
     const [dragging, setDragging] = useState(false);
     const [dragStart, setDragStart] = useState(null);
@@ -9,51 +9,57 @@ const useSlotSelection = (activeMode, days) => {
     const getWeekBounds = (dayIndex) => {
         const dayDate = new Date(days[dayIndex]);
         const dayOfWeek = dayDate.getDay();  // 0=Sunday, 6=Saturday
-        const startOfWeek = dayIndex - dayOfWeek;  // Start on Sunday (0)
-        const endOfWeek = startOfWeek + 6;   // Always end on Saturday (6 days from Sunday)
+        const startOfWeek = dayIndex - dayOfWeek;
+        const endOfWeek = startOfWeek + 6; 
         return { startOfWeek: Math.max(0, startOfWeek), endOfWeek: Math.min(days.length - 1, endOfWeek) };
     };
 
     const handleSlotClick = (dayIndex, timeIndex) => {
         const newSelectedSlots = new Set(selectedSlots);
-        const slotKey = `${dayIndex}-${timeIndex}`;
 
         if (activeMode === 'add') {
-            newSelectedSlots.add(slotKey);
+            newSelectedSlots.add(`${dayIndex}-${timeIndex}`);
         } else if (activeMode === 'remove') {
-            newSelectedSlots.delete(slotKey);
+            newSelectedSlots.delete(`${dayIndex}-${timeIndex}`);
         } else if (activeMode === 'clearWeek') {
             const { startOfWeek, endOfWeek } = getWeekBounds(dayIndex);
             for (let i = startOfWeek; i <= endOfWeek; i++) {
                 for (let j = 0; j < 48; j++) {
-                    const weekSlotKey = `${i}-${j}`;
-                    newSelectedSlots.delete(weekSlotKey);
+                    newSelectedSlots.delete(`${i}-${j}`);
                 }
             }
+            setHoveredSlots(new Set());
+            resetMode();
+        } else if (activeMode === 'applyTemplate') {
+            const { startOfWeek } = getWeekBounds(dayIndex);
+            applyTemplateToSlots(startOfWeek);  // Apply template to the selected week
+            resetMode();
         }
 
         setSelectedSlots(newSelectedSlots);
     };
 
     const handleMouseDown = (dayIndex, timeIndex) => {
+        if (activeMode === 'clearWeek' || activeMode === 'applyTemplate') {
+            return; // Prevent individual slot selection in these modes
+        }
         setDragging(true);
         setDragStart({ dayIndex, timeIndex });
-        setHoveredSlots(new Set([`${dayIndex}-${timeIndex}`]));  // Start by hovering the first slot
+        setHoveredSlots(new Set([`${dayIndex}-${timeIndex}`]));
     };
 
     const handleMouseOver = (dayIndex, timeIndex) => {
-        if (!dragging && activeMode !== 'clearWeek') return;
-
-        const newHoveredSlots = new Set();
-
-        if (activeMode === 'clearWeek') {
+        if (activeMode === 'clearWeek' || activeMode === 'applyTemplate') {
             const { startOfWeek, endOfWeek } = getWeekBounds(dayIndex);
+            const newHoveredSlots = new Set();
             for (let i = startOfWeek; i <= endOfWeek; i++) {
                 for (let j = 0; j < 48; j++) {
                     newHoveredSlots.add(`${i}-${j}`);
                 }
             }
-        } else {
+            setHoveredSlots(newHoveredSlots);
+        } else if (dragging) {
+            const newHoveredSlots = new Set();
             const startDayIndex = Math.min(dragStart.dayIndex, dayIndex);
             const endDayIndex = Math.max(dragStart.dayIndex, dayIndex);
             const startTimeIndex = Math.min(dragStart.timeIndex, timeIndex);
@@ -64,16 +70,14 @@ const useSlotSelection = (activeMode, days) => {
                     newHoveredSlots.add(`${d}-${t}`);
                 }
             }
+            setHoveredSlots(newHoveredSlots);
         }
-
-        setHoveredSlots(newHoveredSlots);
     };
 
     const handleMouseUp = () => {
         if (!dragging) return;
 
         const newSelectedSlots = new Set(selectedSlots);
-
         hoveredSlots.forEach(slot => {
             if (activeMode === 'add') {
                 newSelectedSlots.add(slot);
@@ -83,11 +87,11 @@ const useSlotSelection = (activeMode, days) => {
         });
 
         setSelectedSlots(newSelectedSlots);
-        setHoveredSlots(new Set());  // Clear the hover after drag is done
+        setHoveredSlots(new Set());
         setDragging(false);
     };
 
-    return { selectedSlots, hoveredSlots, handleSlotClick, handleMouseDown, handleMouseOver, handleMouseUp };
+    return { selectedSlots, setSelectedSlots, hoveredSlots, handleSlotClick, handleMouseDown, handleMouseOver, handleMouseUp };
 };
 
 export default useSlotSelection;
