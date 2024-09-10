@@ -38,15 +38,15 @@ const ActionBar = ({
         <div className="action-buttons">
             {mode === "template" && (
                 <>
-                    <select value={selectedTemplate} onChange={handleTemplateChange}>
-                        <option value="" disabled>Select Template</option>
-                        <option value="new">{newTemplateName || "Create New Template"}</option>
-                        {templates.map(template => (
-                            <option key={`${template.templateName}-${Math.random()}`} value={template.templateName}>
-                                {template.templateName}
-                            </option>
-                        ))}
-                    </select>
+                <select value={selectedTemplate || ""} onChange={handleTemplateChange}>
+                    <option value="" disabled hidden>Select Template</option>
+                    {templates.map(template => (
+                        <option key={template.templateName} value={template.templateName}>
+                            {template.templateName}
+                        </option>
+                    ))}
+                </select>
+
 
                     <button onClick={handleSaveTemplate}>Save Template</button>
                     <button onClick={() => handleDeleteTemplate(selectedTemplate)}>Delete Template</button>
