@@ -126,7 +126,7 @@
 
 .time-slot {
     min-width: calc(var(--TimeSlotWidth) - 6.5px); /* Use the calculated width or fallback to 33px */
-    height: calc((var(--TimeSlotWidth) - 6.5px)) !important;
+    height: calc((var(--TimeSlotWidth) - 6.5px))
 }
 
 .template-container {
@@ -135,7 +135,7 @@
 }
 
 .template-container .time-slot {
-    height: 12vh !important;
+    height: 10vh !important;
 }
 
 

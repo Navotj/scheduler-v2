@@ -33,28 +33,36 @@ const useSlotSelection = (activeMode, days, resetMode, templates = [], selectedT
             resetMode();
         } else if (activeMode === 'applyTemplate') {
             const { startOfWeek, endOfWeek } = getWeekBounds(dayIndex);
+            const firstWeekStartOffset = new Date(days[startOfWeek]).getDay();  // Get how far the first week starts from Sunday (0 = Sunday, 6 = Saturday)
+        
+            // Clear selected slots in the week before applying the template
             for (let i = startOfWeek; i <= endOfWeek; i++) {
                 for (let j = 0; j < 48; j++) {
                     newSelectedSlots.delete(`${i}-${j}`);
                 }
             }
+        
             if (Array.isArray(templates) && selectedTemplate) {
                 const template = templates.find(t => t.templateName === selectedTemplate);
                 if (template) {
-                    // Ensure we apply each template day to the corresponding day in the clicked week
                     template.weekTemplate.forEach(({ day: templateDay, time }) => {
-                        const targetDay = startOfWeek + templateDay;  // Map the template day to the clicked week's day
-                        if (targetDay >= startOfWeek && targetDay <= endOfWeek) {
-                            newSelectedSlots.add(`${targetDay}-${time}`);  // Add the slot to the correct day in the clicked week
+                        // Skip first days of the template if the first week starts mid-week
+                        if (templateDay >= firstWeekStartOffset) {
+                            const targetDay = startOfWeek + (templateDay - firstWeekStartOffset);  // Map the template day to the current week's day
+                            if (targetDay >= startOfWeek && targetDay <= endOfWeek) {
+                                newSelectedSlots.add(`${targetDay}-${time}`);  // Add the slot to the correct day in the clicked week
+                            }
                         }
                     });
                 }
             } else {
                 console.error('Templates or selectedTemplate is not defined');
             }
+        
             setHoveredSlots(new Set());
             resetMode();
         }
+        
         
         
     
