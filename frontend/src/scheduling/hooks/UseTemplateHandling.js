@@ -23,30 +23,6 @@ const useTemplateHandling = ({ username, selectedSlots, setSelectedSlots }) => {
         fetchTemplates();
     }, [username]);
 
-    const applyTemplateToSlots = (startOfWeek) => {
-        if (!selectedTemplate) return;
-
-        const newSelectedSlots = new Set();
-        const currentWeekStart = new Date();
-        currentWeekStart.setDate(currentWeekStart.getDate() + startOfWeek);
-
-        selectedTemplate.weekTemplate.forEach(({ day, time }) => {
-            const dayOffset = startOfWeek + day;  // Adjust day for the selected week
-            const slotTime = generateEpochForTime(dayOffset, time);  // Convert slot to epoch
-            newSelectedSlots.add(slotTime);
-        });
-
-        setSelectedSlots(newSelectedSlots);
-    };
-
-    const generateEpochForTime = (dayOffset, timeIndex) => {
-        const slotDate = new Date();
-        slotDate.setDate(slotDate.getDate() + dayOffset);
-        slotDate.setHours(0, 0, 0, 0);  // Start at midnight
-        slotDate.setMinutes(timeIndex * 30);  // Adjust for time slot
-        return slotDate.getTime();
-    };
-
     const handleSaveTemplate = async (templateName) => {
         console.log("Selected Slots:", selectedSlots);
     
@@ -175,7 +151,6 @@ const useTemplateHandling = ({ username, selectedSlots, setSelectedSlots }) => {
         handleDeleteTemplate,
         handleTemplateChange,
         handleSave,
-        applyTemplateToSlots,  // Return this function
     };
 };
 

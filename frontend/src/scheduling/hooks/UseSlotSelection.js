@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const useSlotSelection = (activeMode, days, resetMode, selectedTemplate, applyTemplateToSlots) => {
+const useSlotSelection = (activeMode, days, resetMode, templates = [], selectedTemplate = '') => {
     const [selectedSlots, setSelectedSlots] = useState(new Set());
     const [dragging, setDragging] = useState(false);
     const [dragStart, setDragStart] = useState(null);
@@ -16,7 +16,7 @@ const useSlotSelection = (activeMode, days, resetMode, selectedTemplate, applyTe
 
     const handleSlotClick = (dayIndex, timeIndex) => {
         const newSelectedSlots = new Set(selectedSlots);
-
+    
         if (activeMode === 'add') {
             newSelectedSlots.add(`${dayIndex}-${timeIndex}`);
         } else if (activeMode === 'remove') {
@@ -28,16 +28,41 @@ const useSlotSelection = (activeMode, days, resetMode, selectedTemplate, applyTe
                     newSelectedSlots.delete(`${i}-${j}`);
                 }
             }
+            console.log('Week cleared, newSelectedSlots:', newSelectedSlots);
             setHoveredSlots(new Set());
             resetMode();
         } else if (activeMode === 'applyTemplate') {
-            const { startOfWeek } = getWeekBounds(dayIndex);
-            applyTemplateToSlots(startOfWeek);  // Apply template to the selected week
+            const { startOfWeek, endOfWeek } = getWeekBounds(dayIndex);
+            for (let i = startOfWeek; i <= endOfWeek; i++) {
+                for (let j = 0; j < 48; j++) {
+                    newSelectedSlots.delete(`${i}-${j}`);
+                }
+            }
+            if (Array.isArray(templates) && selectedTemplate) {
+                const template = templates.find(t => t.templateName === selectedTemplate);
+                if (template) {
+                    // Ensure we apply each template day to the corresponding day in the clicked week
+                    template.weekTemplate.forEach(({ day: templateDay, time }) => {
+                        const targetDay = startOfWeek + templateDay;  // Map the template day to the clicked week's day
+                        if (targetDay >= startOfWeek && targetDay <= endOfWeek) {
+                            newSelectedSlots.add(`${targetDay}-${time}`);  // Add the slot to the correct day in the clicked week
+                        }
+                    });
+                }
+            } else {
+                console.error('Templates or selectedTemplate is not defined');
+            }
+            setHoveredSlots(new Set());
             resetMode();
         }
-
+        
+        
+    
+        // Log the updated state and apply the changes
+        console.log('Updating selectedSlots:', newSelectedSlots);
         setSelectedSlots(newSelectedSlots);
     };
+    
 
     const handleMouseDown = (dayIndex, timeIndex) => {
         if (activeMode === 'clearWeek' || activeMode === 'applyTemplate') {

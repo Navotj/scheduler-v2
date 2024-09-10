@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import SchedulerTable from '../components/SchedulerTable';
 import ActionBar from '../components/ActionBar';
 import UseSlotSelection from '../hooks/UseSlotSelection';
@@ -24,10 +24,18 @@ const SchedulePage = ({ username, onAvailabilitySubmit }) => {
     const dates = getDatesForNextNDays(60);
 
     const { activeMode, toggleMode, resetMode } = UseToggleMode();
-    const { selectedSlots, hoveredSlots, handleSlotClick, handleMouseDown, handleMouseOver, handleMouseUp, setSelectedSlots } = UseSlotSelection(activeMode, dates, resetMode);  // Added setSelectedSlots
+    const { templates, handleApplyTemplate } = UseTemplateHandling({ username });
+    const [selectedTemplate, setSelectedTemplate] = useState('');
+
+    // Ensure templates is defined before passing to useSlotSelection
+    const { selectedSlots, hoveredSlots, handleSlotClick, handleMouseDown, handleMouseOver, handleMouseUp, setSelectedSlots } = UseSlotSelection(
+        activeMode, 
+        dates, 
+        resetMode, 
+        templates,  // Pass templates here, after it's initialized
+        selectedTemplate  // Pass selectedTemplate here
+    );  
     const { isSaving, handleSave } = UseSaveAvailability({ username, selectedSlots, onAvailabilitySubmit });
-    const { templates, handleApplyTemplate } = UseTemplateHandling({ username, selectedSlots });
-    const [selectedTemplate, setSelectedTemplate] = React.useState('');
 
     // Fetch availability on load
     UseFetchAvailability({ username, setSelectedSlots });  

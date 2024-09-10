@@ -1,9 +1,10 @@
+import React from 'react';
+
 const ActionBar = ({
     isSaving, 
     handleSaveTemplate, 
     handleSave, 
     templates, 
-    handleApplyTemplate, 
     handleDeleteTemplate, 
     mode, 
     selectedTemplate, 
