@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const ActionBar = ({
     isSaving, 
@@ -13,6 +13,27 @@ const ActionBar = ({
     toggleMode, 
     activeMode
 }) => {
+    const [errorMessage, setErrorMessage] = useState("");
+
+    useEffect(() => {
+      // Set up a timer to clear the error message after 1 second
+      if (errorMessage) {
+        const timer = setTimeout(() => {
+          setErrorMessage("");
+        }, 1000);
+        return () => clearTimeout(timer); // Cleanup timer on component unmount or errorMessage change
+      }
+    }, [errorMessage]);
+  
+    const handleApplyTemplateClick = () => {
+      if (!selectedTemplate) {
+        setErrorMessage("You must select a template before applying.");
+      } else {
+        setErrorMessage(""); // Clear the error message if template is selected
+        toggleMode('applyTemplate');
+      }
+    };
+  
     return (
         <div className="action-buttons">
             {mode === "template" && (
@@ -35,21 +56,22 @@ const ActionBar = ({
             )}
             {mode === "schedule" && (
                 <>
-                    <select value={selectedTemplate || newTemplateName} onChange={handleTemplateChange}>
-                        <option value="" disabled>{newTemplateName || "Select Template"}</option>
-                        <option value="new">Create New Template</option>
+                    <select value={selectedTemplate || ""} onChange={handleTemplateChange}>
+                        <option value="" disabled hidden>Select Template</option>
                         {templates.map(template => (
-                            <option key={`${template.templateName}-${Math.random()}`} value={template.templateName}>
+                            <option key={template.templateName} value={template.templateName}>
                                 {template.templateName}
                             </option>
                         ))}
                     </select>
+
                     <button 
                         className={`apply-template-button ${activeMode === 'applyTemplate' ? 'active' : ''}`} 
-                        onClick={() => toggleMode('applyTemplate')}
+                        onClick={handleApplyTemplateClick}  // Call the new function
                     >
                         Apply Template
                     </button>
+
                     <button 
                         className={`clear-week-button ${activeMode === 'clearWeek' ? 'active' : ''}`} 
                         onClick={() => toggleMode('clearWeek')}
@@ -69,9 +91,11 @@ const ActionBar = ({
                         -
                     </button>
                     <button onClick={handleSave}>Save</button>
+
+                    {errorMessage && <div className="alert-box">{errorMessage}</div>}
                 </>
             )}
-            {isSaving && <div>Saving...</div>}
+            {isSaving && <div className="alert-box">Saving...</div>}
         </div>
     );
 };
