@@ -30,6 +30,7 @@ const SchedulePage = ({ username, onAvailabilitySubmit }) => {
     // Ensure templates is defined before passing to useSlotSelection
     const { selectedSlots, hoveredSlots, handleSlotClick, handleMouseDown, handleMouseOver, handleMouseUp, setSelectedSlots } = UseSlotSelection(
         activeMode, 
+        toggleMode,  // Make sure toggleMode is passed
         dates, 
         resetMode, 
         templates,  // Pass templates here, after it's initialized
