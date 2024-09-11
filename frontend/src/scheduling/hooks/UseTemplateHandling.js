@@ -114,16 +114,14 @@ const useTemplateHandling = ({ username, selectedSlots, setSelectedSlots }) => {
             if (name && name.trim()) {
                 const trimmedName = name.trim();
                 setNewTemplateName(trimmedName);  // Set the new template name
-                setSelectedTemplate(trimmedName);  // Use this new template name as the selected template
+                setSelectedTemplate(trimmedName);  // Select the new template
                 handleSaveTemplate(trimmedName);   // Save the new template immediately
             } else {
-                // If no valid name is entered, reset the selection back to default or previously selected value
-                setSelectedTemplate('');  // Reset selected template
+                setSelectedTemplate('');  // Reset if no valid name is entered
             }
         } else {
-            // Handle the case for selecting an existing template
             setSelectedTemplate(templateName);
-            setNewTemplateName('');  // Clear newTemplateName, as we're now dealing with an existing template
+            setNewTemplateName('');  // Clear `newTemplateName` when selecting an existing template
     
             const template = templates.find(t => t.templateName === templateName);
             if (template) {
