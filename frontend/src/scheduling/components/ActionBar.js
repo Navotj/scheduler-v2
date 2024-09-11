@@ -24,31 +24,39 @@ const ActionBar = ({
         return () => clearTimeout(timer); // Cleanup timer on component unmount or errorMessage change
       }
     }, [errorMessage]);
-  
-    const handleApplyTemplateClick = () => {
-      if (!selectedTemplate) {
-        setErrorMessage("You must select a template before applying.");
-      } else {
-        setErrorMessage(""); // Clear the error message if template is selected
-        toggleMode('applyTemplate');
-      }
+
+    // New method to handle the template creation manually
+    const handleCreateNewTemplate = () => {
+        const name = prompt("Please enter a new template name:");
+        if (name && name.trim()) {
+            handleTemplateChange({ target: { value: name.trim() } }); // Trigger the same event flow with the new template name
+        }
     };
-  
+
     return (
         <div className="action-buttons">
             {mode === "template" && (
                 <>
-                <select value={selectedTemplate || ""} onChange={handleTemplateChange}>
-                    <option value="" disabled hidden>Select Template</option>
-                    {templates.map(template => (
-                        <option key={template.templateName} value={template.templateName}>
-                            {template.templateName}
-                        </option>
-                    ))}
-                </select>
+                    <select value={selectedTemplate || ""} onChange={(e) => {
+                        if (e.target.value === "new") {
+                            handleCreateNewTemplate();  // Manually trigger the prompt
+                        } else {
+                            handleTemplateChange(e);  // For existing templates, use the normal handler
+                        }
+                    }}>
+                        <option value="" disabled hidden>Select Template</option>
 
+                        {/* Create New Template option */}
+                        <option value="new">+ Create New Template</option>
 
-                    <button onClick={handleSaveTemplate}>Save Template</button>
+                        {templates.map(template => (
+                            <option key={template.templateName} value={template.templateName}>
+                                {template.templateName}
+                            </option>
+                        ))}
+                    </select>
+
+                    <button onClick={() => handleSave(selectedTemplate)}>Save Template</button>
                     <button onClick={() => handleDeleteTemplate(selectedTemplate)}>Delete Template</button>
                     <button className={`add-button ${activeMode === 'add' ? 'active' : ''}`} onClick={() => toggleMode('add')}>+</button>
                     <button className={`remove-button ${activeMode === 'remove' ? 'active' : ''}`} onClick={() => toggleMode('remove')}>-</button>
@@ -67,7 +75,7 @@ const ActionBar = ({
 
                     <button 
                         className={`apply-template-button ${activeMode === 'applyTemplate' ? 'active' : ''}`} 
-                        onClick={handleApplyTemplateClick}  // Call the new function
+                        onClick={() => toggleMode('applyTemplate')}
                     >
                         Apply Template
                     </button>

@@ -47,13 +47,30 @@ router.get('/', async (req, res) => {
 router.post('/templates', async (req, res) => {
     const { username, templateName, weekTemplate } = req.body;
 
+    console.log('Received username:', username);
+    console.log('Received templateName:', templateName);
+    console.log('Received weekTemplate:', weekTemplate);
+
     try {
-        const newTemplate = new WeekTemplate({ username, templateName, weekTemplate });
-        await newTemplate.save();
-        res.status(200).json({ message: 'Template saved successfully' });
+        // Try to find the existing template by username and templateName
+        const existingTemplate = await WeekTemplate.findOne({ username: username.trim(), templateName });
+
+        if (existingTemplate) {
+            console.log('Existing template found:', existingTemplate);
+            // If the template exists, update its weekTemplate data
+            existingTemplate.weekTemplate = weekTemplate;
+            await existingTemplate.save();
+            res.status(200).json({ message: 'Template updated successfully', template: existingTemplate });
+        } else {
+            console.log('No existing template found, creating a new one');
+            // If no existing template, create a new one
+            const newTemplate = new WeekTemplate({ username, templateName, weekTemplate });
+            await newTemplate.save();
+            res.status(200).json({ message: 'Template created successfully', template: newTemplate });
+        }
     } catch (err) {
-        console.error('Error saving template:', err);
-        res.status(500).json({ error: 'Failed to save template' });
+        console.error('Error saving/updating template:', err);
+        res.status(500).json({ error: 'Failed to save or update template' });
     }
 });
 

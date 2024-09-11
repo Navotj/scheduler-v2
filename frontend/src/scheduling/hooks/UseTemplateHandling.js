@@ -28,7 +28,7 @@ const useTemplateHandling = ({ username, selectedSlots, setSelectedSlots }) => {
             alert('No slots selected for this template.');
             return; // Stop saving if no slots are selected
         }
-
+    
         const templateData = Array.from(selectedSlots).map(slot => {
             const [dayIndex, timeIndex] = slot.split('-').map(Number);
             if (!isNaN(dayIndex) && !isNaN(timeIndex)) {
@@ -38,48 +38,38 @@ const useTemplateHandling = ({ username, selectedSlots, setSelectedSlots }) => {
                 return null;
             }
         }).filter(slot => slot !== null);
-
+    
         const saveData = {
             username,
             templateName: templateName.trim(),
             weekTemplate: templateData,
         };
-
+    
         try {
-            // Check if a template with the same name exists
-            const existingTemplateIndex = templates.findIndex(t => t.templateName === templateName);
-            
+            // Send POST request to save or update the template
             const response = await fetch('http://localhost:5000/availability/templates', {
-                method: 'POST',
+                method: 'POST',  // Ensure it's POST as we are using upsert in the backend
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(saveData),
             });
-
+    
             if (response.ok) {
-                setTemplates((prev) => {
-                    // If template exists, replace it
-                    if (existingTemplateIndex !== -1) {
-                        const updatedTemplates = [...prev];
-                        updatedTemplates[existingTemplateIndex] = saveData;
-                        return updatedTemplates;
-                    } 
-                    // If template doesn't exist, add it
-                    else {
-                        return [...prev, saveData];
-                    }
-                });
+                const updatedTemplate = await response.json();
+                console.log('Template saved/updated successfully:', updatedTemplate);
                 alert('Template saved successfully!');
             } else {
-                console.error('Failed to save template');
-                alert('Failed to save template. Please try again.');
+                const errorData = await response.json();
+                console.error('Failed to save template:', errorData);
+                alert('Failed to save template. Error: ' + errorData.error);
             }
         } catch (error) {
             console.error('Error saving template:', error);
             alert('An error occurred while saving the template.');
         }
     };
+    
 
     const handleApplyTemplate = (template) => {
         if (template && template.weekTemplate) {
@@ -116,40 +106,46 @@ const useTemplateHandling = ({ username, selectedSlots, setSelectedSlots }) => {
 
     const handleTemplateChange = (event) => {
         const templateName = event.target.value;
-        console.log('Template selected from dropdown:', templateName);  // Logging the selected template
-
+    
+        // When the user selects "Create New Template"
         if (templateName === 'new') {
             const name = prompt('Please enter a name for the new template:');
+            
             if (name && name.trim()) {
                 const trimmedName = name.trim();
-                setNewTemplateName(trimmedName); // Set the name for the new template
-                setSelectedTemplate(trimmedName); // Also set it as the selected template for future saves
+                setNewTemplateName(trimmedName);  // Set the new template name
+                setSelectedTemplate(trimmedName);  // Use this new template name as the selected template
+                handleSaveTemplate(trimmedName);   // Save the new template immediately
+            } else {
+                // If no valid name is entered, reset the selection back to default or previously selected value
+                setSelectedTemplate('');  // Reset selected template
             }
         } else {
+            // Handle the case for selecting an existing template
             setSelectedTemplate(templateName);
-            setNewTemplateName(''); // Clear newTemplateName, as we're now editing an existing template
-
+            setNewTemplateName('');  // Clear newTemplateName, as we're now dealing with an existing template
+    
             const template = templates.find(t => t.templateName === templateName);
             if (template) {
-                handleApplyTemplate(template);
+                handleApplyTemplate(template);  // Apply the selected template
             }
         }
     };
-    const handleSave = () => {
-        // Check if an existing template is selected and it's not "new"
+    
+    
+    const handleSave = (selectedTemplate) => {
         if (selectedTemplate && selectedTemplate !== 'new') {
-            // Directly save to the selected template (overwrite it)
-            handleSaveTemplate(selectedTemplate);
+            handleSaveTemplate(selectedTemplate);  // Save the existing template
         } else {
-            // If no template is selected or the "new" option is selected, prompt for a new name
+            // Prompt the user for a new template name
             const templateName = prompt('Enter a name for the new template:');
             if (templateName && templateName.trim()) {
                 const trimmedName = templateName.trim();
-                setNewTemplateName(trimmedName); // Set the new template name
-                setSelectedTemplate(trimmedName); // Set it as the current template
-                handleSaveTemplate(trimmedName); // Save under the new name
+                setNewTemplateName(trimmedName);  // Set the new template name
+                setSelectedTemplate(trimmedName);  // Select the new template
+                handleSaveTemplate(trimmedName);   // Save the new template
             } else {
-                alert('Template name is required.'); // Handle case when no name is provided
+                alert('Template name is required.');
             }
         }
     };

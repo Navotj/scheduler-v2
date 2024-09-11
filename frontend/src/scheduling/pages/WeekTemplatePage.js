@@ -72,7 +72,7 @@ const WeekTemplatePage = ({ username }) => {
                 />
                 <ActionBar
                     templates={templates}
-                    handleSaveTemplate={handleSave}
+                    handleSave={handleSave}  // Ensure this is passed correctly
                     selectedTemplate={selectedTemplate}
                     newTemplateName={newTemplateName}
                     handleTemplateChange={(event) => setSelectedTemplate(event.target.value)}
