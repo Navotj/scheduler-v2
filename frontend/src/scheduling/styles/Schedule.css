@@ -182,6 +182,7 @@
 .day-date {
     text-align: right;
     flex-grow: 1;
+    font-size: 0.75em;
     color: #bbb; /* Slightly lighter color for date */
 }
 
