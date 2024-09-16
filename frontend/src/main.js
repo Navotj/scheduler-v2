@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Login from './components/Login';
-import CreateGame from './components/CreateGame';
+import CreateGame from './gamecreation/pages/CreateGame';
 import FindGame from './components/FindGame';
 import MyGames from './components/MyGames';
 import MySchedule from './scheduling/pages/SchedulePage';

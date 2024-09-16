@@ -1,0 +1,272 @@
+/* src/styles/CreateGame.css */
+
+.create-game-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.form-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 2em;
+  padding-left: 2em;
+  padding-bottom: 1em;
+}
+
+.buttons-container {
+  flex-shrink: 0;
+  padding: 1em;
+}
+
+.form-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+  margin-top: 0; /* Remove extra margin at the top */
+  height: 100%;
+}
+
+.small-label {
+  font-size: 0.9em;
+  margin-bottom: -0.5em;
+  color: #e0e0e0;
+}
+
+.input-container {
+  margin: 0;
+  margin-bottom: 0.5em; /* Uniform spacing below inputs */
+  margin-top: 0;
+  height: 100%;
+}
+
+input,
+select {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  border-radius: 5px;
+  padding: 0.5em;
+  font-size: 0.9em;
+  margin: 0; /* Remove default margins */
+}
+
+input,
+select {
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 150px;
+  width: 100%;
+}
+
+.table-info-grid,
+.game-info-grid,
+.additional-info-grid {
+  display: flex;
+  gap: 2em;
+  height: 100%;
+}
+
+.left-column,
+.right-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* Uniform gap between elements */
+}
+
+
+.game-description-textarea {
+  height: 100%;
+}
+
+.tags-manager-container {
+  width: 100%;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.nav-button {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.nav-button.active {
+  background-color: #4caf50;
+}
+
+.nav-button:hover:not(:disabled) {
+  background-color: #4caf50;
+}
+
+.nav-button:disabled {
+  background-color: #777;
+  cursor: not-allowed;
+}
+
+/* Unified container for horizontal components */
+.unified-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  width: 100%;
+}
+
+.unified-container > * {
+  flex: 1;
+}
+
+.unified-container input,
+.unified-container select,
+.unified-container button {
+  flex: 1;
+  width: auto;
+}
+
+.unified-container span {
+  flex: 0;
+}
+
+/* Session Days Selector */
+.day-button {
+  background-color: #1e1e1e;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0.5em;
+  text-align: center;
+}
+
+.day-button.active {
+  background-color: #4caf50;
+}
+
+/* Location Selector */
+.location-button {
+  background-color: #1e1e1e;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0.5em;
+  text-align: center;
+}
+
+.location-button.active {
+  background-color: #4caf50;
+}
+
+.banner-upload {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  padding: 0.5em 1em;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.banner-image-container {
+  width: 100%;
+  overflow: hidden;
+  margin-top: 1em;
+}
+
+.banner-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.cropper-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cropper-wrapper {
+  width: 80%;
+  height: 70%;
+  position: relative;
+}
+
+.cropper-buttons {
+  margin-top: 1em;
+  display: flex;
+  gap: 1em;
+}
+
+.cropper-buttons button {
+  background-color: #4caf50;
+  color: white;
+  padding: 0.75em 1.5em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cropper-buttons button:last-child {
+  background-color: #f44336;
+}
+
+/* Adjust the page title */
+h2 {
+  font-size: 2em; /* Make the page title bigger */
+  color: #fff;
+  margin-top: 0; /* Reduce vertical gap above the page title */
+  margin-bottom: 0; /* Adjust as needed */
+}
+
+/* Game Preview Wrapper */
+.game-preview-wrapper {
+  position: relative;
+  padding: 20px;
+  flex: 1;
+  top: 0;
+  left: 0;
+}
+
+
+@media (max-width: 768px) {
+  .table-info-grid,
+  .game-info-grid,
+  .additional-info-grid {
+    flex-direction: column;
+  }
+
+  .navigation-buttons {
+    flex-wrap: wrap;
+  }
+
+  .nav-button {
+    margin: 0.2em;
+  }
+
+  .unified-container {
+    flex-wrap: wrap;
+  }
+}
