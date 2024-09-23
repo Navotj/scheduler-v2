@@ -1,96 +1,93 @@
 // File: src/components/GroupSchedulerTable.js
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
-const GroupSchedulerTable = ({
+const GroupSchedulerTable = React.memo(({
   selectedSlotsCounts = {},
   days,
   usernames = [],
   minPlayers = 1,
   minSessionLength = 1,
 }) => {
-  console.log('GroupSchedulerTable rendered');
-  console.log('selectedSlotsCounts:', selectedSlotsCounts);
 
-  const timeSlots = Array.from({ length: 48 }, (_, index) =>
-    `${Math.floor(index / 2).toString().padStart(2, '0')}:${
-      index % 2 === 0 ? '00' : '30'
-    }`
+  const timeSlots = useMemo(
+    () =>
+      Array.from({ length: 48 }, (_, index) =>
+        `${Math.floor(index / 2)
+          .toString()
+          .padStart(2, '0')}:${index % 2 === 0 ? '00' : '30'}`
+      ),
+    []
   );
 
   const totalPlayers = usernames.length;
 
-  // Generate colors for different concurrency levels
-  const colorsByN = {};
-  for (let n = minPlayers; n <= totalPlayers; n++) {
-    const hue = ((n - minPlayers) / (totalPlayers - minPlayers + 1)) * 120; // Green to red spectrum
-    colorsByN[n] = `hsl(${hue}, 100%, 50%)`;
-  }
-
-  const processSlotsByConcurrency = () => {
-    const slotsByConcurrency = {};
-
-    // Initialize slots for each concurrency level
+  // Memoize colorsByN
+  const colorsByN = useMemo(() => {
+    const colors = {};
     for (let n = minPlayers; n <= totalPlayers; n++) {
-      slotsByConcurrency[n] = {};
+      const lightness =
+        ((n - minPlayers) / (totalPlayers - minPlayers || 1)) * 30 + 20; // Lightness from 20% to 50%
+      colors[n] = `hsl(120, 100%, ${lightness}%)`; // Hue fixed at 120 for green
+    }
+    return colors;
+  }, [minPlayers, totalPlayers]);
+
+  // Memoize slotsByConcurrency
+  const slotsByConcurrency = useMemo(() => {
+    const slots = {};
+
+    for (let n = minPlayers; n <= totalPlayers; n++) {
+      slots[n] = {};
     }
 
-    for (let dayIndex = 0; dayIndex < days.length; dayIndex++) {
-      for (let timeIndex = 0; timeIndex < timeSlots.length; timeIndex++) {
-        const slotKey = `${dayIndex}-${timeIndex}`;
-        const count = selectedSlotsCounts[slotKey] || 0;
-
-        for (let n = minPlayers; n <= totalPlayers; n++) {
-          if (count >= n) {
-            slotsByConcurrency[n][slotKey] = true;
-          }
+    for (let slotKey in selectedSlotsCounts) {
+      const count = selectedSlotsCounts[slotKey];
+      for (let n = minPlayers; n <= totalPlayers; n++) {
+        if (count >= n) {
+          slots[n][slotKey] = true;
         }
       }
     }
 
-    return slotsByConcurrency;
-  };
+    return slots;
+  }, [selectedSlotsCounts, minPlayers, totalPlayers]);
 
-  const slotsByConcurrency = processSlotsByConcurrency();
-
-  const processContinuousSlots = () => {
+  // Memoize coloredSlots
+  const coloredSlots = useMemo(() => {
     const slots = {};
     const minSlots = minSessionLength * 2; // Convert hours to half-hour slots
 
     for (let n = minPlayers; n <= totalPlayers; n++) {
       const concurrencySlots = slotsByConcurrency[n];
 
-      for (let dayIndex = 0; dayIndex < days.length; dayIndex++) {
-        for (let timeIndex = 0; timeIndex < timeSlots.length; timeIndex++) {
-          const slotKey = `${dayIndex}-${timeIndex}`;
-          if (!concurrencySlots[slotKey]) continue;
+      for (let slotKey in concurrencySlots) {
+        const [dayIndexStr, timeIndexStr] = slotKey.split('-');
+        const dayIndex = parseInt(dayIndexStr, 10);
+        let timeIndex = parseInt(timeIndexStr, 10);
 
-          let length = 0;
-          while (
-            length < minSlots &&
-            timeIndex + length < timeSlots.length &&
-            concurrencySlots[`${dayIndex}-${timeIndex + length}`]
-          ) {
-            length++;
-          }
+        let length = 0;
+        while (
+          length < minSlots &&
+          concurrencySlots[`${dayIndex}-${timeIndex + length}`]
+        ) {
+          length++;
+        }
 
-          if (length >= minSlots) {
-            for (let l = 0; l < length; l++) {
-              slots[`${dayIndex}-${timeIndex + l}`] = {
-                concurrency: n,
-                color: colorsByN[n],
-              };
-            }
-            timeIndex += length - 1;
+        if (length >= minSlots) {
+          for (let l = 0; l < length; l++) {
+            const key = `${dayIndex}-${timeIndex + l}`;
+            slots[key] = {
+              concurrency: n,
+              color: colorsByN[n],
+            };
           }
         }
       }
     }
 
     return slots;
-  };
-
-  const coloredSlots = processContinuousSlots();
+  }, [slotsByConcurrency, minPlayers, totalPlayers, minSessionLength, colorsByN]);
 
   return (
     <div className="scheduler-table-wrapper">
@@ -107,7 +104,7 @@ const GroupSchedulerTable = ({
                     className="scheduler-time-header"
                     colSpan="2"
                   >
-                    {parseInt(time.split(':')[0]) + 1}
+                    {parseInt(time.split(':')[0], 10) + 1}
                   </th>
                 )
             )}
@@ -170,6 +167,6 @@ const GroupSchedulerTable = ({
       </table>
     </div>
   );
-};
+});
 
 export default GroupSchedulerTable;
