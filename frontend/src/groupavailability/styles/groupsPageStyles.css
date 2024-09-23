@@ -1,0 +1,27 @@
+/* File: src/styles/groupsPageStyles.css */
+
+
+
+
+.groups-page-container {
+    padding: 20px;
+  }
+  
+  .create-group-form {
+    margin-top: 30px;
+  }
+  
+  .create-group-form input {
+    padding: 5px;
+    margin-right: 10px;
+  }
+  
+  .create-group-form button {
+    padding: 5px 10px;
+  }
+  
+  .error {
+    color: red;
+    margin-top: 10px;
+  }
+  

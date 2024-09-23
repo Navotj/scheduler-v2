@@ -1,0 +1,72 @@
+/* File: src/styles/groupStyles.css */
+
+.group-container {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .group-container h3 {
+    margin: 0;
+  }
+  
+  .members-list {
+    margin-top: 10px;
+  }
+  
+  .member-item {
+    display: flex;
+    justify-content: space-between;
+    width: 200px;
+    margin-bottom: 5px;
+  }
+  
+  .member-item button {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 2px 5px;
+    cursor: pointer;
+  }
+  
+  .disabled-button {
+    background-color: grey;
+    cursor: not-allowed;
+  }
+  
+  .add-member-form {
+    margin-top: 10px;
+  }
+  
+  .add-member-form input {
+    padding: 5px;
+    margin-right: 10px;
+  }
+  
+  .add-member-form button {
+    padding: 5px 10px;
+  }
+  
+  .availability-form {
+    margin-top: 20px;
+  }
+  
+  .availability-form label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .availability-form input {
+    padding: 5px;
+    margin-left: 10px;
+  }
+  
+  .availability-form button {
+    padding: 5px 10px;
+  }
+  
+  .error {
+    color: red;
+    margin-top: 10px;
+  }
+  

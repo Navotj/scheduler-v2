@@ -1,3 +1,4 @@
+// File: routes/availability.js
 const express = require('express');
 const router = express.Router();
 const Availability = require('../models/Availability');
@@ -24,7 +25,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Route for fetching availability
+// Route for fetching availability of a single user
 router.get('/', async (req, res) => {
     console.log('GET /availability called with:', req.query.username);
     const { username } = req.query;
@@ -32,7 +33,7 @@ router.get('/', async (req, res) => {
     try {
         const availability = await Availability.findOne({ username: username.trim() });
         console.log('Query Result:', availability);
-        
+
         if (availability) {
             res.json(availability);
         } else {
@@ -41,6 +42,23 @@ router.get('/', async (req, res) => {
     } catch (err) {
         console.error('Error fetching availability:', err);
         res.status(500).json({ error: 'Failed to fetch availability' });
+    }
+});
+
+// Route for fetching availabilities of multiple users
+router.post('/multiple', async (req, res) => {
+    const { usernames } = req.body;
+
+    if (!Array.isArray(usernames) || usernames.length === 0) {
+        return res.status(400).json({ error: 'Usernames must be a non-empty array' });
+    }
+
+    try {
+        const availabilities = await Availability.find({ username: { $in: usernames.map(u => u.trim()) } });
+        res.json(availabilities);
+    } catch (err) {
+        console.error('Error fetching availabilities:', err);
+        res.status(500).json({ error: 'Failed to fetch availabilities' });
     }
 });
 
@@ -87,7 +105,6 @@ router.get('/templates', async (req, res) => {
     }
 });
 
-
 router.delete('/templates', async (req, res) => {
     const { username, templateName } = req.body;
 
@@ -103,9 +120,5 @@ router.delete('/templates', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete template' });
     }
 });
-
-// Existing exports...
-
-
 
 module.exports = router;

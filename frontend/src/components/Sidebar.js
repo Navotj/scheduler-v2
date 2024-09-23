@@ -56,12 +56,13 @@ const Sidebar = ({ isLoggedIn }) => {
                 </li>
                 <li>
                     <NavLink
-                        to="/groups"
+                        to="/GroupsPage"
                         className={({ isActive }) => isActive ? 'active-link' : 'inactive-link'}
                     >
-                        Groups
+                        Group Availability
                     </NavLink>
                 </li>
+
 
             </ul>
         </div>

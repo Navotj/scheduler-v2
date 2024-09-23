@@ -1,0 +1,139 @@
+/* File: src/styles/groupAvailabilityStyles.css */
+
+/* Container styles */
+.group-availability-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 400px; /* Adjust as needed */
+    overflow: hidden;
+    user-select: none;
+  }
+  
+  /* Scheduler styles */
+  .scheduler-table-wrapper {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
+  
+  .scheduler-table {
+    width: max-content;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin: 0;
+  }
+  
+  /* Styling for table headers and cells */
+  .scheduler-table th,
+  .scheduler-table td {
+    height: 16px;
+    line-height: 16px;
+    padding: 3px;
+    text-align: center;
+    vertical-align: middle;
+    color: #e0e0e0;
+    background-color: #333;
+    box-shadow: inset -1px -1px 0 #555, inset 1px 1px 0 #555;
+    overflow: hidden;
+  }
+  
+  .scheduler-time-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    box-shadow: none;
+    border: none;
+  }
+  
+  .scheduler-table th {
+    box-shadow: none;
+    border: none;
+  }
+  
+  .scheduler-day-slot {
+    position: sticky;
+    left: 0;
+    background-color: #222;
+    z-index: 0;
+    width: 150px;
+    text-align: left;
+    vertical-align: middle;
+    background-clip: padding-box;
+  }
+  
+  .scheduler-day-slot::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background-color: #555;
+  }
+  
+  .day-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding-right: 10px;
+    font-size: 1.5em;
+  }
+  
+  .day-name {
+    text-align: left;
+    flex-grow: 1;
+    font-family: 'Ubuntu Mono', monospace;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+  
+  .day-date {
+    text-align: right;
+    flex-grow: 1;
+    font-size: 0.75em;
+    color: #bbb;
+  }
+  
+  .time-slot {
+    min-width: 30px;
+    height: 16px;
+    cursor: default;
+    position: relative; /* Add this for layering */
+    border: 1px solid #ccc; /* Optional: Add border for visibility */
+  }
+  
+  .group-availability-slot {
+    position: relative;
+  }
+  
+  .end-of-week {
+    border-bottom: 1.5px solid #888 !important;
+  }
+  
+  .scheduler-background-bar {
+    position: sticky;
+    top: 0;
+    left: 1px;
+    width: 100%;
+    height: 22px;
+    background-color: #333;
+    z-index: 0;
+    margin-top: -22px;
+  }
+  
+  /* Add these styles for layering */
+  .group-availability-slot::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+    opacity: 0.7;
+    z-index: -1;
+  }
+  

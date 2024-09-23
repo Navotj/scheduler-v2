@@ -8,7 +8,7 @@ import MyGames from './components/MyGames';
 import MySchedule from './scheduling/pages/SchedulePage';
 import Profile from './components/Profile';
 import WeekTemplate from './scheduling/pages/WeekTemplatePage';
-import Group from './components/Group';
+import GroupsPage from './groupavailability/pages/GroupsPage';
 import './styles/main.css';
 
 const Main = () => {
@@ -35,7 +35,7 @@ const Main = () => {
                                 <Route path="/findGame" element={<FindGame username={username} />} />
                                 <Route path="/myGames" element={<MyGames username={username} />} />
                                 <Route path="/WeekTemplate" element={<WeekTemplate username={username} />} />
-                                <Route path="/groups" element={<Group username={username} />} />
+                                <Route path="/GroupsPage" element={<GroupsPage username={username} />} />
                                 <Route path="*" element={<Navigate to="/profile" />} />
                             </>
                         ) : (
