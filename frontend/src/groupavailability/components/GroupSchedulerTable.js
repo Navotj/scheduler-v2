@@ -89,8 +89,31 @@ const GroupSchedulerTable = React.memo(({
     return slots;
   }, [slotsByConcurrency, minPlayers, totalPlayers, minSessionLength, colorsByN]);
 
+  // Create legend data
+  const legendItems = useMemo(() => {
+    const items = [];
+    for (let n = minPlayers; n <= totalPlayers; n++) {
+      items.push({
+        concurrency: n,
+        color: colorsByN[n],
+      });
+    }
+    return items;
+  }, [minPlayers, totalPlayers, colorsByN]);
+
   return (
     <div className="scheduler-table-wrapper">
+      <div className="scheduler-legend">
+        {legendItems.map((item) => (
+          <div key={item.concurrency} className="legend-item">
+            <span
+              className="legend-color"
+              style={{ backgroundColor: item.color }}
+            ></span>
+            {item.concurrency} {item.concurrency === 1 ? 'player' : 'players'}
+          </div>
+        ))}
+      </div>
       <div className="scheduler-background-bar"></div>
       <table className="scheduler-table">
         <thead>
