@@ -1,6 +1,7 @@
 // File: src/components/GroupSchedulerTable.js
 
 import React, { useMemo } from 'react';
+import '../styles/groupAvailabilityStyles.css'; // Ensure this path is correct
 
 const GroupSchedulerTable = React.memo(({
   selectedSlotsCounts = {},
@@ -9,7 +10,6 @@ const GroupSchedulerTable = React.memo(({
   minPlayers = 1,
   minSessionLength = 1,
 }) => {
-
   const timeSlots = useMemo(
     () =>
       Array.from({ length: 48 }, (_, index) =>
@@ -22,18 +22,18 @@ const GroupSchedulerTable = React.memo(({
 
   const totalPlayers = usernames.length;
 
-  // Memoize colorsByN
+  // Generate colorsByN
   const colorsByN = useMemo(() => {
     const colors = {};
     for (let n = minPlayers; n <= totalPlayers; n++) {
       const lightness =
-        ((n - minPlayers) / (totalPlayers - minPlayers || 1)) * 30 + 20; // Lightness from 20% to 50%
-      colors[n] = `hsl(120, 100%, ${lightness}%)`; // Hue fixed at 120 for green
+        ((n - minPlayers) / (totalPlayers - minPlayers || 1)) * 30 + 20;
+      colors[n] = `hsl(120, 100%, ${lightness}%)`;
     }
     return colors;
   }, [minPlayers, totalPlayers]);
 
-  // Memoize slotsByConcurrency
+  // Generate slotsByConcurrency
   const slotsByConcurrency = useMemo(() => {
     const slots = {};
 
@@ -53,10 +53,10 @@ const GroupSchedulerTable = React.memo(({
     return slots;
   }, [selectedSlotsCounts, minPlayers, totalPlayers]);
 
-  // Memoize coloredSlots
+  // Generate coloredSlots
   const coloredSlots = useMemo(() => {
     const slots = {};
-    const minSlots = minSessionLength * 2; // Convert hours to half-hour slots
+    const minSlots = minSessionLength * 2;
 
     for (let n = minPlayers; n <= totalPlayers; n++) {
       const concurrencySlots = slotsByConcurrency[n];
@@ -89,33 +89,11 @@ const GroupSchedulerTable = React.memo(({
     return slots;
   }, [slotsByConcurrency, minPlayers, totalPlayers, minSessionLength, colorsByN]);
 
-  // Create legend data
-  const legendItems = useMemo(() => {
-    const items = [];
-    for (let n = minPlayers; n <= totalPlayers; n++) {
-      items.push({
-        concurrency: n,
-        color: colorsByN[n],
-      });
-    }
-    return items;
-  }, [minPlayers, totalPlayers, colorsByN]);
-
   return (
-    <div className="scheduler-table-wrapper">
-      <div className="scheduler-legend">
-        {legendItems.map((item) => (
-          <div key={item.concurrency} className="legend-item">
-            <span
-              className="legend-color"
-              style={{ backgroundColor: item.color }}
-            ></span>
-            {item.concurrency} {item.concurrency === 1 ? 'player' : 'players'}
-          </div>
-        ))}
-      </div>
+    <div className="scheduler-container">
       <div className="scheduler-background-bar"></div>
-      <table className="scheduler-table">
+      {/* Header Table */}
+      <table className="scheduler-time-header-table">
         <thead>
           <tr>
             <th className="scheduler-day-slot"></th>
@@ -133,61 +111,69 @@ const GroupSchedulerTable = React.memo(({
             )}
           </tr>
         </thead>
-        <tbody>
-          {days.map((day, dayIndex) => {
-            let dayOfWeek, formattedDate;
-
-            if (!isNaN(new Date(day).getTime())) {
-              const dayDate = new Date(day);
-              dayOfWeek = dayDate.toLocaleDateString('en-US', {
-                weekday: 'short',
-              });
-              formattedDate = dayDate.toLocaleDateString();
-            } else {
-              dayOfWeek = day;
-              formattedDate = '';
-            }
-
-            const isEndOfWeek = new Date(day).getDay() === 6;
-
-            return (
-              <React.Fragment key={dayIndex}>
-                <tr className={isEndOfWeek ? 'end-of-week' : ''}>
-                  <td className="scheduler-day-slot">
-                    <div className="day-wrapper">
-                      <span className="day-name">{dayOfWeek}</span>
-                      {formattedDate && (
-                        <span className="day-date">{formattedDate}</span>
-                      )}
-                    </div>
-                  </td>
-                  {timeSlots.map((_, timeIndex) => {
-                    const slotKey = `${dayIndex}-${timeIndex}`;
-                    const slotInfo = coloredSlots[slotKey];
-
-                    let className = 'time-slot';
-                    let style = {};
-
-                    if (slotInfo) {
-                      className += ' group-availability-slot';
-                      style.backgroundColor = slotInfo.color;
-                      style.zIndex = slotInfo.concurrency; // Higher concurrency has higher z-index
-                    }
-
-                    return (
-                      <td
-                        key={timeIndex}
-                        className={className}
-                        style={style}
-                      />
-                    );
-                  })}
-                </tr>
-              </React.Fragment>
-            );
-          })}
-        </tbody>
       </table>
+      {/* Main Table Wrapper */}
+      <div className="scheduler-table-wrapper">
+        {/* Main Table */}
+        <div className="scheduler-table-scroll-container">
+          <table className="scheduler-table">
+            <tbody>
+              {days.map((day, dayIndex) => {
+                let dayOfWeek, formattedDate;
+
+                if (!isNaN(new Date(day).getTime())) {
+                  const dayDate = new Date(day);
+                  dayOfWeek = dayDate.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                  });
+                  formattedDate = dayDate.toLocaleDateString();
+                } else {
+                  dayOfWeek = day;
+                  formattedDate = '';
+                }
+
+                const isEndOfWeek = new Date(day).getDay() === 6;
+
+                return (
+                  <tr
+                    key={dayIndex}
+                    className={isEndOfWeek ? 'end-of-week' : ''}
+                  >
+                    <td className="scheduler-day-slot">
+                      <div className="day-wrapper">
+                        <span className="day-name">{dayOfWeek}</span>
+                        {formattedDate && (
+                          <span className="day-date">{formattedDate}</span>
+                        )}
+                      </div>
+                    </td>
+                    {timeSlots.map((_, timeIndex) => {
+                      const slotKey = `${dayIndex}-${timeIndex}`;
+                      const slotInfo = coloredSlots[slotKey];
+
+                      let className = 'time-slot';
+                      let style = {};
+
+                      if (slotInfo) {
+                        className += ' group-availability-slot';
+                        style.backgroundColor = slotInfo.color;
+                      }
+
+                      return (
+                        <td
+                          key={timeIndex}
+                          className={className}
+                          style={style}
+                        />
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 });

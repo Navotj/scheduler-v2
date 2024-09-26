@@ -85,17 +85,19 @@ const Group = ({ group, username, onDelete }) => {
   };
 
   const handleDeleteGroup = async () => {
-    try {
-      await axios.delete('http://localhost:5000/groups/delete', {
-        data: { groupId: group._id },
-      });
-      // Notify parent component to remove this group from the list
-      if (onDelete) {
-        onDelete(group._id);
+    if (window.confirm(`Are you sure you want to delete group "${group.groupName}"?`)) {
+      try {
+        await axios.delete('http://localhost:5000/groups/delete', {
+          data: { groupId: group._id },
+        });
+        // Notify parent component to remove this group from the list
+        if (onDelete) {
+          onDelete(group._id);
+        }
+      } catch (err) {
+        console.error('Error deleting group:', err);
+        setError('Failed to delete group.');
       }
-    } catch (err) {
-      console.error('Error deleting group:', err);
-      setError('Failed to delete group.');
     }
   };
 
@@ -106,18 +108,28 @@ const Group = ({ group, username, onDelete }) => {
 
   return (
     <div className="group-container">
-      <div className="group-header" onClick={handleToggleDetails}>
-        <h3 style={{ cursor: 'pointer' }}>
-          {group.groupName || 'Unnamed Group'}
-        </h3>
+      <div className="group-header">
+        <h3 onClick={handleToggleDetails}>{group.groupName || 'Unnamed Group'}</h3>
+        <button className="delete-group-button" onClick={handleDeleteGroup}>
+          &#128465;
+        </button>
       </div>
       {showDetails && (
         <>
           <div className="group-content">
             <div className="members-list">
-              <h4>Members</h4>
-              {members.length > 0 ? (
-                <div className="member-items">
+              <div className="add-member-section">
+                <input
+                  type="text"
+                  value={memberUsername}
+                  onChange={(e) => setMemberUsername(e.target.value)}
+                  placeholder="Add member"
+                />
+                <button onClick={handleAddMember}>Add</button>
+                {addMemberError && <div className="error">{addMemberError}</div>}
+              </div>
+              {members.length > 0 && (
+                <div className="members-container">
                   {members.map((member) => (
                     <div className="member-item" key={member}>
                       <span>{member}</span>
@@ -125,6 +137,7 @@ const Group = ({ group, username, onDelete }) => {
                         <button
                           onClick={() => handleRemoveMember(member)}
                           className="remove-member-button"
+                          title={`Remove ${member}`}
                         >
                           &times;
                         </button>
@@ -132,59 +145,48 @@ const Group = ({ group, username, onDelete }) => {
                     </div>
                   ))}
                 </div>
-              ) : (
-                <p>No members in this group.</p>
               )}
-              <div className="add-member-form">
-                <input
-                  type="text"
-                  value={memberUsername}
-                  onChange={(e) => setMemberUsername(e.target.value)}
-                  placeholder="Enter username to add"
-                />
-                <button onClick={handleAddMember}>Add Member</button>
-                {addMemberError && <div className="error">{addMemberError}</div>}
-              </div>
             </div>
 
             <div className="availability-form">
               {error && <div className="error">{error}</div>}
               <div className="availability-inputs">
-                <label>
-                  Minimum Number of Players:
+                <div className="availability-input">
+                  <label htmlFor="minPlayers">Min Players:</label>
                   <input
+                    id="minPlayers"
                     type="number"
                     min="1"
                     max={members.length > 0 ? members.length : 1}
                     value={minPlayers}
                     onChange={(e) => setMinPlayers(Number(e.target.value))}
                   />
-                </label>
-                <label>
-                  Minimum Session Length (hours):
+                </div>
+                <div className="availability-input">
+                  <label htmlFor="minSessionLength">Min Session Length (hrs):</label>
                   <input
+                    id="minSessionLength"
                     type="number"
                     min="1"
                     value={minSessionLength}
                     onChange={(e) => setMinSessionLength(Number(e.target.value))}
                   />
-                </label>
+                </div>
                 <button onClick={handleFindAvailability}>Find Availability</button>
               </div>
 
               {availabilityData && (
-                <GroupAvailability
-                  availabilities={availabilityData}
-                  usernames={members}
-                  minPlayers={minPlayers}
-                  minSessionLength={minSessionLength}
-                />
+                <div className="group-availability-table">
+                  <GroupAvailability
+                    availabilities={availabilityData}
+                    usernames={members}
+                    minPlayers={minPlayers}
+                    minSessionLength={minSessionLength}
+                  />
+                </div>
               )}
             </div>
           </div>
-          <button className="delete-group-button" onClick={handleDeleteGroup}>
-            Delete Group
-          </button>
         </>
       )}
     </div>

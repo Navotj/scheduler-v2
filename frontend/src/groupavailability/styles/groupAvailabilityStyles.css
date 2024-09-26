@@ -1,157 +1,165 @@
 /* File: src/styles/groupAvailabilityStyles.css */
 
 /* Container styles */
-.group-availability-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 400px;
-    user-select: none;
-  }
-  
-  /* Scheduler styles */
-  .scheduler-table-wrapper {
-    flex-grow: 1;
-    width: 100%;
-    height: 100%;
-    overflow-x: auto;
-    overflow-y: auto;
-  }
-  
-  /* Legend styles */
-  .scheduler-legend {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 30px;
-  }
-  
-  .legend-item {
-    display: flex;
-    align-items: center;
-    margin-right: 15px;
-  }
-  
-  .legend-color {
-    width: 20px;
-    height: 20px;
-    background-color: green;
-    margin-right: 5px;
-    border: 1px solid #000;
-  }
-  
-  /* Table styles */
-  .scheduler-table {
-    width: max-content;
-    table-layout: fixed;
-    border-collapse: collapse;
-    margin: 0;
-  }
-  
-  .scheduler-table th,
-  .scheduler-table td {
-    height: 16px;
-    line-height: 16px;
-    padding: 3px;
-    text-align: center;
-    vertical-align: middle;
-    color: #e0e0e0;
-    background-color: #333;
-    box-shadow: inset -1px -1px 0 #555, inset 1px 1px 0 #555;
-  }
-  
-  .scheduler-time-header {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-    box-shadow: none;
-    border: none;
-  }
-  
-  .scheduler-table th {
-    box-shadow: none;
-    border: none;
-  }
-  
-  .scheduler-day-slot {
-    position: sticky;
-    left: 0;
-    background-color: #222;
-    z-index: 0;
-    width: 150px;
-    text-align: left;
-    vertical-align: middle;
-    background-clip: padding-box;
-  }
-  
-  .scheduler-day-slot::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 1px;
-    height: 100%;
-    background-color: #555;
-  }
-  
-  .day-wrapper {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding-right: 10px;
-    font-size: 1.5em;
-  }
-  
-  .day-name {
-    text-align: left;
-    flex-grow: 1;
-    font-family: 'Ubuntu Mono', monospace;
-    letter-spacing: 1px;
-    font-weight: bold;
-  }
-  
-  .day-date {
-    text-align: right;
-    flex-grow: 1;
-    font-size: 0.75em;
-    color: #bbb;
-  }
-  
-  .time-slot {
-    min-width: 30px;
-    height: 16px;
-    cursor: default;
-    position: relative;
-  }
-  
-  .group-availability-slot {
-    position: relative;
-  }
-  
-  .end-of-week {
-    border-bottom: 1.5px solid #888 !important;
-  }
-  
-  .scheduler-background-bar {
-    position: sticky;
-    top: 0;
-    left: 1px;
-    width: 100%;
-    height: 22px;
-    background-color: #333;
-    z-index: 0;
-    margin-top: -22px;
-  }
-  
-  /* Layering styles */
-  .group-availability-slot::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: inherit;
-    opacity: 0.8;
-    z-index: -1;
-  }
-  
+.scheduler-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  user-select: none;
+}
+
+/* Background bar */
+.scheduler-background-bar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 22px;
+  background-color: #333;
+  z-index: 1;
+  margin-top: -22px;
+}
+
+/* Header table */
+.scheduler-time-header-table {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 5; /* Highest z-index to stay on top */
+  background-color: #333;
+  width: max-content;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.scheduler-time-header-table th {
+  width: 37.4px;
+  height: 16px;
+  line-height: 16px;
+  padding-bottom: 5px;
+  text-align: center;
+  vertical-align: middle;
+  background-color: #333;
+  color: #e0e0e0;
+}
+
+/* Scheduler table wrapper */
+.scheduler-table-wrapper {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 22px); /* Subtract the height of the header */
+  overflow-y: auto;
+  margin-top: 0; /* Push down to make space for the header */
+}
+
+/* Scroll container */
+.scheduler-table-scroll-container {
+  position: relative;
+  overflow-x: auto;
+}
+
+/* Main table */
+.scheduler-table {
+  width: max-content;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+/* Data cells */
+.scheduler-table td {
+  height: 16px;
+  line-height: 16px;
+  padding: 3px;
+  text-align: center;
+  vertical-align: middle;
+  position: relative;
+  background-color: #333;
+  color: #e0e0e0;
+  box-shadow: inset -1px -1px 0 #555, inset 1px 1px 0 #555;
+}
+
+/* Day slot */
+.scheduler-day-slot {
+  position: sticky;
+  left: 0;
+  background-color: #222;
+  z-index: 3; /* Keep above slots */
+  width: 150px;
+  text-align: left;
+  vertical-align: middle;
+  background-clip: padding-box;
+}
+
+/* Day slot */
+.scheduler-time-header-table .scheduler-day-slot {
+  opacity: 0;
+  background-color: transparent;
+  width: 173.5px;
+}
+
+/* Day slot after */
+.scheduler-day-slot::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background-color: #555;
+}
+
+/* Day wrapper */
+.day-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 10px;
+  font-size: 1.5em;
+}
+
+/* Day name and date */
+.day-name {
+  text-align: left;
+  flex-grow: 1;
+  font-family: 'Ubuntu Mono', monospace;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.day-date {
+  text-align: right;
+  flex-grow: 1;
+  font-size: 0.75em;
+  color: #bbb;
+}
+
+/* Time slot */
+.time-slot {
+  min-width: 13px;
+  height: 16px;
+  cursor: default;
+  position: relative;
+}
+
+/* Group availability slot */
+.group-availability-slot {
+  position: relative;
+}
+
+/* Layering styles */
+.group-availability-slot::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: inherit;
+  opacity: 0.7;
+  z-index: 1;
+}
+
+/* End of week styling */
+.end-of-week {
+  border-bottom: 1.5px solid #888 !important;
+}

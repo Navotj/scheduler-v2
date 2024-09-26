@@ -1,73 +1,119 @@
 /* File: src/styles/groupStyles.css */
 
 .group-container {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin-bottom: 20px;
-    overflow-y: scroll;
-  }
-  
-  .group-container h3 {
-    margin: 0;
-  }
-  
-  .members-list {
-    margin-top: 10px;
-  }
-  
-  .member-item {
-    display: flex;
-    justify-content: space-between;
-    width: 200px;
-    margin-bottom: 5px;
-  }
-  
-  .member-item button {
-    background-color: #e74c3c;
-    color: #fff;
-    border: none;
-    padding: 2px 5px;
-    cursor: pointer;
-  }
-  
-  .disabled-button {
-    background-color: grey;
-    cursor: not-allowed;
-  }
-  
-  .add-member-form {
-    margin-top: 10px;
-  }
-  
-  .add-member-form input {
-    padding: 5px;
-    margin-right: 10px;
-  }
-  
-  .add-member-form button {
-    padding: 5px 10px;
-  }
-  
-  .availability-form {
-    margin-top: 20px;
-  }
-  
-  .availability-form label {
-    display: block;
-    margin-bottom: 10px;
-  }
-  
-  .availability-form input {
-    padding: 5px;
-    margin-left: 10px;
-  }
-  
-  .availability-form button {
-    padding: 5px 10px;
-  }
-  
-  .error {
-    color: red;
-    margin-top: 10px;
-  }
-  
+  border: 1px solid #7e7e7e;
+  border-radius: 3px;
+  padding: 5px;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.group-header h3 {
+  margin: 0;
+  cursor: pointer;
+}
+
+.delete-group-button {
+  background-color: transparent;
+  color: #e74c3c;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  font-size: 1em;
+  padding: 0;
+}
+
+.members-list {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.add-member-section {
+  display: flex;
+  align-items: center;
+}
+
+.add-member-section input {
+  padding: 5px;
+  margin-right: 5px;
+}
+
+.add-member-section button {
+  padding: 5px 10px;
+  margin-right: 10px;
+}
+
+.members-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  background-color: #2c2c2c;
+  border-radius: 3px;
+}
+
+.member-item span {
+  margin-right: 5px;
+}
+
+.remove-member-button {
+  background-color: transparent;
+  color: #e74c3c;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  height: 10px;
+  width: 10px;
+  align-items: center;
+  display: flex;
+  font-size: 1em;
+}
+
+.availability-form {
+  margin-top: 20px;
+}
+
+.availability-inputs {
+  display: flex;
+  align-items: center;
+}
+
+.availability-input {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.availability-input label {
+  margin-right: 5px;
+}
+
+.availability-input input {
+  padding: 5px;
+  width: 60px;
+}
+
+.availability-inputs button {
+  padding: 5px 10px;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+}
+
+.group-availability-table {
+  overflow-x: auto;
+}

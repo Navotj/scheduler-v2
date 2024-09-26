@@ -62,7 +62,6 @@ const GroupsPage = ({ username }) => {
 
   return (
     <div className="groups-page-container">
-      <h2>Your Groups</h2>
       {groups.length > 0 ? (
         groups.map((group) => (
           <Group
